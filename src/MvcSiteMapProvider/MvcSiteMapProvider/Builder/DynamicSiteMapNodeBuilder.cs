@@ -12,26 +12,22 @@ namespace MvcSiteMapProvider.Builder
     public class DynamicSiteMapNodeBuilder
         : IDynamicSiteMapNodeBuilder
     {
+        protected readonly ICultureContext cultureContext;
+
+        protected readonly ICultureContextFactory cultureContextFactory;
+
+        protected readonly ISiteMapNodeCreator siteMapNodeCreator;
+
         public DynamicSiteMapNodeBuilder(
-            ISiteMapNodeCreator siteMapNodeCreator,
+                                    ISiteMapNodeCreator siteMapNodeCreator,
             ICultureContext cultureContext,
             ICultureContextFactory cultureContextFactory
             )
         {
-            if (siteMapNodeCreator == null)
-                throw new ArgumentNullException("siteMapNodeCreator");
-            if (cultureContext == null)
-                throw new ArgumentNullException("cultureContext");
-            if (cultureContextFactory == null)
-                throw new ArgumentNullException("cultureContextFactory");
-
-            this.siteMapNodeCreator = siteMapNodeCreator;
-            this.cultureContext = cultureContext;
-            this.cultureContextFactory = cultureContextFactory;
+            this.siteMapNodeCreator = siteMapNodeCreator ?? throw new ArgumentNullException(nameof(siteMapNodeCreator));
+            this.cultureContext = cultureContext ?? throw new ArgumentNullException(nameof(cultureContext));
+            this.cultureContextFactory = cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
         }
-        protected readonly ISiteMapNodeCreator siteMapNodeCreator;
-        protected readonly ICultureContext cultureContext;
-        protected readonly ICultureContextFactory cultureContextFactory;
 
         /// <summary>
         /// Gets the dynamic nodes for node.
@@ -49,13 +45,13 @@ namespace MvcSiteMapProvider.Builder
 
             // Get the dynamic nodes using the request's culture context.
             // NOTE: In version 5, we need to use the invariant context and pass a reference to it
-            // into the dynamic node provider. This would be a breaking change, so for now we are 
+            // into the dynamic node provider. This would be a breaking change, so for now we are
             // swapping the context back to the state of the current request. This way, the end user
-            // still can opt to change to invariant culture, but in the reverse situation there would 
-            // be no way to identify the culture of the current request without a reference to the 
+            // still can opt to change to invariant culture, but in the reverse situation there would
+            // be no way to identify the culture of the current request without a reference to the
             // cultureContext object.
             IEnumerable<DynamicNode> dynamicNodes;
-            using (var originalCultureContext = this.cultureContextFactory.Create(this.cultureContext.OriginalCulture, this.cultureContext.OriginalUICulture))
+            using (var originalCultureContext = cultureContextFactory.Create(cultureContext.OriginalCulture, cultureContext.OriginalUICulture))
             {
                 dynamicNodes = node.GetDynamicNodeCollection();
             }
@@ -69,7 +65,7 @@ namespace MvcSiteMapProvider.Builder
 
                 if (string.IsNullOrEmpty(key))
                 {
-                    key = this.siteMapNodeCreator.GenerateSiteMapNodeKey(
+                    key = siteMapNodeCreator.GenerateSiteMapNodeKey(
                         parentKey,
                         Guid.NewGuid().ToString(),
                         node.Url,
@@ -82,7 +78,7 @@ namespace MvcSiteMapProvider.Builder
                 }
 
                 // Create a new node
-                var nodeParentMap = this.siteMapNodeCreator.CreateDynamicSiteMapNode(key, parentKey, node.DynamicNodeProvider, node.ResourceKey);
+                var nodeParentMap = siteMapNodeCreator.CreateDynamicSiteMapNode(key, parentKey, node.DynamicNodeProvider, node.ResourceKey);
                 var newNode = nodeParentMap.Node;
 
                 // Copy the values from the original node to the new one

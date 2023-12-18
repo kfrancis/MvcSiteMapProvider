@@ -8,7 +8,7 @@ namespace MvcSiteMapProvider.Web.Mvc.Filters
     /// </summary>
     /// <remarks>
     /// Using the built in IFilterProvider directly doesn't work in conjunction with IDependencyResolver because
-    /// doing so makes it impossible to access the filters that are registered via the static method 
+    /// doing so makes it impossible to access the filters that are registered via the static method
     /// FilterProviders.Providers.Add().
     /// </remarks>
     public class GlobalFilterProvider
@@ -25,6 +25,6 @@ namespace MvcSiteMapProvider.Web.Mvc.Filters
 #endif
         }
 
-        #endregion
+        #endregion IGlobalFilterProvider Members
     }
 }

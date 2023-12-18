@@ -9,7 +9,7 @@ using System.Web.Mvc;
 namespace MvcSiteMapProvider
 {
     /// <summary>
-    /// Provides overrides of the <see cref="T:MvcSiteMapProvider.SiteMap"/> that track the return values of specific 
+    /// Provides overrides of the <see cref="T:MvcSiteMapProvider.SiteMap"/> that track the return values of specific
     /// resource-intensive members in case they are accessed more than one time during a single request.
     /// </summary>
     public class RequestCacheableSiteMap
@@ -25,10 +25,7 @@ namespace MvcSiteMapProvider
             )
             : base(pluginProvider, mvcContextFactory, siteMapChildStateFactory, urlPath, siteMapSettings)
         {
-            if (requestCache == null)
-                throw new ArgumentNullException("requestCache");
-
-            this.requestCache = requestCache;
+            this.requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
         }
 
         private readonly IRequestCache requestCache;
@@ -37,14 +34,14 @@ namespace MvcSiteMapProvider
 
         public override ISiteMapNode FindSiteMapNode(string rawUrl)
         {
-            var key = this.GetCacheKey("FindSiteMapNode_" + rawUrl);
-            var result = this.requestCache.GetValue<ISiteMapNode>(key);
+            var key = GetCacheKey("FindSiteMapNode_" + rawUrl);
+            var result = requestCache.GetValue<ISiteMapNode>(key);
             if (result == null)
             {
                 result = base.FindSiteMapNode(rawUrl);
                 if (result != null)
                 {
-                    this.requestCache.SetValue<ISiteMapNode>(key, result);
+                    requestCache.SetValue<ISiteMapNode>(key, result);
                 }
             }
             return result;
@@ -52,14 +49,14 @@ namespace MvcSiteMapProvider
 
         public override ISiteMapNode FindSiteMapNodeFromCurrentContext()
         {
-            var key = this.GetCacheKey("FindSiteMapNodeFromCurrentContext");
-            var result = this.requestCache.GetValue<ISiteMapNode>(key);
+            var key = GetCacheKey("FindSiteMapNodeFromCurrentContext");
+            var result = requestCache.GetValue<ISiteMapNode>(key);
             if (result == null)
             {
                 result = base.FindSiteMapNodeFromCurrentContext();
                 if (result != null)
                 {
-                    this.requestCache.SetValue<ISiteMapNode>(key, result);
+                    requestCache.SetValue<ISiteMapNode>(key, result);
                 }
             }
             return result;
@@ -67,14 +64,14 @@ namespace MvcSiteMapProvider
 
         public override ISiteMapNode FindSiteMapNode(ControllerContext context)
         {
-            var key = this.GetCacheKey("FindSiteMapNode_ControllerContext" + this.GetDictionaryKey(context.RouteData.Values));
-            var result = this.requestCache.GetValue<ISiteMapNode>(key);
+            var key = GetCacheKey("FindSiteMapNode_ControllerContext" + GetDictionaryKey(context.RouteData.Values));
+            var result = requestCache.GetValue<ISiteMapNode>(key);
             if (result == null)
             {
                 result = base.FindSiteMapNode(context);
                 if (result != null)
                 {
-                    this.requestCache.SetValue<ISiteMapNode>(key, result);
+                    requestCache.SetValue<ISiteMapNode>(key, result);
                 }
             }
             return result;
@@ -82,8 +79,8 @@ namespace MvcSiteMapProvider
 
         public override bool IsAccessibleToUser(ISiteMapNode node)
         {
-            var key = this.GetCacheKey("IsAccessibleToUser_" + node.Key);
-            var result = this.requestCache.GetValue<bool?>(key);
+            var key = GetCacheKey("IsAccessibleToUser_" + node.Key);
+            var result = requestCache.GetValue<bool?>(key);
             if (result == null)
             {
                 // Fix for #272 - Change the context of the URL cache to ensure
@@ -91,25 +88,25 @@ namespace MvcSiteMapProvider
                 // from having any effect on the URL. This setting takes effect in
                 // the RequestCacheableSiteMapNode.Url property.
                 var urlContextKey = this.GetUrlContextKey();
-                this.requestCache.SetValue<string>(urlContextKey, "AclModule");
+                requestCache.SetValue<string>(urlContextKey, "AclModule");
                 result = base.IsAccessibleToUser(node);
-                this.requestCache.SetValue<bool>(key, (bool)result);
+                requestCache.SetValue<bool>(key, (bool)result);
 
                 // Restore the URL context.
-                this.requestCache.SetValue<string>(urlContextKey, string.Empty);
+                requestCache.SetValue<string>(urlContextKey, string.Empty);
             }
             return (bool)result;
         }
 
-        #endregion
+        #endregion Request Cacheable Members
 
         #region Protected Members
 
         protected virtual string GetCacheKey(string memberName)
         {
-            // NOTE: We must include IsReadOnly in the request cache key because we may have a different 
+            // NOTE: We must include IsReadOnly in the request cache key because we may have a different
             // result when the sitemap is being constructed than when it is being read by the presentation layer.
-            return "__MVCSITEMAP_" + this.CacheKey + "_" + memberName + "_" + this.IsReadOnly.ToString() + "_";
+            return "__MVCSITEMAP_" + CacheKey + "_" + memberName + "_" + IsReadOnly.ToString() + "_";
         }
 
         protected virtual string GetDictionaryKey(IDictionary<string, object> dictionary)
@@ -134,7 +131,6 @@ namespace MvcSiteMapProvider
             return value.GetHashCode().ToString();
         }
 
-        #endregion
-
+        #endregion Protected Members
     }
 }

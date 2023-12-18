@@ -14,10 +14,7 @@ namespace MvcSiteMapProvider.Security
             IMvcContextFactory mvcContextFactory
             )
         {
-            if (mvcContextFactory == null)
-                throw new ArgumentNullException("mvcContextFactory");
-
-            this.mvcContextFactory = mvcContextFactory;
+            this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
         }
 
         protected readonly IMvcContextFactory mvcContextFactory;
@@ -35,36 +32,36 @@ namespace MvcSiteMapProvider.Security
         public bool IsAccessibleToUser(ISiteMap siteMap, ISiteMapNode node)
         {
             // If we have roles assigned, check them against the roles defined in the sitemap
-            if (node.Roles != null && node.Roles.Count > 0)
+            if (node.Roles?.Count > 0)
             {
                 var context = mvcContextFactory.CreateHttpContext();
 
-                    // if there is an authenticated user and the role allows anyone authenticated ("*"), show it
+                // if there is an authenticated user and the role allows anyone authenticated ("*"), show it
                 if ((context.User.Identity.IsAuthenticated) && node.Roles.Contains("*"))
                 {
                     return true;
                 }
 
-                    // if there is no user, but the role allows unauthenticated users ("?"), show it
+                // if there is no user, but the role allows unauthenticated users ("?"), show it
                 if ((!context.User.Identity.IsAuthenticated) && node.Roles.Contains("?"))
-                    {
-                        return true;
-                    }
+                {
+                    return true;
+                }
 
-                    // if the user is in one of the listed roles, show it
+                // if the user is in one of the listed roles, show it
                 if (node.Roles.OfType<string>().Any(role => context.User.IsInRole(role)))
-                    {
-                        return true;
-                    }
+                {
+                    return true;
+                }
 
-                    // if we got this far, deny showing
-                    return false;
+                // if we got this far, deny showing
+                return false;
             }
 
             // Everything seems OK...
             return true;
         }
 
-        #endregion
+        #endregion IAclModule Members
     }
 }

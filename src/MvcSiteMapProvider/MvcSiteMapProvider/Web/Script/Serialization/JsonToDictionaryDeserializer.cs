@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace MvcSiteMapProvider.Web.Script.Serialization
 {
     /// <summary>
-    /// Specialized class to deserialize JSON into a <see cref="T:System.Collections.Generic.IDictionary{string, object}"/>. The 
+    /// Specialized class to deserialize JSON into a <see cref="T:System.Collections.Generic.IDictionary{string, object}"/>. The
     /// value is request cached so if the string has been encountered before in the current request it will not be deserialized again.
     /// </summary>
     public class JsonToDictionaryDeserializer : MvcSiteMapProvider.Web.Script.Serialization.IJsonToDictionaryDeserializer
@@ -16,13 +16,11 @@ namespace MvcSiteMapProvider.Web.Script.Serialization
             IMvcContextFactory mvcContextFactory
             )
         {
-            if (javaScriptSerializer == null)
-                throw new ArgumentNullException("javaScriptSerializer");
             if (mvcContextFactory == null)
-                throw new ArgumentNullException("mvcContextFactory");
+                throw new ArgumentNullException(nameof(mvcContextFactory));
 
-            this.javaScriptSerializer = javaScriptSerializer;
-            this.requestCache = mvcContextFactory.GetRequestCache();
+            this.javaScriptSerializer = javaScriptSerializer ?? throw new ArgumentNullException(nameof(javaScriptSerializer));
+            requestCache = mvcContextFactory.GetRequestCache();
         }
 
         protected readonly IJavaScriptSerializer javaScriptSerializer;
@@ -34,13 +32,13 @@ namespace MvcSiteMapProvider.Web.Script.Serialization
             {
                 return new Dictionary<string, object>();
             }
-            
+
             var key = "__JsonToDictionaryDeserializer_" + json;
-            var result = this.requestCache.GetValue<IDictionary<string, object>>(key);
+            var result = requestCache.GetValue<IDictionary<string, object>>(key);
             if (result == null)
             {
-                result = this.DeserializeJson(json);
-                this.requestCache.SetValue<IDictionary<string, object>>(key, result);
+                result = DeserializeJson(json);
+                requestCache.SetValue<IDictionary<string, object>>(key, result);
             }
 
             return result;
@@ -50,7 +48,7 @@ namespace MvcSiteMapProvider.Web.Script.Serialization
         {
             try
             {
-                return this.javaScriptSerializer.Deserialize<Dictionary<string, object>>(json);
+                return javaScriptSerializer.Deserialize<Dictionary<string, object>>(json);
             }
             catch (Exception ex)
             {

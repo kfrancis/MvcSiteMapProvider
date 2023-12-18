@@ -31,7 +31,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
                 var collection = stringToSplit.Split(separator, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var item in collection)
                 {
-                    this.Add(item.Trim());
+                    Add(item.Trim());
                 }
             }
         }
@@ -46,6 +46,6 @@ namespace MvcSiteMapProvider.Collections.Specialized
             {
                 base.AddRange(collection);
             }
-        } 
+        }
     }
 }

@@ -32,21 +32,25 @@ namespace MvcSiteMapProvider.Text
 
         // definition of a valid C# identifier: http://msdn.microsoft.com/en-us/library/aa664670(v=vs.71).aspx
         private const string formattingCharacter = @"\p{Cf}";
+
         private const string connectingCharacter = @"\p{Pc}";
         private const string decimalDigitCharacter = @"\p{Nd}";
         private const string combiningCharacter = @"\p{Mn}|\p{Mc}";
         private const string letterCharacter = @"\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}";
+
         private const string identifierPartCharacter = letterCharacter + "|" +
             decimalDigitCharacter + "|" +
             connectingCharacter + "|" +
             combiningCharacter + "|" +
             formattingCharacter;
+
         private const string identifierPartCharacters = "(" + identifierPartCharacter + ")+";
         private const string identifierStartCharacter = "(" + letterCharacter + "|_)";
+
         private const string identifierOrKeyword = identifierStartCharacter + "(" +
             identifierPartCharacters + ")*";
-        private static Regex validIdentifierRegex = new Regex("^" + identifierOrKeyword + "$", RegexOptions.Compiled);
 
+        private static Regex validIdentifierRegex = new Regex("^" + identifierOrKeyword + "$", RegexOptions.Compiled);
 
         /// <summary>
         /// Determines if a string matches a valid C# identifier according to the C# language specification (including Unicode support).

@@ -47,21 +47,21 @@ namespace MvcSiteMapProvider.Tests.Unit.Web.Html
             var result = SiteMapHelper.BuildModel(
                 helper: helperExtension,
                 sourceMetadata: new SourceMetadataDictionary(),
-                startingNode: startingNode, 
-                startingNodeInChildLevel: true, 
+                startingNode: startingNode,
+                startingNodeInChildLevel: true,
                 visibilityAffectsDescendants: true);
 
             // Assert
             // Flat structure - 3 nodes
-            Assert.AreEqual("Home", result.Nodes[0].Title);
-            Assert.AreEqual("About", result.Nodes[1].Title);
-            Assert.AreEqual("Contact", result.Nodes[2].Title);
+            Affirm.That("Home").IsEqualTo(result.Nodes[0].Title);
+            Affirm.That("About").IsEqualTo(result.Nodes[1].Title);
+            Affirm.That("Contact").IsEqualTo(result.Nodes[2].Title);
 
             // Check counts
-            Assert.AreEqual(3, result.Nodes.Count);
-            Assert.AreEqual(0, result.Nodes[0].Children.Count);
-            Assert.AreEqual(0, result.Nodes[1].Children.Count);
-            Assert.AreEqual(0, result.Nodes[2].Children.Count);
+            Affirm.That(3).IsEqualTo(result.Nodes.Count);
+            Affirm.That(0).IsEqualTo(result.Nodes[0].Children.Count);
+            Affirm.That(0).IsEqualTo(result.Nodes[1].Children.Count);
+            Affirm.That(0).IsEqualTo(result.Nodes[2].Children.Count);
         }
 
         [Test]
@@ -85,15 +85,15 @@ namespace MvcSiteMapProvider.Tests.Unit.Web.Html
 
             // Assert
             // Tree structure - 3 nodes
-            Assert.AreEqual("Home", result.Nodes[0].Title);
-            Assert.AreEqual("About", result.Nodes[0].Children[0].Title);
-            Assert.AreEqual("Contact", result.Nodes[0].Children[1].Title);
+            Affirm.That("Home").IsEqualTo(result.Nodes[0].Title);
+            Affirm.That("About").IsEqualTo(result.Nodes[0].Children[0].Title);
+            Affirm.That("Contact").IsEqualTo(result.Nodes[0].Children[1].Title);
 
             // Check Counts
-            Assert.AreEqual(1, result.Nodes.Count);
-            Assert.AreEqual(2, result.Nodes[0].Children.Count);
-            Assert.AreEqual(0, result.Nodes[0].Children[0].Children.Count);
-            Assert.AreEqual(0, result.Nodes[0].Children[1].Children.Count);
+            Affirm.That(1).IsEqualTo(result.Nodes.Count);
+            Affirm.That(2).IsEqualTo(result.Nodes[0].Children.Count);
+            Affirm.That(0).IsEqualTo(result.Nodes[0].Children[0].Children.Count);
+            Affirm.That(0).IsEqualTo(result.Nodes[0].Children[1].Children.Count);
         }
 
         [Test]
@@ -116,20 +116,20 @@ namespace MvcSiteMapProvider.Tests.Unit.Web.Html
                 visibilityAffectsDescendants: true);
 
             // Assert
-            Assert.AreEqual("Home", result.Nodes[0].Title);
-            Assert.AreEqual("About", result.Nodes[0].Children[0].Title);
-            Assert.AreEqual("About Me", result.Nodes[0].Children[0].Children[0].Title);
-            Assert.AreEqual("About You", result.Nodes[0].Children[0].Children[1].Title);
+            Affirm.That("Home").IsEqualTo(result.Nodes[0].Title);
+            Affirm.That("About").IsEqualTo(result.Nodes[0].Children[0].Title);
+            Affirm.That("About Me").IsEqualTo(result.Nodes[0].Children[0].Children[0].Title);
+            Affirm.That("About You").IsEqualTo(result.Nodes[0].Children[0].Children[1].Title);
 
             // "Contact" is inaccessible - should be skipped. So should its child node "ContactSomebody".
-            Assert.AreEqual("Categories", result.Nodes[0].Children[1].Title);
+            Affirm.That("Categories").IsEqualTo(result.Nodes[0].Children[1].Title);
 
-            Assert.AreEqual("Cameras", result.Nodes[0].Children[1].Children[0].Title);
-            Assert.AreEqual("Nikon Coolpix 200", result.Nodes[0].Children[1].Children[0].Children[0].Title);
-            Assert.AreEqual("Canon Ixus 300", result.Nodes[0].Children[1].Children[0].Children[1].Title);
+            Affirm.That("Cameras").IsEqualTo(result.Nodes[0].Children[1].Children[0].Title);
+            Affirm.That("Nikon Coolpix 200").IsEqualTo(result.Nodes[0].Children[1].Children[0].Children[0].Title);
+            Affirm.That("Canon Ixus 300").IsEqualTo(result.Nodes[0].Children[1].Children[0].Children[1].Title);
 
             // "Memory Cards" is not visible. None of its children should be visible.
-            Assert.AreEqual(1, result.Nodes[0].Children[1].Children.Count);
+            Affirm.That(1).IsEqualTo(result.Nodes[0].Children[1].Children.Count);
         }
 
         [Test]
@@ -152,36 +152,36 @@ namespace MvcSiteMapProvider.Tests.Unit.Web.Html
                 visibilityAffectsDescendants: false);
 
             // Assert
-            Assert.AreEqual("Home", result.Nodes[0].Title);
-            Assert.AreEqual("About", result.Nodes[0].Children[0].Title);
-            Assert.AreEqual("About Me", result.Nodes[0].Children[0].Children[0].Title);
-            Assert.AreEqual("About You", result.Nodes[0].Children[0].Children[1].Title);
+            Affirm.That("Home").IsEqualTo(result.Nodes[0].Title);
+            Affirm.That("About").IsEqualTo(result.Nodes[0].Children[0].Title);
+            Affirm.That("About Me").IsEqualTo(result.Nodes[0].Children[0].Children[0].Title);
+            Affirm.That("About You").IsEqualTo(result.Nodes[0].Children[0].Children[1].Title);
 
             // "Contact" is inaccessible - should be skipped. So should its child node "ContactSomebody".
-            Assert.AreEqual("Categories", result.Nodes[0].Children[1].Title);
+            Affirm.That("Categories").IsEqualTo(result.Nodes[0].Children[1].Title);
 
-            Assert.AreEqual("Cameras", result.Nodes[0].Children[1].Children[0].Title);
-            Assert.AreEqual("Nikon Coolpix 200", result.Nodes[0].Children[1].Children[0].Children[0].Title);
-            Assert.AreEqual("Canon Ixus 300", result.Nodes[0].Children[1].Children[0].Children[1].Title);
+            Affirm.That("Cameras").IsEqualTo(result.Nodes[0].Children[1].Children[0].Title);
+            Affirm.That("Nikon Coolpix 200").IsEqualTo(result.Nodes[0].Children[1].Children[0].Children[0].Title);
+            Affirm.That("Canon Ixus 300").IsEqualTo(result.Nodes[0].Children[1].Children[0].Children[1].Title);
 
             // "Memory Cards" is not visible. However its children should be in its place.
-            Assert.AreEqual("Kingston 256 GB SD", result.Nodes[0].Children[1].Children[1].Title);
-            Assert.AreEqual("Sony 256 GB SD", result.Nodes[0].Children[1].Children[2].Title);
-            Assert.AreEqual("Sony SD Card Reader", result.Nodes[0].Children[1].Children[2].Children[0].Title);
+            Affirm.That("Kingston 256 GB SD").IsEqualTo(result.Nodes[0].Children[1].Children[1].Title);
+            Affirm.That("Sony 256 GB SD").IsEqualTo(result.Nodes[0].Children[1].Children[2].Title);
+            Affirm.That("Sony SD Card Reader").IsEqualTo(result.Nodes[0].Children[1].Children[2].Children[0].Title);
 
             // Check counts
-            Assert.AreEqual(1, result.Nodes.Count);
-            Assert.AreEqual(2, result.Nodes[0].Children.Count); // Home
-            Assert.AreEqual(2, result.Nodes[0].Children[0].Children.Count); // About
-            Assert.AreEqual(0, result.Nodes[0].Children[0].Children[0].Children.Count); // About Me
-            Assert.AreEqual(0, result.Nodes[0].Children[0].Children[1].Children.Count); // About You
-            Assert.AreEqual(3, result.Nodes[0].Children[1].Children.Count); // Categories
-            Assert.AreEqual(2, result.Nodes[0].Children[1].Children[0].Children.Count); // Cameras
-            Assert.AreEqual(0, result.Nodes[0].Children[1].Children[0].Children[0].Children.Count); // Nikon Coolpix 200
-            Assert.AreEqual(0, result.Nodes[0].Children[1].Children[0].Children[1].Children.Count); // Canon Ixus 300
-            Assert.AreEqual(0, result.Nodes[0].Children[1].Children[1].Children.Count); // Kingston 256 GB SD
-            Assert.AreEqual(1, result.Nodes[0].Children[1].Children[2].Children.Count); // Sony 256 GB SD
-            Assert.AreEqual(0, result.Nodes[0].Children[1].Children[2].Children[0].Children.Count); // Sony SD Card Reader
+            Affirm.That(1).IsEqualTo( result.Nodes.Count);
+            Affirm.That(2).IsEqualTo( result.Nodes[0].Children.Count); // Home
+            Affirm.That(2).IsEqualTo( result.Nodes[0].Children[0].Children.Count); // About
+            Affirm.That(0).IsEqualTo( result.Nodes[0].Children[0].Children[0].Children.Count); // About Me
+            Affirm.That(0).IsEqualTo( result.Nodes[0].Children[0].Children[1].Children.Count); // About You
+            Affirm.That(3).IsEqualTo( result.Nodes[0].Children[1].Children.Count); // Categories
+            Affirm.That(2).IsEqualTo( result.Nodes[0].Children[1].Children[0].Children.Count); // Cameras
+            Affirm.That(0).IsEqualTo( result.Nodes[0].Children[1].Children[0].Children[0].Children.Count); // Nikon Coolpix 200
+            Affirm.That(0).IsEqualTo( result.Nodes[0].Children[1].Children[0].Children[1].Children.Count); // Canon Ixus 300
+            Affirm.That(0).IsEqualTo( result.Nodes[0].Children[1].Children[1].Children.Count); // Kingston 256 GB SD
+            Affirm.That(1).IsEqualTo( result.Nodes[0].Children[1].Children[2].Children.Count); // Sony 256 GB SD
+            Affirm.That(0).IsEqualTo(result.Nodes[0].Children[1].Children[2].Children[0].Children.Count); // Sony SD Card Reader
         }
 
 

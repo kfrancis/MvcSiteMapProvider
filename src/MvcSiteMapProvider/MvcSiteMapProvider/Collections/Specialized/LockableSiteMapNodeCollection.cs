@@ -1,8 +1,7 @@
-﻿
-namespace MvcSiteMapProvider.Collections.Specialized
+﻿namespace MvcSiteMapProvider.Collections.Specialized
 {
     /// <summary>
-    /// Provides the means to make the <see cref="T:MvcSiteMapProvider.ISiteMapNodeCollection"/> instance read-only so it cannot be 
+    /// Provides the means to make the <see cref="T:MvcSiteMapProvider.ISiteMapNodeCollection"/> instance read-only so it cannot be
     /// inadvertently altered while it is in the cache.
     /// </summary>
     public class LockableSiteMapNodeCollection
@@ -14,6 +13,5 @@ namespace MvcSiteMapProvider.Collections.Specialized
             : base(siteMap)
         {
         }
-
     }
 }

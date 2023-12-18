@@ -8,7 +8,7 @@ namespace MvcSiteMapProvider.Web.Mvc.Filters
     /// Note: Do NOT use this in conjunction with dynamic node providers!
     /// </summary>
     [Obsolete("SiteMapPreserveRouteDataAttribute has been deprecated and will be removed in version 5. Use preservedRouteParameters instead (either in your .sitemap file or on MvcSiteMapNodeAttribute).")]
-    public class SiteMapPreserveRouteDataAttribute 
+    public class SiteMapPreserveRouteDataAttribute
         : ActionFilterAttribute
     {
         /// <summary>

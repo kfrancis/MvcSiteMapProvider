@@ -36,8 +36,8 @@ namespace MvcSiteMapProvider.Web.Mvc.Filters
         /// <param name="propertyName">Property in ViewData used as the SiteMap.CurrentNode.Title</param>
         public SiteMapTitleAttribute(string propertyName)
         {
-            this.PropertyName = propertyName;
-            this.Target = AttributeTarget.CurrentNode;
+            PropertyName = propertyName;
+            Target = AttributeTarget.CurrentNode;
         }
 
         /// <summary>
@@ -46,8 +46,7 @@ namespace MvcSiteMapProvider.Web.Mvc.Filters
         /// <param name="filterContext">The filter context.</param>
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
-            ViewResult result = filterContext.Result as ViewResult;
-            if (result != null)
+            if (filterContext.Result is ViewResult result)
             {
                 var target = (ResolveTarget(result.ViewData.Model, PropertyName) ??
                               ResolveTarget(result.ViewData, PropertyName)) ??
@@ -55,8 +54,8 @@ namespace MvcSiteMapProvider.Web.Mvc.Filters
 
                 if (target != null)
                 {
-                    ISiteMap siteMap = SiteMaps.GetSiteMap(this.SiteMapCacheKey); 
-                    if (siteMap != null && siteMap.CurrentNode != null)
+                    ISiteMap siteMap = SiteMaps.GetSiteMap(SiteMapCacheKey);
+                    if (siteMap?.CurrentNode != null)
                     {
                         if (Target == AttributeTarget.ParentNode && siteMap.CurrentNode.ParentNode != null)
                         {
@@ -77,7 +76,7 @@ namespace MvcSiteMapProvider.Web.Mvc.Filters
         /// <param name="target">Target object</param>
         /// <param name="expression">Target expression</param>
         /// <returns>
-        /// A target represented as a <see cref="object"/> instance 
+        /// A target represented as a <see cref="object"/> instance
         /// </returns>
         internal static object ResolveTarget(object target, string expression)
         {
@@ -98,5 +97,4 @@ namespace MvcSiteMapProvider.Web.Mvc.Filters
             }
         }
     }
-
 }

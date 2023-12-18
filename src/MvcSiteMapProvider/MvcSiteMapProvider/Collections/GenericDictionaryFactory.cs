@@ -9,7 +9,6 @@ namespace MvcSiteMapProvider.Collections
     public class GenericDictionaryFactory
         : IGenericDictionaryFactory
     {
-
         #region IGenericDictionaryFactory Members
 
         public virtual IDictionary<TKey, TValue> Create<TKey, TValue>()
@@ -22,6 +21,6 @@ namespace MvcSiteMapProvider.Collections
             return new Dictionary<TKey, TValue>(comparer);
         }
 
-        #endregion
+        #endregion IGenericDictionaryFactory Members
     }
 }

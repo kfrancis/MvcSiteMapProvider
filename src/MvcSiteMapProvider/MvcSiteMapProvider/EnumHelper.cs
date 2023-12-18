@@ -2,7 +2,7 @@
 
 namespace MvcSiteMapProvider
 {
-    static class EnumHelper
+    internal static class EnumHelper
     {
         public static bool TryParse<TEnum>(string value, bool ignoreCase, out TEnum result) where TEnum : struct
         {
@@ -28,4 +28,3 @@ namespace MvcSiteMapProvider
         }
     }
 }
-

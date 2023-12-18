@@ -8,6 +8,7 @@ namespace MvcSiteMapProvider.Loader
     public interface ISiteMapCreator
     {
         ISiteMap CreateSiteMap(string siteMapCacheKey);
+
         ICacheDetails GetCacheDetails(string siteMapCacheKey);
     }
 }

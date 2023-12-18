@@ -3,9 +3,9 @@
 namespace MvcSiteMapProvider.Builder
 {
     /// <summary>
-    /// Contract for specifying a named builder set that can be used to build a <see cref="T:MvcSiteMapProvider.ISiteMap"/> for 
+    /// Contract for specifying a named builder set that can be used to build a <see cref="T:MvcSiteMapProvider.ISiteMap"/> for
     /// a specific type of tenant in a multi-tenant application that contains more than one site structure. These named builder sets
-    /// can then be mapped to a request using instances of <see cref="T:MvcSiteMapProvider.Caching.ISiteMapCacheKeyGenerator"/> and 
+    /// can then be mapped to a request using instances of <see cref="T:MvcSiteMapProvider.Caching.ISiteMapCacheKeyGenerator"/> and
     /// <see cref="T:MvcSiteMapProvider.Caching.ISiteMapCacheKeyToBuilderSetMapper"/>.
     /// </summary>
     public interface ISiteMapBuilderSet

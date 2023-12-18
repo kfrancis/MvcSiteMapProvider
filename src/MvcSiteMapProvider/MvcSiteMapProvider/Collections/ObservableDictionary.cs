@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+
 #if !NET35
+
 using System.Collections.Specialized;
+
 #endif
+
 using System.ComponentModel;
 using System.Linq;
 
@@ -11,7 +15,7 @@ using System.Linq;
 
 namespace MvcSiteMapProvider.Collections
 {
-    public class ObservableDictionary<TKey, TValue> 
+    public class ObservableDictionary<TKey, TValue>
         : IDictionary<TKey, TValue>,
 #if !NET35
         INotifyCollectionChanged,
@@ -24,37 +28,45 @@ namespace MvcSiteMapProvider.Collections
         private const string ValuesName = "Values";
 
         private IDictionary<TKey, TValue> dictionary;
+
         protected IDictionary<TKey, TValue> Dictionary
         {
             get { return dictionary; }
         }
 
         #region Constructors
+
         public ObservableDictionary()
         {
-            this.dictionary = new Dictionary<TKey, TValue>();
+            dictionary = new Dictionary<TKey, TValue>();
         }
+
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary)
         {
             this.dictionary = new Dictionary<TKey, TValue>(dictionary);
         }
+
         public ObservableDictionary(IEqualityComparer<TKey> comparer)
         {
-            this.dictionary = new Dictionary<TKey, TValue>(comparer);
+            dictionary = new Dictionary<TKey, TValue>(comparer);
         }
+
         public ObservableDictionary(int capacity)
         {
-            this.dictionary = new Dictionary<TKey, TValue>(capacity);
+            dictionary = new Dictionary<TKey, TValue>(capacity);
         }
+
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
         {
             this.dictionary = new Dictionary<TKey, TValue>(dictionary, comparer);
         }
+
         public ObservableDictionary(int capacity, IEqualityComparer<TKey> comparer)
         {
-            this.dictionary = new Dictionary<TKey, TValue>(capacity, comparer);
+            dictionary = new Dictionary<TKey, TValue>(capacity, comparer);
         }
-        #endregion
+
+        #endregion Constructors
 
         #region IDictionary<TKey,TValue> Members
 
@@ -75,7 +87,7 @@ namespace MvcSiteMapProvider.Collections
 
         public virtual bool Remove(TKey key)
         {
-            if (key == null) throw new ArgumentNullException("key");
+            if (key == null) throw new ArgumentNullException(nameof(key));
 
             TValue value;
             Dictionary.TryGetValue(key, out value);
@@ -110,7 +122,7 @@ namespace MvcSiteMapProvider.Collections
             }
         }
 
-        #endregion
+        #endregion IDictionary<TKey,TValue> Members
 
         #region ICollection<KeyValuePair<TKey,TValue>> Members
 
@@ -153,8 +165,7 @@ namespace MvcSiteMapProvider.Collections
             return Remove(item.Key);
         }
 
-
-        #endregion
+        #endregion ICollection<KeyValuePair<TKey,TValue>> Members
 
         #region IEnumerable<KeyValuePair<TKey,TValue>> Members
 
@@ -163,7 +174,7 @@ namespace MvcSiteMapProvider.Collections
             return Dictionary.GetEnumerator();
         }
 
-        #endregion
+        #endregion IEnumerable<KeyValuePair<TKey,TValue>> Members
 
         #region IEnumerable Members
 
@@ -172,23 +183,27 @@ namespace MvcSiteMapProvider.Collections
             return ((IEnumerable)Dictionary).GetEnumerator();
         }
 
-        #endregion
+        #endregion IEnumerable Members
 
         #region INotifyCollectionChanged Members
+
 #if !NET35
+
         public event NotifyCollectionChangedEventHandler CollectionChanged;
+
 #endif
-        #endregion
+
+        #endregion INotifyCollectionChanged Members
 
         #region INotifyPropertyChanged Members
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        #endregion
+        #endregion INotifyPropertyChanged Members
 
         public virtual void AddRange(IDictionary<TKey, TValue> items)
         {
-            if (items == null) throw new ArgumentNullException("items");
+            if (items == null) throw new ArgumentNullException(nameof(items));
 
             if (items.Count > 0)
             {
@@ -209,7 +224,7 @@ namespace MvcSiteMapProvider.Collections
 
         protected virtual void Insert(TKey key, TValue value, bool add)
         {
-            if (key == null) throw new ArgumentNullException("key");
+            if (key == null) throw new ArgumentNullException(nameof(key));
 
             TValue item;
             if (Dictionary.TryGetValue(key, out item))
@@ -243,7 +258,6 @@ namespace MvcSiteMapProvider.Collections
             if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-
         protected void OnCollectionChanged()
         {
             OnPropertyChanged();
@@ -253,6 +267,7 @@ namespace MvcSiteMapProvider.Collections
         }
 
 #if !NET35
+
         protected void OnCollectionChanged(NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue> changedItem)
         {
             OnPropertyChanged();
@@ -270,6 +285,7 @@ namespace MvcSiteMapProvider.Collections
             OnPropertyChanged();
             if (CollectionChanged != null) CollectionChanged(this, new NotifyCollectionChangedEventArgs(action, newItems));
         }
+
 #endif
     }
 }

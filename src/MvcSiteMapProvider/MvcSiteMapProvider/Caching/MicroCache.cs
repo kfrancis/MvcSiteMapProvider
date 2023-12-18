@@ -5,7 +5,7 @@ using System.Threading;
 namespace MvcSiteMapProvider.Caching
 {
     /// <summary>
-    /// A lightweight cache that ensures thread safety when loading items by using a callback that 
+    /// A lightweight cache that ensures thread safety when loading items by using a callback that
     /// gets called exactly 1 time.
     /// </summary>
     /// <typeparam name="T">The type of object to cache.</typeparam>
@@ -20,13 +20,12 @@ namespace MvcSiteMapProvider.Caching
             ICacheProvider<T> cacheProvider
             )
         {
-            if (cacheProvider == null)
-                throw new ArgumentNullException("cacheProvider");
-            this.cacheProvider = cacheProvider;
+            this.cacheProvider = cacheProvider ?? throw new ArgumentNullException(nameof(cacheProvider));
 
             // Attach our event so we can receive notifications when objects are removed
             this.cacheProvider.ItemRemoved += cacheProvider_ItemRemoved;
         }
+
         protected readonly ICacheProvider<T> cacheProvider;
         private ReaderWriterLockSlim synclock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
 
@@ -39,7 +38,7 @@ namespace MvcSiteMapProvider.Caching
             synclock.EnterReadLock();
             try
             {
-                return this.cacheProvider.Contains(key);
+                return cacheProvider.Contains(key);
             }
             finally
             {
@@ -55,7 +54,7 @@ namespace MvcSiteMapProvider.Caching
             synclock.EnterReadLock();
             try
             {
-                success = this.cacheProvider.TryGetValue(key, out lazy);
+                success = cacheProvider.TryGetValue(key, out lazy);
             }
             finally
             {
@@ -67,11 +66,11 @@ namespace MvcSiteMapProvider.Caching
                 synclock.EnterWriteLock();
                 try
                 {
-                    if (!this.cacheProvider.TryGetValue(key, out lazy))
+                    if (!cacheProvider.TryGetValue(key, out lazy))
                     {
                         lazy = new LazyLock();
                         var cacheDetails = getCacheDetailsFunction();
-                        this.cacheProvider.Add(key, lazy, cacheDetails);
+                        cacheProvider.Add(key, lazy, cacheDetails);
                     }
                 }
                 finally
@@ -88,7 +87,7 @@ namespace MvcSiteMapProvider.Caching
             synclock.EnterWriteLock();
             try
             {
-                this.cacheProvider.Remove(key);
+                cacheProvider.Remove(key);
             }
             finally
             {
@@ -96,13 +95,13 @@ namespace MvcSiteMapProvider.Caching
             }
         }
 
-        #endregion
+        #endregion IMicroCache<T> Members
 
         protected virtual void cacheProvider_ItemRemoved(object sender, MicroCacheItemRemovedEventArgs<T> e)
         {
             // Skip the event if the item is null, empty, or otherwise a default value,
             // since nothing was actually put in the cache, so nothing was removed
-            if (!EqualityComparer<T>.Default.Equals(e.Item, default(T)))
+            if (!EqualityComparer<T>.Default.Equals(e.Item, default))
             {
                 // Cascade the event
                 OnCacheItemRemoved(e);
@@ -111,7 +110,7 @@ namespace MvcSiteMapProvider.Caching
 
         protected virtual void OnCacheItemRemoved(MicroCacheItemRemovedEventArgs<T> e)
         {
-            if (this.ItemRemoved != null)
+            if (ItemRemoved != null)
             {
                 ItemRemoved(this, e);
             }

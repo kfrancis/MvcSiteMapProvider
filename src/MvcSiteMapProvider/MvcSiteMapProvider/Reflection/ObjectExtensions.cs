@@ -21,9 +21,8 @@ namespace MvcSiteMapProvider.Reflection
         /// <returns>PropertyValue</returns>
         public static T GetPrivatePropertyValue<T>(this object obj, string propertyName)
         {
-            if (obj == null) throw new ArgumentNullException("obj");
-            PropertyInfo pi = obj.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (pi == null) throw new ArgumentOutOfRangeException("propertyName", string.Format(Resources.Messages.ObjectPropertyNotFound, propertyName, obj.GetType().FullName));
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+            PropertyInfo pi = obj.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance) ?? throw new ArgumentOutOfRangeException(nameof(propertyName), string.Format(Resources.Messages.ObjectPropertyNotFound, propertyName, obj.GetType().FullName));
             return (T)pi.GetValue(obj, null);
         }
 
@@ -37,7 +36,7 @@ namespace MvcSiteMapProvider.Reflection
         /// <returns>PropertyValue</returns>
         public static T GetPrivateFieldValue<T>(this object obj, string fieldName)
         {
-            if (obj == null) throw new ArgumentNullException("obj");
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
             Type t = obj.GetType();
             FieldInfo fi = null;
             while (fi == null && t != null)
@@ -45,7 +44,7 @@ namespace MvcSiteMapProvider.Reflection
                 fi = t.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                 t = t.BaseType;
             }
-            if (fi == null) throw new ArgumentOutOfRangeException("fieldName", string.Format(Resources.Messages.ObjectFieldNotFound, fieldName, obj.GetType().FullName));
+            if (fi == null) throw new ArgumentOutOfRangeException(nameof(fieldName), string.Format(Resources.Messages.ObjectFieldNotFound, fieldName, obj.GetType().FullName));
             return (T)fi.GetValue(obj);
         }
     }

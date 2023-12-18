@@ -19,7 +19,7 @@ namespace MvcSiteMapProvider.Reflection
                 {
                     result.Add(plugin);
                 }
-            }         
+            }
             return result;
         }
 
@@ -27,6 +27,5 @@ namespace MvcSiteMapProvider.Reflection
         {
             return (TPluginType)Activator.CreateInstance(type, args);
         }
-
     }
 }

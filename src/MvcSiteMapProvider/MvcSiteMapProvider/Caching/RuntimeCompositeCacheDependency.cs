@@ -17,9 +17,7 @@ namespace MvcSiteMapProvider.Caching
             params ICacheDependency[] cacheDependencies
             )
         {
-            if (cacheDependencies == null)
-                throw new ArgumentNullException("cacheDependencies");
-            this.cacheDependencies = cacheDependencies;
+            this.cacheDependencies = cacheDependencies ?? throw new ArgumentNullException(nameof(cacheDependencies));
         }
 
         protected readonly ICacheDependency[] cacheDependencies;
@@ -30,10 +28,10 @@ namespace MvcSiteMapProvider.Caching
         {
             get
             {
-                if (this.cacheDependencies.Count() > 0)
+                if (cacheDependencies.Count() > 0)
                 {
                     var list = new List<ChangeMonitor>();
-                    foreach (var item in this.cacheDependencies)
+                    foreach (var item in cacheDependencies)
                     {
                         var changeMonitorList = (IList<ChangeMonitor>)item.Dependency;
                         if (changeMonitorList != null)

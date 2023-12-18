@@ -19,16 +19,9 @@ namespace MvcSiteMapProvider
             IAclModule aclModule
             )
         {
-            if (siteMapBuilder == null)
-                throw new ArgumentNullException("siteMapBuilder");
-            if (mvcResolver == null)
-                throw new ArgumentNullException("mvcResolver");
-            if (aclModule == null)
-                throw new ArgumentNullException("aclModule");
-
-            this.siteMapBuilder = siteMapBuilder;
-            this.mvcResolver = mvcResolver;
-            this.aclModule = aclModule;
+            this.siteMapBuilder = siteMapBuilder ?? throw new ArgumentNullException(nameof(siteMapBuilder));
+            this.mvcResolver = mvcResolver ?? throw new ArgumentNullException(nameof(mvcResolver));
+            this.aclModule = aclModule ?? throw new ArgumentNullException(nameof(aclModule));
         }
 
         protected readonly ISiteMapBuilder siteMapBuilder;
@@ -52,6 +45,6 @@ namespace MvcSiteMapProvider
             get { return aclModule; }
         }
 
-        #endregion
+        #endregion ISiteMapPluginProvider Members
     }
 }

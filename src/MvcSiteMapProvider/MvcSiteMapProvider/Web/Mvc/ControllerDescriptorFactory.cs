@@ -28,6 +28,6 @@ namespace MvcSiteMapProvider.Web.Mvc
             return controllerDescriptor;
         }
 
-        #endregion
+        #endregion IControllerDescriptorFactory Members
     }
 }

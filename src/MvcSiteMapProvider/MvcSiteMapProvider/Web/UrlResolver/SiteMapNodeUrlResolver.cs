@@ -14,24 +14,18 @@ namespace MvcSiteMapProvider.Web.UrlResolver
     public class SiteMapNodeUrlResolver
         : SiteMapNodeUrlResolverBase
     {
+        protected readonly IMvcContextFactory mvcContextFactory;
+
+        protected readonly IUrlPath urlPath;
+
         public SiteMapNodeUrlResolver(
-            IMvcContextFactory mvcContextFactory,
+                            IMvcContextFactory mvcContextFactory,
             IUrlPath urlPath
             )
         {
-            if (mvcContextFactory == null)
-                throw new ArgumentNullException("mvcContextFactory");
-            if (urlPath == null)
-                throw new ArgumentNullException("urlPath");
-
-            this.mvcContextFactory = mvcContextFactory;
-            this.urlPath = urlPath;
+            this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
+            this.urlPath = urlPath ?? throw new ArgumentNullException(nameof(urlPath));
         }
-
-        protected readonly IMvcContextFactory mvcContextFactory;
-        protected readonly IUrlPath urlPath;
-
-        #region ISiteMapNodeUrlResolver Members
 
         /// <summary>
         /// Resolves the URL.
@@ -46,27 +40,49 @@ namespace MvcSiteMapProvider.Web.UrlResolver
         {
             if (!string.IsNullOrEmpty(node.UnresolvedUrl))
             {
-                return this.ResolveVirtualPath(node);
+                return ResolveVirtualPath(node);
             }
-            return this.ResolveRouteUrl(node, area, controller, action, routeValues);
+            return ResolveRouteUrl(node, area, controller, action, routeValues);
         }
 
-        #endregion
-
-        protected virtual string ResolveVirtualPath(ISiteMapNode node)
+        protected virtual HttpContextBase CreateHttpContext(ISiteMapNode node, TextWriter writer)
         {
-            return this.urlPath.ResolveUrl(node.UnresolvedUrl, node.Protocol, node.HostName);
+            var currentHttpContext = mvcContextFactory.CreateHttpContext();
+
+            // Create a URI with the home page and no query string values.
+            var uri = new Uri(currentHttpContext.Request.Url, "/");
+            return mvcContextFactory.CreateHttpContext(node, uri, writer);
+        }
+
+        protected virtual RequestContext CreateRequestContext(ISiteMapNode node, TextWriter writer)
+        {
+            var realRequestContext = mvcContextFactory.CreateRequestContext();
+
+            // For interop with MvcCodeRouting, we need to build a data token with the appropriate value.
+            realRequestContext.RouteData.SetMvcCodeRoutingContext(node);
+
+            if (!node.IncludeAmbientValuesInUrl)
+            {
+                var httpContext = CreateHttpContext(node, writer);
+                var fakeRequestContext = mvcContextFactory.CreateRequestContext(httpContext);
+                fakeRequestContext.RouteData.MergeDataTokens(realRequestContext.RouteData.DataTokens);
+                fakeRequestContext.RouteData.Route = realRequestContext.RouteData.Route;
+                fakeRequestContext.RouteData.RouteHandler = realRequestContext.RouteData.RouteHandler;
+                return fakeRequestContext;
+            }
+
+            return realRequestContext;
         }
 
         protected virtual string ResolveRouteUrl(ISiteMapNode node, string area, string controller, string action, IDictionary<string, object> routeValues)
         {
             string result = string.Empty;
-            // Create a TextWriter with null stream as a backing stream 
+            // Create a TextWriter with null stream as a backing stream
             // which doesn't consume resources
             using (var nullWriter = new StreamWriter(Stream.Null))
             {
-                var requestContext = this.CreateRequestContext(node, nullWriter);
-                result = this.ResolveRouteUrl(node, area, controller, action, routeValues, requestContext);
+                var requestContext = CreateRequestContext(node, nullWriter);
+                result = ResolveRouteUrl(node, area, controller, action, routeValues, requestContext);
             }
 
             if (string.IsNullOrEmpty(result))
@@ -80,10 +96,10 @@ namespace MvcSiteMapProvider.Web.UrlResolver
 
         protected virtual string ResolveRouteUrl(ISiteMapNode node, string area, string controller, string action, IDictionary<string, object> routeValues, RequestContext requestContext)
         {
-            string result = string.Empty;
-            var urlHelper = this.mvcContextFactory.CreateUrlHelper(requestContext);
+            var urlHelper = mvcContextFactory.CreateUrlHelper(requestContext);
             var routeValueDictionary = new RouteValueDictionary(routeValues);
 
+            string result;
             if (!string.IsNullOrEmpty(node.Route))
             {
                 // (comment copied from MVC source code)
@@ -103,43 +119,19 @@ namespace MvcSiteMapProvider.Web.UrlResolver
 
             if (!string.IsNullOrEmpty(result))
             {
-                // NOTE: We are purposely using the current request's context when resolving any absolute 
+                // NOTE: We are purposely using the current request's context when resolving any absolute
                 // URL so it will read the headers and use the HTTP_HOST of the client machine, if included,
                 // in the case where HostName is null or empty and protocol is not. The public facing port is
                 // also used when the protocol matches.
-                return this.urlPath.ResolveUrl(result, node.Protocol, node.HostName);
+                return urlPath.ResolveUrl(result, node.Protocol, node.HostName);
             }
 
             return result;
         }
 
-        protected virtual HttpContextBase CreateHttpContext(ISiteMapNode node, TextWriter writer)
+        protected virtual string ResolveVirtualPath(ISiteMapNode node)
         {
-            var currentHttpContext = this.mvcContextFactory.CreateHttpContext();
-
-            // Create a URI with the home page and no query string values.
-            var uri = new Uri(currentHttpContext.Request.Url, "/");
-            return this.mvcContextFactory.CreateHttpContext(node, uri, writer);
-        }
-
-        protected virtual RequestContext CreateRequestContext(ISiteMapNode node, TextWriter writer)
-        {
-            var realRequestContext = this.mvcContextFactory.CreateRequestContext();
-
-            // For interop with MvcCodeRouting, we need to build a data token with the appropriate value.
-            realRequestContext.RouteData.SetMvcCodeRoutingContext(node);
-
-            if (!node.IncludeAmbientValuesInUrl)
-            {
-                var httpContext = this.CreateHttpContext(node, writer);
-                var fakeRequestContext = this.mvcContextFactory.CreateRequestContext(httpContext);
-                fakeRequestContext.RouteData.MergeDataTokens(realRequestContext.RouteData.DataTokens);
-                fakeRequestContext.RouteData.Route = realRequestContext.RouteData.Route;
-                fakeRequestContext.RouteData.RouteHandler = realRequestContext.RouteData.RouteHandler;
-                return fakeRequestContext;
-            }
-
-            return realRequestContext;
+            return urlPath.ResolveUrl(node.UnresolvedUrl, node.Protocol, node.HostName);
         }
     }
 }

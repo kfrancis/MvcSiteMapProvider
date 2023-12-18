@@ -14,10 +14,7 @@ namespace MvcSiteMapProvider.Web.Mvc
             ControllerBuilder controllerBuilder
             )
         {
-            if (controllerBuilder == null)
-                throw new ArgumentNullException("controllerBuilder");
-
-            this.controllerBuilder = controllerBuilder;
+            this.controllerBuilder = controllerBuilder ?? throw new ArgumentNullException(nameof(controllerBuilder));
         }
 
         protected readonly ControllerBuilder controllerBuilder;
@@ -44,6 +41,6 @@ namespace MvcSiteMapProvider.Web.Mvc
             controllerBuilder.SetControllerFactory(controllerFactory);
         }
 
-        #endregion
+        #endregion IControllerBuilder Members
     }
 }

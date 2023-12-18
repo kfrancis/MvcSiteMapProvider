@@ -3,7 +3,6 @@ using System.Reflection;
 
 namespace MvcSiteMapProvider.Reflection
 {
-    
     /// <summary>
     /// Extensions to the Type type.
     /// </summary>

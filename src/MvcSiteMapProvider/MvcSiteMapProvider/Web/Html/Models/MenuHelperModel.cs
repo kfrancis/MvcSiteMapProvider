@@ -6,7 +6,7 @@ namespace MvcSiteMapProvider.Web.Html.Models
     /// <summary>
     /// MenuHelperModel
     /// </summary>
-    public class MenuHelperModel 
+    public class MenuHelperModel
         : IEnumerable<SiteMapNodeModel>
     {
         /// <summary>

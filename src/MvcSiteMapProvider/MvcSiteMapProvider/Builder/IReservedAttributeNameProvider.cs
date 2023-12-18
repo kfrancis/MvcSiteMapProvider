@@ -6,7 +6,7 @@
     public interface IReservedAttributeNameProvider
     {
         /// <summary>
-        /// Determines whether the attribute with the supplied name can be added to the 
+        /// Determines whether the attribute with the supplied name can be added to the
         /// <see cref="T:SiteMapNodeProvider.Collections.Specialized.IAttributeDictionary"/>.
         /// </summary>
         /// <param name="attributeName">The name of the attribute.</param>
@@ -14,7 +14,7 @@
         bool IsRegularAttribute(string attributeName);
 
         /// <summary>
-        /// Determines whether the route value with the supplied name can be added to the 
+        /// Determines whether the route value with the supplied name can be added to the
         /// <see cref="T:SiteMapNodeProvider.Collections.Specialized.IRouteValueDictionary"/>.
         /// </summary>
         /// <param name="attributeName">The name of the attribute.</param>

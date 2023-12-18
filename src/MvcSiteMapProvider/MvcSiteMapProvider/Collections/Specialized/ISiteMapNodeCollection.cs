@@ -10,6 +10,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
         : IList<ISiteMapNode>, ICollection<ISiteMapNode>, IEnumerable<ISiteMapNode>
     {
         void AddRange(IEnumerable<ISiteMapNode> collection);
+
         void RemoveRange(int index, int count);
     }
 }

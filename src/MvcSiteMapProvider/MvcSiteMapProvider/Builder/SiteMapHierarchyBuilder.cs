@@ -31,11 +31,11 @@ namespace MvcSiteMapProvider.Builder
                     var parentNode = siteMap.FindSiteMapNodeFromKey(node.ParentKey);
                     if (parentNode != null)
                     {
-                        this.AddAndTrackNode(siteMap, node, parentNode, sourceNodes, nodesAlreadyAdded);
+                        AddAndTrackNode(siteMap, node, parentNode, sourceNodes, nodesAlreadyAdded);
                         nodesAddedThisIteration += 1;
 
                         // Add the rest of the tree branch below the current node
-                        this.AddDescendantNodes(siteMap, node.Node, sourceNodes, sourceNodesByParent, nodesAlreadyAdded);
+                        AddDescendantNodes(siteMap, node.Node, sourceNodes, sourceNodesByParent, nodesAlreadyAdded);
                     }
                 }
             }
@@ -44,8 +44,8 @@ namespace MvcSiteMapProvider.Builder
             return sourceNodes;
         }
 
-        #endregion
-        
+        #endregion ISiteMapHierarchyBuilder Members
+
         protected virtual void AddDescendantNodes(
             ISiteMap siteMap,
             ISiteMapNode currentNode,
@@ -71,14 +71,14 @@ namespace MvcSiteMapProvider.Builder
                     return;
                 }
 
-                this.AddAndTrackNode(siteMap, child, currentNode, sourceNodes, nodesAlreadyAdded);
+                AddAndTrackNode(siteMap, child, currentNode, sourceNodes, nodesAlreadyAdded);
 
                 if (sourceNodes.Count == 0)
                 {
                     return;
                 }
 
-                this.AddDescendantNodes(siteMap, child.Node, sourceNodes, sourceNodesByParent, nodesAlreadyAdded);
+                AddDescendantNodes(siteMap, child.Node, sourceNodes, sourceNodesByParent, nodesAlreadyAdded);
             }
         }
 

@@ -18,7 +18,7 @@ namespace MvcSiteMapProvider
             }
 
             var childNodes = node.ChildNodes;
-            return childNodes == null || childNodes.Any(c => c.IsVisible(sourceMetadata));
+            return childNodes?.Any(c => c.IsVisible(sourceMetadata)) != false;
         }
     }
 }

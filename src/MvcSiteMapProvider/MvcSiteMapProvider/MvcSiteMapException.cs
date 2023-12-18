@@ -27,5 +27,4 @@ namespace MvcSiteMapProvider
         /// <param name="innerException">Inner Exception</param>
         public MvcSiteMapException(string message, Exception innerException) : base(message, innerException) { }
     }
-
 }

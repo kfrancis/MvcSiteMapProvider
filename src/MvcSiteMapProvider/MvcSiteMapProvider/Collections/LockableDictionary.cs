@@ -14,58 +14,55 @@ namespace MvcSiteMapProvider.Collections
             ISiteMap siteMap
             )
         {
-            if (siteMap == null)
-                throw new ArgumentNullException("siteMap");
-
-            this.siteMap = siteMap;
+            this.siteMap = siteMap ?? throw new ArgumentNullException(nameof(siteMap));
         }
 
         protected readonly ISiteMap siteMap;
 
         public override void Add(KeyValuePair<TKey, TValue> item)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.Add(item);
         }
 
         public override void Add(TKey key, TValue value)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.Add(key, value);
         }
 
         public override void AddRange(IDictionary<TKey, TValue> items)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.AddRange(items);
         }
 
         public override void Clear()
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.Clear();
         }
 
         protected override void Insert(TKey key, TValue value, bool add)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.Insert(key, value, add);
         }
 
         public override bool IsReadOnly
         {
-            get { return this.siteMap.IsReadOnly; }
+            get { return siteMap.IsReadOnly; }
         }
 
         public override bool Remove(KeyValuePair<TKey, TValue> item)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             return base.Remove(item);
         }
 
         public override bool Remove(TKey key)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             return base.Remove(key);
         }
 
@@ -77,14 +74,14 @@ namespace MvcSiteMapProvider.Collections
             }
             set
             {
-                this.ThrowIfReadOnly();
+                ThrowIfReadOnly();
                 base[key] = value;
             }
         }
 
         public virtual void CopyTo(IDictionary<TKey, TValue> destination)
         {
-            foreach (var item in this.Dictionary)
+            foreach (var item in Dictionary)
             {
                 var keyIsPointer = item.Key.GetType().IsPointer;
                 var valueIsPointer = item.Value.GetType().IsPointer;
@@ -101,7 +98,7 @@ namespace MvcSiteMapProvider.Collections
 
         protected virtual void ThrowIfReadOnly()
         {
-            if (this.IsReadOnly)
+            if (IsReadOnly)
             {
                 throw new InvalidOperationException(string.Format(Resources.Messages.SiteMapReadOnly));
             }

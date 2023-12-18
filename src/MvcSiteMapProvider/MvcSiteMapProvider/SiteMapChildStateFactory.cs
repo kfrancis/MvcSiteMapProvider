@@ -19,16 +19,9 @@ namespace MvcSiteMapProvider
             IUrlKeyFactory urlKeyFactory
             )
         {
-            if (genericDictionaryFactory == null)
-                throw new ArgumentNullException("genericDictionaryFactory");
-            if (siteMapNodeCollectionFactory == null)
-                throw new ArgumentNullException("siteMapNodeCollectionFactory");
-            if (urlKeyFactory == null)
-                throw new ArgumentNullException("urlKeyFactory");
-
-            this.genericDictionaryFactory = genericDictionaryFactory;
-            this.siteMapNodeCollectionFactory = siteMapNodeCollectionFactory;
-            this.urlKeyFactory = urlKeyFactory;
+            this.genericDictionaryFactory = genericDictionaryFactory ?? throw new ArgumentNullException(nameof(genericDictionaryFactory));
+            this.siteMapNodeCollectionFactory = siteMapNodeCollectionFactory ?? throw new ArgumentNullException(nameof(siteMapNodeCollectionFactory));
+            this.urlKeyFactory = urlKeyFactory ?? throw new ArgumentNullException(nameof(urlKeyFactory));
         }
 
         protected readonly IGenericDictionaryFactory genericDictionaryFactory;
@@ -59,12 +52,12 @@ namespace MvcSiteMapProvider
 
         public virtual IUrlKey CreateUrlKey(ISiteMapNode node)
         {
-            return this.urlKeyFactory.Create(node);
+            return urlKeyFactory.Create(node);
         }
 
         public virtual IUrlKey CreateUrlKey(string relativeOrAbsoluteUrl, string hostName)
         {
-            return this.urlKeyFactory.Create(relativeOrAbsoluteUrl, hostName);
+            return urlKeyFactory.Create(relativeOrAbsoluteUrl, hostName);
         }
 
         public virtual ISiteMapNodeCollection CreateSiteMapNodeCollection()
@@ -87,6 +80,6 @@ namespace MvcSiteMapProvider
             return siteMapNodeCollectionFactory.CreateEmptyReadOnly();
         }
 
-        #endregion
+        #endregion ISiteMapChildStateFactory Members
     }
 }

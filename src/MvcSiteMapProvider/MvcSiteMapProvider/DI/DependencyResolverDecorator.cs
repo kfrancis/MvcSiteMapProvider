@@ -18,12 +18,8 @@ namespace MvcSiteMapProvider.DI
             ConfigurationSettings settings
             )
         {
-            if (dependencyResolver == null)
-                throw new ArgumentNullException("dependencyResolver");
-            if (settings == null)
-                throw new ArgumentNullException("settings");
-            this.innerDependencyResolver = dependencyResolver;
-            this.settings = settings;
+            innerDependencyResolver = dependencyResolver ?? throw new ArgumentNullException(nameof(dependencyResolver));
+            this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         }
 
         private readonly IDependencyResolver innerDependencyResolver;
@@ -35,7 +31,7 @@ namespace MvcSiteMapProvider.DI
         {
             if (typeof(XmlSiteMapController).Equals(serviceType))
             {
-                var xmlSiteMapResultFactoryContainer = new XmlSiteMapResultFactoryContainer(this.settings);
+                var xmlSiteMapResultFactoryContainer = new XmlSiteMapResultFactoryContainer(settings);
                 return new XmlSiteMapController(xmlSiteMapResultFactoryContainer.ResolveXmlSiteMapResultFactory());
             }
 
@@ -46,7 +42,7 @@ namespace MvcSiteMapProvider.DI
         {
             if (typeof(XmlSiteMapController).Equals(serviceType))
             {
-                var xmlSiteMapResultFactoryContainer = new XmlSiteMapResultFactoryContainer(this.settings);
+                var xmlSiteMapResultFactoryContainer = new XmlSiteMapResultFactoryContainer(settings);
                 return new List<object>() { new XmlSiteMapController(xmlSiteMapResultFactoryContainer.ResolveXmlSiteMapResultFactory()) };
             }
 

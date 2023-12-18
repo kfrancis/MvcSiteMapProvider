@@ -5,7 +5,7 @@ namespace MvcSiteMapProvider.Web.Mvc
     /// <summary>
     /// HttpContext wrapper.
     /// </summary>
-    public class SiteMapHttpContext 
+    public class SiteMapHttpContext
         : HttpContextWrapper
     {
         private readonly HttpContext httpContext;
@@ -32,7 +32,7 @@ namespace MvcSiteMapProvider.Web.Mvc
         /// <returns>The current HTTP request.</returns>
         public override HttpRequestBase Request
         {
-            get { return new SiteMapHttpRequest(this.httpContext.Request, this.node); }
+            get { return new SiteMapHttpRequest(httpContext.Request, node); }
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace MvcSiteMapProvider.Web.Mvc
         /// <returns>The current HTTP response.</returns>
         public override HttpResponseBase Response
         {
-            get { return new SiteMapHttpResponse(this.httpContext.Response); }
+            get { return new SiteMapHttpResponse(httpContext.Response); }
         }
     }
 }

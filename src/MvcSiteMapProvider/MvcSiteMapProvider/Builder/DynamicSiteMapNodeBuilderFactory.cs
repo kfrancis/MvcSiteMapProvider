@@ -6,30 +6,23 @@ namespace MvcSiteMapProvider.Builder
     public class DynamicSiteMapNodeBuilderFactory
         : IDynamicSiteMapNodeBuilderFactory
     {
+        protected readonly ICultureContextFactory cultureContextFactory;
+
+        protected readonly ISiteMapNodeCreatorFactory siteMapNodeCreatorFactory;
+
         public DynamicSiteMapNodeBuilderFactory(
-            ISiteMapNodeCreatorFactory siteMapNodeCreatorFactory,
+                            ISiteMapNodeCreatorFactory siteMapNodeCreatorFactory,
             ICultureContextFactory cultureContextFactory
             )
         {
-            if (siteMapNodeCreatorFactory == null)
-                throw new ArgumentNullException("siteMapNodeCreatorFactory");
-            if (cultureContextFactory == null)
-                throw new ArgumentNullException("cultureContextFactory");
-
-            this.siteMapNodeCreatorFactory = siteMapNodeCreatorFactory;
-            this.cultureContextFactory = cultureContextFactory;
+            this.siteMapNodeCreatorFactory = siteMapNodeCreatorFactory ?? throw new ArgumentNullException(nameof(siteMapNodeCreatorFactory));
+            this.cultureContextFactory = cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
         }
-        protected readonly ISiteMapNodeCreatorFactory siteMapNodeCreatorFactory;
-        protected readonly ICultureContextFactory cultureContextFactory;
-
-        #region IDynamicSiteMapNodeBuilderFactory Members
 
         public IDynamicSiteMapNodeBuilder Create(ISiteMap siteMap, ICultureContext cultureContext)
         {
-            var siteMapNodeCreator = this.siteMapNodeCreatorFactory.Create(siteMap);
-            return new DynamicSiteMapNodeBuilder(siteMapNodeCreator, cultureContext, this.cultureContextFactory);
+            var siteMapNodeCreator = siteMapNodeCreatorFactory.Create(siteMap);
+            return new DynamicSiteMapNodeBuilder(siteMapNodeCreator, cultureContext, cultureContextFactory);
         }
-
-        #endregion
     }
 }

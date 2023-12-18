@@ -2,12 +2,11 @@
 
 namespace MvcSiteMapProvider.Builder
 {
-
     /// <summary>
     /// Default NodeKeyGenerator class. This class provides the logic to generate a unique key based on several fields of a given node.
     /// This key can then be assigned as the unique identifier for the node.
     /// </summary>
-    public class NodeKeyGenerator 
+    public class NodeKeyGenerator
         : INodeKeyGenerator
     {
         /// <summary>

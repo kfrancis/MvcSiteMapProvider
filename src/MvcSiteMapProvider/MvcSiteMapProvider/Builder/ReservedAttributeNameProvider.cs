@@ -17,10 +17,7 @@ namespace MvcSiteMapProvider.Builder
             IEnumerable<string> attributesToIgnore
             )
         {
-            if (attributesToIgnore == null)
-                throw new ArgumentNullException("attributesToIgnore");
-
-            this.attributesToIgnore = attributesToIgnore;
+            this.attributesToIgnore = attributesToIgnore ?? throw new ArgumentNullException(nameof(attributesToIgnore));
         }
 
         protected readonly IEnumerable<string> attributesToIgnore;
@@ -29,7 +26,7 @@ namespace MvcSiteMapProvider.Builder
 
         public virtual bool IsRegularAttribute(string attributeName)
         {
-            return !this.IsKnownAttribute(attributeName)
+            return !IsKnownAttribute(attributeName)
                 && attributeName != "controller"
                 && attributeName != "action"
                 && attributeName != "area";
@@ -37,13 +34,13 @@ namespace MvcSiteMapProvider.Builder
 
         public virtual bool IsRouteAttribute(string attributeName)
         {
-            return !this.IsKnownAttribute(attributeName)
+            return !IsKnownAttribute(attributeName)
                 && attributeName != "visibility"
                 && !attributesToIgnore.Contains(attributeName)
                 && !attributeName.StartsWith("data-");
         }
 
-        #endregion
+        #endregion IReservedAttributeNameProvider Members
 
         protected virtual bool IsKnownAttribute(string attributeName)
         {
@@ -77,7 +74,7 @@ namespace MvcSiteMapProvider.Builder
                 || attributeName == "metaRobotsValues"
                 || attributeName == "route"
                 || attributeName == "inheritedRouteParameters"
-                || attributeName == "preservedRouteParameters";    
+                || attributeName == "preservedRouteParameters";
         }
     }
 }

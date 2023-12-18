@@ -25,19 +25,10 @@ namespace MvcSiteMapProvider.Security
             IGlobalFilterProvider filterProvider
             )
         {
-            if (mvcContextFactory == null)
-                throw new ArgumentNullException("mvcContextFactory");
-            if (controllerDescriptorFactory == null)
-                throw new ArgumentNullException("controllerDescriptorFactory");
-            if (controllerBuilder == null)
-                throw new ArgumentNullException("controllerBuilder");
-            if (filterProvider == null)
-                throw new ArgumentNullException("filterProvider");
-
-            this.mvcContextFactory = mvcContextFactory;
-            this.controllerDescriptorFactory = controllerDescriptorFactory;
-            this.controllerBuilder = controllerBuilder;
-            this.filterProvider = filterProvider;
+            this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
+            this.controllerDescriptorFactory = controllerDescriptorFactory ?? throw new ArgumentNullException(nameof(controllerDescriptorFactory));
+            this.controllerBuilder = controllerBuilder ?? throw new ArgumentNullException(nameof(controllerBuilder));
+            this.filterProvider = filterProvider ?? throw new ArgumentNullException(nameof(filterProvider));
         }
 
         protected readonly IMvcContextFactory mvcContextFactory;
@@ -67,16 +58,16 @@ namespace MvcSiteMapProvider.Security
             if (node.HasExternalUrl(httpContext))
                 return true;
 
-            return this.VerifyNode(siteMap, node, httpContext);
+            return VerifyNode(siteMap, node, httpContext);
         }
 
-        #endregion
+        #endregion IAclModule Members
 
         #region Protected Members
 
         protected virtual bool VerifyNode(ISiteMap siteMap, ISiteMapNode node, HttpContextBase httpContext)
         {
-            var routes = this.FindRoutesForNode(node, httpContext);
+            var routes = FindRoutesForNode(node, httpContext);
             if (routes == null)
                 return true; // Static URLs will sometimes have no route data, therefore return true.
 
@@ -86,7 +77,7 @@ namespace MvcSiteMapProvider.Security
             if (controllerType == null)
                 return true;
 
-            return this.VerifyController(node, routes, controllerType);
+            return VerifyController(node, routes, controllerType);
         }
 
         protected virtual bool VerifyController(ISiteMapNode node, RouteData routes, Type controllerType)
@@ -96,10 +87,10 @@ namespace MvcSiteMapProvider.Security
 
             // Create controller context
             bool factoryBuiltController = false;
-            var controllerContext = this.CreateControllerContext(node, routes, controllerType, controllerFactory, out factoryBuiltController);
+            var controllerContext = CreateControllerContext(node, routes, controllerType, controllerFactory, out factoryBuiltController);
             try
             {
-                return this.VerifyControllerAttributes(routes, controllerType, controllerContext);
+                return VerifyControllerAttributes(routes, controllerType, controllerContext);
             }
             finally
             {
@@ -117,12 +108,12 @@ namespace MvcSiteMapProvider.Security
             // it will be used instead of the baseUri.
             var nodeUri = new Uri(httpContext.Request.Url, node.Url);
 
-            // Create a TextWriter with null stream as a backing stream 
+            // Create a TextWriter with null stream as a backing stream
             // which doesn't consume resources
             using (var nullWriter = new StreamWriter(Stream.Null))
             {
                 // Create a new HTTP context using the node's URL instead of the current one.
-                var nodeHttpContext = this.mvcContextFactory.CreateHttpContext(node, nodeUri, nullWriter);
+                var nodeHttpContext = mvcContextFactory.CreateHttpContext(node, nodeUri, nullWriter);
 
                 // Find routes for the sitemap node's URL using the new HTTP context
                 routeData = node.GetRouteData(nodeHttpContext);
@@ -139,13 +130,13 @@ namespace MvcSiteMapProvider.Security
                 return true;
 
             // Get action descriptor
-            var actionDescriptor = this.GetActionDescriptor(routes.GetOptionalString("action"), controllerDescriptor, controllerContext);
+            var actionDescriptor = GetActionDescriptor(routes.GetOptionalString("action"), controllerDescriptor, controllerContext);
             if (actionDescriptor == null)
                 return true;
 
             // Verify security
-            var authorizeAttributes = this.GetAuthorizeAttributes(actionDescriptor, controllerContext);
-            return this.VerifyAuthorizeAttributes(authorizeAttributes, controllerContext, actionDescriptor);
+            var authorizeAttributes = GetAuthorizeAttributes(actionDescriptor, controllerContext);
+            return VerifyAuthorizeAttributes(authorizeAttributes, controllerContext, actionDescriptor);
         }
 
         protected virtual bool VerifyAuthorizeAttributes(IEnumerable<AuthorizeAttribute> authorizeAttributes, ControllerContext controllerContext, ActionDescriptor actionDescriptor)
@@ -155,7 +146,7 @@ namespace MvcSiteMapProvider.Security
             {
                 try
                 {
-                    var authorized = this.VerifyAuthorizeAttribute(authorizeAttribute, controllerContext, actionDescriptor);
+                    var authorized = VerifyAuthorizeAttribute(authorizeAttribute, controllerContext, actionDescriptor);
                     if (!authorized)
                         return false;
                 }
@@ -178,6 +169,7 @@ namespace MvcSiteMapProvider.Security
                                    <AuthorizeAttribute>().ToList());
         }
 #else
+
         protected virtual IEnumerable<AuthorizeAttribute> GetAuthorizeAttributes(ActionDescriptor actionDescriptor, ControllerContext controllerContext)
         {
             var filters = filterProvider.GetFilters(controllerContext, actionDescriptor);
@@ -186,21 +178,20 @@ namespace MvcSiteMapProvider.Security
                     .Where(f => typeof(AuthorizeAttribute).IsAssignableFrom(f.Instance.GetType()))
                     .Select(f => f.Instance as AuthorizeAttribute);
         }
+
 #endif
 
         protected virtual bool VerifyAuthorizeAttribute(AuthorizeAttribute authorizeAttribute, ControllerContext controllerContext, ActionDescriptor actionDescriptor)
         {
-            var authorizationContext = this.mvcContextFactory.CreateAuthorizationContext(controllerContext, actionDescriptor);
+            var authorizationContext = mvcContextFactory.CreateAuthorizationContext(controllerContext, actionDescriptor);
             authorizeAttribute.OnAuthorization(authorizationContext);
-            if (authorizationContext.Result != null)
-                return false;
-            return true;
+            return authorizationContext.Result == null;
         }
 
         protected virtual ActionDescriptor GetActionDescriptor(string actionName, ControllerDescriptor controllerDescriptor, ControllerContext controllerContext)
         {
             ActionDescriptor actionDescriptor = null;
-            var found = this.TryFindActionDescriptor(actionName, controllerContext, controllerDescriptor, out actionDescriptor);
+            var found = TryFindActionDescriptor(actionName, controllerContext, controllerDescriptor, out actionDescriptor);
             if (!found)
             {
                 actionDescriptor = controllerDescriptor.GetCanonicalActions().Where(a => a.ActionName == actionName).FirstOrDefault();
@@ -227,7 +218,7 @@ namespace MvcSiteMapProvider.Security
 
         protected virtual ControllerContext CreateControllerContext(ISiteMapNode node, RouteData routes, Type controllerType, IControllerFactory controllerFactory, out bool factoryBuiltController)
         {
-            var requestContext = this.mvcContextFactory.CreateRequestContext(node, routes);
+            var requestContext = mvcContextFactory.CreateRequestContext(node, routes);
             ControllerBase controller = null;
             string controllerName = requestContext.RouteData.GetOptionalString("controller");
 
@@ -278,9 +269,9 @@ namespace MvcSiteMapProvider.Security
             return false;
         }
 
-        #endregion
+        #endregion Protected Members
 
-        private class ActionSelector 
+        private class ActionSelector
             : AsyncControllerActionInvoker
         {
             // Needed because FindAction is protected, and we are changing it to be public

@@ -148,13 +148,13 @@ namespace MvcSiteMapProvider
         public virtual string Url { get; set; }
 
         /// <summary>
-        /// A value indicating to cache the resolved URL. If false, the URL will be 
+        /// A value indicating to cache the resolved URL. If false, the URL will be
         /// resolved every time it is accessed.
         /// </summary>
         public virtual bool? CacheResolvedUrl { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to include ambient request values 
+        /// Gets or sets a value indicating whether to include ambient request values
         /// (from the RouteValues and/or query string) when resolving URLs.
         /// </summary>
         /// <value><b>true</b> to include ambient values (like MVC does); otherwise <b>false</b>.</value>
@@ -243,29 +243,29 @@ namespace MvcSiteMapProvider
         /// <param name="node">The site map node to copy the values into.</param>
         public virtual void SafeCopyTo(ISiteMapNode node)
         {
-            if (this.Order != null)
-                node.Order = (int)this.Order;
-            if (!string.IsNullOrEmpty(this.HttpMethod))
-                node.HttpMethod = this.HttpMethod;
-            if (!string.IsNullOrEmpty(this.Title))
-                node.Title = this.Title;
-            if (!string.IsNullOrEmpty(this.Description))
-                node.Description = this.Description;
-            if (!string.IsNullOrEmpty(this.TargetFrame))
-                node.TargetFrame = this.TargetFrame;
-            if (!string.IsNullOrEmpty(this.ImageUrl))
-                node.ImageUrl = this.ImageUrl;
-            if (!string.IsNullOrEmpty(this.ImageUrlProtocol))
-                node.ImageUrlProtocol = this.ImageUrlProtocol;
-            if (!string.IsNullOrEmpty(this.ImageUrlHostName))
-                node.ImageUrlHostName = this.ImageUrlHostName;
-            foreach (var kvp in this.Attributes)
+            if (Order != null)
+                node.Order = (int)Order;
+            if (!string.IsNullOrEmpty(HttpMethod))
+                node.HttpMethod = HttpMethod;
+            if (!string.IsNullOrEmpty(Title))
+                node.Title = Title;
+            if (!string.IsNullOrEmpty(Description))
+                node.Description = Description;
+            if (!string.IsNullOrEmpty(TargetFrame))
+                node.TargetFrame = TargetFrame;
+            if (!string.IsNullOrEmpty(ImageUrl))
+                node.ImageUrl = ImageUrl;
+            if (!string.IsNullOrEmpty(ImageUrlProtocol))
+                node.ImageUrlProtocol = ImageUrlProtocol;
+            if (!string.IsNullOrEmpty(ImageUrlHostName))
+                node.ImageUrlHostName = ImageUrlHostName;
+            foreach (var kvp in Attributes)
             {
                 node.Attributes[kvp.Key] = kvp.Value;
             }
-            if (this.Roles.Any())
+            if (Roles.Any())
             {
-                foreach (var role in this.Roles)
+                foreach (var role in Roles)
                 {
                     if (!node.Roles.Contains(role))
                     {
@@ -273,39 +273,39 @@ namespace MvcSiteMapProvider
                     }
                 }
             }
-            if (this.LastModifiedDate != null && this.LastModifiedDate.HasValue)
-                node.LastModifiedDate = this.LastModifiedDate.Value;
-            if (this.ChangeFrequency != ChangeFrequency.Undefined)
-                node.ChangeFrequency = this.ChangeFrequency;
-            if (this.UpdatePriority != UpdatePriority.Undefined)
-                node.UpdatePriority = this.UpdatePriority;
-            if (!string.IsNullOrEmpty(this.VisibilityProvider))
-                node.VisibilityProvider = this.VisibilityProvider;
-            if (this.Clickable != null)
-                node.Clickable = (bool)this.Clickable;
-            if (!string.IsNullOrEmpty(this.UrlResolver))
-                node.UrlResolver = this.UrlResolver;
-            if (!string.IsNullOrEmpty(this.Url))
-                node.Url = this.Url;
-            if (this.CacheResolvedUrl != null)
-                node.CacheResolvedUrl = (bool)this.CacheResolvedUrl;
-            if (this.IncludeAmbientValuesInUrl != null)
-                node.IncludeAmbientValuesInUrl = (bool)this.IncludeAmbientValuesInUrl;
-            if (!string.IsNullOrEmpty(this.Protocol))
-                node.Protocol = this.Protocol;
-            if (!string.IsNullOrEmpty(this.HostName))
-                node.HostName = this.HostName;
-            if (!string.IsNullOrEmpty(this.CanonicalKey))
-                node.CanonicalKey = this.CanonicalKey;
-            if (!string.IsNullOrEmpty(this.CanonicalUrl))
-                node.CanonicalUrl = this.CanonicalUrl;
-            if (!string.IsNullOrEmpty(this.CanonicalUrlProtocol))
-                node.CanonicalUrlProtocol = this.CanonicalUrlProtocol;
-            if (!string.IsNullOrEmpty(this.CanonicalUrlHostName))
-                node.CanonicalUrlHostName = this.CanonicalUrlHostName;
-            if (this.MetaRobotsValues.Any())
+            if (LastModifiedDate != null && LastModifiedDate.HasValue)
+                node.LastModifiedDate = LastModifiedDate.Value;
+            if (ChangeFrequency != ChangeFrequency.Undefined)
+                node.ChangeFrequency = ChangeFrequency;
+            if (UpdatePriority != UpdatePriority.Undefined)
+                node.UpdatePriority = UpdatePriority;
+            if (!string.IsNullOrEmpty(VisibilityProvider))
+                node.VisibilityProvider = VisibilityProvider;
+            if (Clickable != null)
+                node.Clickable = (bool)Clickable;
+            if (!string.IsNullOrEmpty(UrlResolver))
+                node.UrlResolver = UrlResolver;
+            if (!string.IsNullOrEmpty(Url))
+                node.Url = Url;
+            if (CacheResolvedUrl != null)
+                node.CacheResolvedUrl = (bool)CacheResolvedUrl;
+            if (IncludeAmbientValuesInUrl != null)
+                node.IncludeAmbientValuesInUrl = (bool)IncludeAmbientValuesInUrl;
+            if (!string.IsNullOrEmpty(Protocol))
+                node.Protocol = Protocol;
+            if (!string.IsNullOrEmpty(HostName))
+                node.HostName = HostName;
+            if (!string.IsNullOrEmpty(CanonicalKey))
+                node.CanonicalKey = CanonicalKey;
+            if (!string.IsNullOrEmpty(CanonicalUrl))
+                node.CanonicalUrl = CanonicalUrl;
+            if (!string.IsNullOrEmpty(CanonicalUrlProtocol))
+                node.CanonicalUrlProtocol = CanonicalUrlProtocol;
+            if (!string.IsNullOrEmpty(CanonicalUrlHostName))
+                node.CanonicalUrlHostName = CanonicalUrlHostName;
+            if (MetaRobotsValues.Any())
             {
-                foreach (var value in this.MetaRobotsValues)
+                foreach (var value in MetaRobotsValues)
                 {
                     if (!node.MetaRobotsValues.Contains(value))
                     {
@@ -313,15 +313,15 @@ namespace MvcSiteMapProvider
                     }
                 }
             }
-            if (!string.IsNullOrEmpty(this.Route))
-                node.Route = this.Route;
-            foreach (var kvp in this.RouteValues)
+            if (!string.IsNullOrEmpty(Route))
+                node.Route = Route;
+            foreach (var kvp in RouteValues)
             {
                 node.RouteValues[kvp.Key] = kvp.Value;
             }
-            if (this.PreservedRouteParameters.Any())
+            if (PreservedRouteParameters.Any())
             {
-                foreach (var p in this.PreservedRouteParameters)
+                foreach (var p in PreservedRouteParameters)
                 {
                     if (!node.PreservedRouteParameters.Contains(p))
                     {
@@ -329,12 +329,12 @@ namespace MvcSiteMapProvider
                     }
                 }
             }
-            if (!string.IsNullOrEmpty(this.Area))
-                node.Area = this.Area;
-            if (!string.IsNullOrEmpty(this.Controller))
-                node.Controller = this.Controller;
-            if (!string.IsNullOrEmpty(this.Action))
-                node.Action = this.Action;
+            if (!string.IsNullOrEmpty(Area))
+                node.Area = Area;
+            if (!string.IsNullOrEmpty(Controller))
+                node.Controller = Controller;
+            if (!string.IsNullOrEmpty(Action))
+                node.Action = Action;
         }
 
         /// <summary>

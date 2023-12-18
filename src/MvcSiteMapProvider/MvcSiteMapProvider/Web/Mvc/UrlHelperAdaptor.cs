@@ -8,7 +8,7 @@ namespace MvcSiteMapProvider.Web
     /// Adapter for the <see cref="T:System.Web.Mvc.UrlHelper"/> class so a test double can be passed between methods.
     /// </summary>
     [Obsolete("Please use the UrlHelperAdapter (spelled with an e) instead. This class will be removed in version 5.")]
-    public class UrlHelperAdaptor 
+    public class UrlHelperAdaptor
         : UrlHelper, IUrlHelper
     {
         public UrlHelperAdaptor(RequestContext requestContext)

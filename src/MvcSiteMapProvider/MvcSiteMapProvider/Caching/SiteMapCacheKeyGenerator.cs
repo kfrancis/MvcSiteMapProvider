@@ -5,7 +5,7 @@ using System.Text;
 namespace MvcSiteMapProvider.Caching
 {
     /// <summary>
-    /// The default cache key generator. This class generates a unique cache key for each 
+    /// The default cache key generator. This class generates a unique cache key for each
     /// DnsSafeHost.
     /// </summary>
     public class SiteMapCacheKeyGenerator
@@ -15,9 +15,7 @@ namespace MvcSiteMapProvider.Caching
             IMvcContextFactory mvcContextFactory
             )
         {
-            if (mvcContextFactory == null)
-                throw new ArgumentNullException("mvcContextFactory");
-            this.mvcContextFactory = mvcContextFactory;
+            this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
         }
 
         protected readonly IMvcContextFactory mvcContextFactory;
@@ -28,20 +26,20 @@ namespace MvcSiteMapProvider.Caching
         {
             var builder = new StringBuilder();
             builder.Append("sitemap://");
-            builder.Append(this.GetHostName());
+            builder.Append(GetHostName());
             builder.Append("/");
 
             return builder.ToString();
         }
 
-        #endregion
+        #endregion ISiteMapCacheKeyGenerator Members
 
         protected virtual string GetHostName()
         {
-            var context = this.mvcContextFactory.CreateHttpContext();
+            var context = mvcContextFactory.CreateHttpContext();
             var request = context.Request;
 
-            // In a cloud or web farm environment, use the HTTP_HOST 
+            // In a cloud or web farm environment, use the HTTP_HOST
             // header to derive the host name.
             if (request.ServerVariables["HTTP_HOST"] != null)
             {

@@ -28,18 +28,13 @@ namespace MvcSiteMapProvider.Collections.Specialized
             ) : base(siteMap, cache)
         {
             if (string.IsNullOrEmpty(siteMapNodeKey))
-                throw new ArgumentNullException("siteMapNodeKey");
+                throw new ArgumentNullException(nameof(siteMapNodeKey));
             if (string.IsNullOrEmpty(memberName))
-                throw new ArgumentNullException("memberName");
-            if (reservedAttributeNameProvider == null)
-                throw new ArgumentNullException("reservedAttributeNameProvider");
-            if (jsonToDictionaryDeserializer == null)
-                throw new ArgumentNullException("jsonToDictionaryDeserializer");
-
+                throw new ArgumentNullException(nameof(memberName));
             this.siteMapNodeKey = siteMapNodeKey;
             this.memberName = memberName;
-            this.reservedAttributeNameProvider = reservedAttributeNameProvider;
-            this.jsonToDictionaryDeserializer = jsonToDictionaryDeserializer;
+            this.reservedAttributeNameProvider = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
+            this.jsonToDictionaryDeserializer = jsonToDictionaryDeserializer ?? throw new ArgumentNullException(nameof(jsonToDictionaryDeserializer));
 
             // An area route value must always exist, so we add it here to ensure it does.
             this["area"] = string.Empty;
@@ -52,7 +47,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
 
         protected override string GetCacheKey()
         {
-            return "__ROUTE_VALUE_DICTIONARY_" + this.siteMap.CacheKey + "_" + this.siteMapNodeKey + "_" + this.memberName + "_";
+            return "__ROUTE_VALUE_DICTIONARY_" + siteMap.CacheKey + "_" + siteMapNodeKey + "_" + memberName + "_";
         }
 
         /// <summary>
@@ -62,7 +57,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
         /// <param name="value">The value of the new item to add.</param>
         public override void Add(string key, object value)
         {
-            this.Add(key, value, true);
+            Add(key, value, true);
         }
 
         /// <summary>
@@ -71,7 +66,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
         /// <param name="item">The KeyValuePair object that contains the key and value to add.</param>
         public override void Add(KeyValuePair<string, object> item)
         {
-            this.Add(item.Key, item.Value, true);
+            Add(item.Key, item.Value, true);
         }
 
         /// <summary>
@@ -81,7 +76,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
         /// <param name="throwIfReservedKey"><c>true</c> to throw an exception if one of the keys being added is a reserved key name; otherwise, <c>false</c>.</param>
         public void Add(KeyValuePair<string, object> item, bool throwIfReservedKey)
         {
-            this.Add(item.Key, item.Value, throwIfReservedKey);
+            Add(item.Key, item.Value, throwIfReservedKey);
         }
 
         /// <summary>
@@ -92,16 +87,16 @@ namespace MvcSiteMapProvider.Collections.Specialized
         /// <param name="throwIfReservedKey"><c>true</c> to throw an exception if one of the keys being added is a reserved key name; otherwise, <c>false</c>.</param>
         public void Add(string key, object value, bool throwIfReservedKey)
         {
-            if (this.reservedAttributeNameProvider.IsRouteAttribute(key))
+            if (reservedAttributeNameProvider.IsRouteAttribute(key))
             {
-                if (!this.ContainsKey(key))
+                if (!ContainsKey(key))
                     base.Add(key, value);
                 else
                     base[key] = value;
             }
             else if (throwIfReservedKey)
             {
-                throw new ReservedKeyException(string.Format(Resources.Messages.RouteValueKeyReserved, this.siteMapNodeKey, key, value));
+                throw new ReservedKeyException(string.Format(Resources.Messages.RouteValueKeyReserved, siteMapNodeKey, key, value));
             }
         }
 
@@ -111,7 +106,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
         /// <param name="items">The <see cref="T:System.Collections.Generic.IDictionary{string, object}"/> of items to add.</param>
         public override void AddRange(IDictionary<string, object> items)
         {
-            this.AddRange(items, true);
+            AddRange(items, true);
         }
 
         /// <summary>
@@ -123,30 +118,30 @@ namespace MvcSiteMapProvider.Collections.Specialized
         {
             foreach (var item in items)
             {
-                this.Add(item.Key, item.Value, throwIfReservedKey);
+                Add(item.Key, item.Value, throwIfReservedKey);
             }
         }
 
         /// <summary>
         /// Adds the elements from a JSON string representing the attributes. If the key exists, the value will be overwritten.
         /// </summary>
-        /// <param name="jsonString">A JSON string that represents a dictionary of key-value pairs. Example: @"{ ""key-1"": ""value-1""[, ""key-x"": ""value-x""] }". 
+        /// <param name="jsonString">A JSON string that represents a dictionary of key-value pairs. Example: @"{ ""key-1"": ""value-1""[, ""key-x"": ""value-x""] }".
         /// The value may be a string or primitive type (by leaving off the quotes).</param>
         public void AddRange(string jsonString)
         {
-            this.AddRange(jsonString, true);
+            AddRange(jsonString, true);
         }
 
         /// <summary>
         /// Adds the elements from a JSON string representing the attributes. If the key exists, the value will be overwritten.
         /// </summary>
-        /// <param name="jsonString">A JSON string that represents a dictionary of key-value pairs. Example: @"{ ""key-1"": ""value-1""[, ""key-x"": ""value-x""] }". 
+        /// <param name="jsonString">A JSON string that represents a dictionary of key-value pairs. Example: @"{ ""key-1"": ""value-1""[, ""key-x"": ""value-x""] }".
         /// The value may be a string or primitive type (by leaving off the quotes).</param>
         /// <param name="throwIfReservedKey"><c>true</c> to throw an exception if one of the keys being added is a reserved key name; otherwise, <c>false</c>.</param>
         public void AddRange(string jsonString, bool throwIfReservedKey)
         {
-            var items = this.jsonToDictionaryDeserializer.Deserialize(jsonString);
-            this.AddRange(items, throwIfReservedKey);
+            var items = jsonToDictionaryDeserializer.Deserialize(jsonString);
+            AddRange(items, throwIfReservedKey);
         }
 
         /// <summary>
@@ -155,7 +150,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
         /// <param name="xmlNode">The <see cref="System.Xml.Linq.XElement"/> that represents the siteMapNode element in XML.</param>
         public void AddRange(XElement xmlNode)
         {
-            this.AddRange(xmlNode, true);
+            AddRange(xmlNode, true);
         }
 
         /// <summary>
@@ -167,7 +162,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
         {
             foreach (XAttribute attribute in xmlNode.Attributes())
             {
-                this.Add(attribute.Name.ToString(), attribute.Value, throwIfReservedKey);
+                Add(attribute.Name.ToString(), attribute.Value, throwIfReservedKey);
             }
         }
 
@@ -177,7 +172,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
         /// <param name="nameValueCollection">The <see cref="System.Collections.Specialized.NameValueCollection"/> to retrieve the values from.</param>
         public void AddRange(NameValueCollection nameValueCollection)
         {
-            this.AddRange(nameValueCollection, true);
+            AddRange(nameValueCollection, true);
         }
 
         /// <summary>
@@ -189,24 +184,24 @@ namespace MvcSiteMapProvider.Collections.Specialized
         {
             foreach (string key in nameValueCollection.Keys)
             {
-                this.Add(key, nameValueCollection[key], throwIfReservedKey);
+                Add(key, nameValueCollection[key], throwIfReservedKey);
             }
         }
 
         protected override void Insert(string key, object value, bool add)
         {
-            this.Insert(key, value, add, true);
+            Insert(key, value, add, true);
         }
 
         protected void Insert(string key, object value, bool add, bool throwIfReservedKey)
         {
-            if (this.reservedAttributeNameProvider.IsRouteAttribute(key))
+            if (reservedAttributeNameProvider.IsRouteAttribute(key))
             {
                 base.Insert(key, value, add);
             }
             else if (throwIfReservedKey)
             {
-                throw new ReservedKeyException(string.Format(Resources.Messages.RouteValueKeyReserved, this.siteMapNodeKey, key, value));
+                throw new ReservedKeyException(string.Format(Resources.Messages.RouteValueKeyReserved, siteMapNodeKey, key, value));
             }
         }
 
@@ -218,13 +213,13 @@ namespace MvcSiteMapProvider.Collections.Specialized
             }
             set
             {
-                if (this.reservedAttributeNameProvider.IsRouteAttribute(key))
+                if (reservedAttributeNameProvider.IsRouteAttribute(key))
                 {
                     base[key] = value;
                 }
                 else
                 {
-                    throw new ReservedKeyException(string.Format(Resources.Messages.RouteValueKeyReserved, this.siteMapNodeKey, key, value));
+                    throw new ReservedKeyException(string.Format(Resources.Messages.RouteValueKeyReserved, siteMapNodeKey, key, value));
                 }
             }
         }
@@ -236,12 +231,12 @@ namespace MvcSiteMapProvider.Collections.Specialized
         {
             get
             {
-                if (this.Count > 3)
+                if (Count > 3)
                     return true;
 
-                foreach (var key in this.Keys)
+                foreach (var key in Keys)
                 {
-                    if (this.IsCustomKey(key))
+                    if (IsCustomKey(key))
                         return true;
                 }
 
@@ -257,7 +252,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
         [Obsolete("Use the overload MatchesRoute(IDictionary<string, object>) instead. This overload will be removed in version 5.")]
         public virtual bool MatchesRoute(IEnumerable<string> actionParameters, IDictionary<string, object> routeValues)
         {
-            return this.MatchesRoute(routeValues);
+            return MatchesRoute(routeValues);
         }
 
         public virtual bool MatchesRoute(IDictionary<string, object> routeValues)
@@ -267,7 +262,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
 
             foreach (var pair in routeValues)
             {
-                if (!this.MatchesRouteValue(pair.Key, pair.Value))
+                if (!MatchesRouteValue(pair.Key, pair.Value))
                 {
                     return false;
                 }
@@ -276,8 +271,8 @@ namespace MvcSiteMapProvider.Collections.Specialized
             // Locate any orphan keys (with non-empty values) in the current configuration that were not
             // included in the comparison. We only want to match if all of them were considered.
             var remainingList = (from rv in this
-                                 where !this.IsEmptyValue(rv.Value)
-                                 where !(routeValues.Keys.Any(x => x == rv.Key))
+                                 where !IsEmptyValue(rv.Value)
+                                 where !routeValues.Keys.Any(x => x == rv.Key)
                                  select rv)
                                 .ToDictionary(x => x.Key);
 
@@ -286,16 +281,16 @@ namespace MvcSiteMapProvider.Collections.Specialized
 
         protected virtual bool MatchesRouteValue(string key, object value)
         {
-            if (this.ValueExists(key))
+            if (ValueExists(key))
             {
-                if (this.MatchesValue(key, value))
+                if (MatchesValue(key, value))
                 {
                     return true;
                 }
             }
             else
             {
-                if (this.IsEmptyValue(value))
+                if (IsEmptyValue(value))
                 {
                     return true;
                 }
@@ -316,8 +311,8 @@ namespace MvcSiteMapProvider.Collections.Specialized
 
         protected virtual bool ValueExists(string key)
         {
-            return this.ContainsKey(key) && 
-                this[key] != null && 
+            return ContainsKey(key) &&
+                this[key] != null &&
                 !string.IsNullOrEmpty(this[key].ToString());
         }
     }

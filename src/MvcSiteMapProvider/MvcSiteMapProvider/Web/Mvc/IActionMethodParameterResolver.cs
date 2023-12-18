@@ -17,7 +17,7 @@ namespace MvcSiteMapProvider.Web.Mvc
         /// <param name="controllerName">Name of the controller.</param>
         /// <param name="actionMethodName">Name of the action method.</param>
         /// <returns>
-        /// A action method parameters represented as a <see cref="string"/> instance 
+        /// A action method parameters represented as a <see cref="string"/> instance
         /// </returns>
         IEnumerable<string> ResolveActionMethodParameters(IControllerTypeResolver controllerTypeResolver, string areaName, string controllerName, string actionMethodName);
     }

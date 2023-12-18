@@ -19,7 +19,7 @@ namespace MvcSiteMapProvider
         /// </value>
         public override ISiteMapNode ParentNode
         {
-            get { return this.SiteMap.GetParentNode(this); }
+            get { return SiteMap.GetParentNode(this); }
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace MvcSiteMapProvider
         /// </value>
         public override ISiteMapNodeCollection ChildNodes
         {
-            get { return this.SiteMap.GetChildNodes(this); }
+            get { return SiteMap.GetChildNodes(this); }
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace MvcSiteMapProvider
         /// </value>
         public override ISiteMapNodeCollection Descendants
         {
-            get { return this.SiteMap.GetDescendants(this); }
+            get { return SiteMap.GetDescendants(this); }
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace MvcSiteMapProvider
         /// </value>
         public override ISiteMapNodeCollection Ancestors
         {
-            get { return this.SiteMap.GetAncestors(this); }
+            get { return SiteMap.GetAncestors(this); }
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace MvcSiteMapProvider
         /// <returns>true if the current node is a child or descendant of the specified node; otherwise, false.</returns>
         public override bool IsDescendantOf(ISiteMapNode node)
         {
-            for (var parent = this.ParentNode; parent != null; parent = parent.ParentNode)
+            for (var parent = ParentNode; parent != null; parent = parent.ParentNode)
             {
                 if (parent.Equals(node))
                 {
@@ -82,7 +82,7 @@ namespace MvcSiteMapProvider
         {
             get
             {
-                var siblingNodes = this.SiblingNodes;
+                var siblingNodes = SiblingNodes;
                 if (siblingNodes != null)
                 {
                     int index = siblingNodes.IndexOf(this);
@@ -105,7 +105,7 @@ namespace MvcSiteMapProvider
         {
             get
             {
-                var siblingNodes = this.SiblingNodes;
+                var siblingNodes = SiblingNodes;
                 if (siblingNodes != null)
                 {
                     int index = siblingNodes.IndexOf(this);
@@ -126,7 +126,7 @@ namespace MvcSiteMapProvider
         /// </value>
         public override ISiteMapNode RootNode
         {
-            get { return this.SiteMap.RootNode; }
+            get { return SiteMap.RootNode; }
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace MvcSiteMapProvider
         {
             get
             {
-                var parentNode = this.ParentNode;
+                var parentNode = ParentNode;
                 if (parentNode != null)
                 {
                     return parentNode.ChildNodes;
@@ -157,7 +157,7 @@ namespace MvcSiteMapProvider
         public override bool IsInCurrentPath()
         {
             ISiteMapNode node = this;
-            return (this.SiteMap.CurrentNode != null && (this.SiteMap.CurrentNode.Equals(node) || this.SiteMap.CurrentNode.IsDescendantOf(node)));
+            return SiteMap.CurrentNode != null && (SiteMap.CurrentNode.Equals(node) || SiteMap.CurrentNode.IsDescendantOf(node));
         }
 
         /// <summary>
@@ -167,8 +167,8 @@ namespace MvcSiteMapProvider
         {
             get
             {
-                var childNodes = this.ChildNodes;
-                return ((childNodes != null) && (childNodes.Count > 0));
+                var childNodes = ChildNodes;
+                return (childNodes?.Count > 0);
             }
         }
 
@@ -197,6 +197,6 @@ namespace MvcSiteMapProvider
         /// </summary>
         public override int Order { get; set; }
 
-        #endregion
+        #endregion Node Map Positioning
     }
 }

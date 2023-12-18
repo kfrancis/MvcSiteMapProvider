@@ -1325,7 +1325,7 @@ namespace MvcSiteMapProvider.Web.Html
 
         /// <summary>
         /// This determines the deepest node matching the current HTTP context, so if the current URL describes a location
-        /// deeper than the site map designates, it will determine the closest parent to the current URL and return that 
+        /// deeper than the site map designates, it will determine the closest parent to the current URL and return that
         /// as the current node. This allows menu relevance when navigating deeper than the sitemap structure designates, such
         /// as when navigating to MVC actions, which are not shown in the menus
         /// </summary>
@@ -1338,7 +1338,7 @@ namespace MvcSiteMapProvider.Web.Html
 
         /// <summary>
         /// This determines the deepest node matching the current HTTP context, so if the current URL describes a location
-        /// deeper than the site map designates, it will determine the closest parent to the current URL and return that 
+        /// deeper than the site map designates, it will determine the closest parent to the current URL and return that
         /// as the current node. This allows menu relevance when navigating deeper than the sitemap structure designates, such
         /// as when navigating to MVC actions, which are not shown in the menus
         /// </summary>
@@ -1350,7 +1350,7 @@ namespace MvcSiteMapProvider.Web.Html
             // get the node matching the current URL location
             var currentNode = selectedSiteMap.CurrentNode;
 
-            // if there is no node matching the current URL path, 
+            // if there is no node matching the current URL path,
             // remove parts until we get a hit
             if (currentNode == null)
             {
@@ -1365,7 +1365,7 @@ namespace MvcSiteMapProvider.Web.Html
                     // if we get a hit, stop
                     if (currentNode != null) break;
 
-                    // if not, remove the last path item  
+                    // if not, remove the last path item
                     var lastSlashlocation = url.LastIndexOf("/");
                     if (lastSlashlocation < 0) break; // protects us from malformed URLs
                     url = url.Remove(lastSlashlocation);
@@ -1466,7 +1466,6 @@ namespace MvcSiteMapProvider.Web.Html
 
             return null;
         }
-
 
         /// <summary>
         /// Gets the source meta data for the current context.

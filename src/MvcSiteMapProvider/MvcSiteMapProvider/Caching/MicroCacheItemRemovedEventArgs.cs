@@ -3,7 +3,7 @@
 namespace MvcSiteMapProvider.Caching
 {
     /// <summary>
-    /// A specialized <see cref="T:System.EventArgs"/> superclass that provides 
+    /// A specialized <see cref="T:System.EventArgs"/> superclass that provides
     /// access to the object instance that was removed from the cache.
     /// </summary>
     public class MicroCacheItemRemovedEventArgs<T>
@@ -11,8 +11,8 @@ namespace MvcSiteMapProvider.Caching
     {
         public MicroCacheItemRemovedEventArgs(string key, T item)
         {
-            this.Key = key;
-            this.Item = item;
+            Key = key;
+            Item = item;
         }
 
         public string Key { get; private set; }

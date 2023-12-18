@@ -12,10 +12,7 @@ namespace MvcSiteMapProvider.Collections
     {
         public LockableList(ISiteMap siteMap)
         {
-            if (siteMap == null)
-                throw new ArgumentNullException("siteMap");
-
-            this.siteMap = siteMap;
+            this.siteMap = siteMap ?? throw new ArgumentNullException(nameof(siteMap));
         }
 
         protected readonly ISiteMap siteMap;
@@ -24,107 +21,106 @@ namespace MvcSiteMapProvider.Collections
         /// Adds an object to the end of the <see cref="T:LockableList"/>
         /// </summary>
         /// <param name="item">The item to add to the list.</param>
-        new public virtual void Add(T item)
+        public virtual new void Add(T item)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.Add(item);
         }
 
-        new public virtual void AddRange(IEnumerable<T> collection)
+        public virtual new void AddRange(IEnumerable<T> collection)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.AddRange(collection);
         }
 
-        new public virtual void Clear()
+        public virtual new void Clear()
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.Clear();
         }
 
-        new public virtual void Insert(int index, T item)
+        public virtual new void Insert(int index, T item)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.Insert(index, item);
         }
 
-        new public virtual void InsertRange(int index, IEnumerable<T> collection)
+        public virtual new void InsertRange(int index, IEnumerable<T> collection)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.InsertRange(index, collection);
         }
 
         public virtual bool IsReadOnly
         {
-            get { return this.siteMap.IsReadOnly; }
+            get { return siteMap.IsReadOnly; }
         }
 
-        new public virtual bool Remove(T item)
+        public virtual new bool Remove(T item)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             return base.Remove(item);
         }
 
-        new public virtual int RemoveAll(Predicate<T> match)
+        public virtual new int RemoveAll(Predicate<T> match)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             return base.RemoveAll(match);
         }
 
-        new public virtual void RemoveAt(int index)
+        public virtual new void RemoveAt(int index)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.RemoveAt(index);
         }
 
-        new public virtual void RemoveRange(int index, int count)
+        public virtual new void RemoveRange(int index, int count)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.RemoveRange(index, count);
         }
 
-        new public virtual void Reverse()
+        public virtual new void Reverse()
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.Reverse();
         }
 
-        new public virtual void Reverse(int index, int count)
+        public virtual new void Reverse(int index, int count)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.Reverse(index, count);
         }
 
-        new public virtual void Sort()
+        public virtual new void Sort()
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.Sort();
         }
 
-        new public virtual void Sort(Comparison<T> comparison)
+        public virtual new void Sort(Comparison<T> comparison)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.Sort(comparison);
         }
 
-        new public virtual void Sort(IComparer<T> comparer)
+        public virtual new void Sort(IComparer<T> comparer)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.Sort(comparer);
         }
 
-        new public virtual void Sort(int index, int count, IComparer<T> comparer)
+        public virtual new void Sort(int index, int count, IComparer<T> comparer)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.Sort(index, count, comparer);
         }
 
-        new public virtual void TrimExcess()
+        public virtual new void TrimExcess()
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.TrimExcess();
         }
-
 
         // Property access to internal list
         protected LockableList<T> List
@@ -134,7 +130,7 @@ namespace MvcSiteMapProvider.Collections
 
         public virtual void CopyTo(IList<T> destination)
         {
-            foreach (var item in this.List)
+            foreach (var item in List)
             {
                 if (!item.GetType().IsPointer)
                 {
@@ -149,7 +145,7 @@ namespace MvcSiteMapProvider.Collections
 
         protected virtual void ThrowIfReadOnly()
         {
-            if (this.IsReadOnly)
+            if (IsReadOnly)
             {
                 throw new InvalidOperationException(string.Format(Resources.Messages.SiteMapReadOnly));
             }

@@ -6,7 +6,7 @@ using System.Threading;
 namespace MvcSiteMapProvider.Globalization
 {
     /// <summary>
-    /// Allows switching the current thread to a new culture in a using block that will automatically 
+    /// Allows switching the current thread to a new culture in a using block that will automatically
     /// return the culture to its previous state upon completion.
     /// </summary>
     [ExcludeFromAutoRegistration]
@@ -18,20 +18,15 @@ namespace MvcSiteMapProvider.Globalization
             CultureInfo uiCulture
             )
         {
-            if (culture == null)
-                throw new ArgumentNullException("culture");
-            if (uiCulture == null)
-                throw new ArgumentNullException("uiCulture");
-
-            this.currentThread = Thread.CurrentThread;
+            currentThread = Thread.CurrentThread;
 
             // Record the current culture settings so they can be restored later.
-            this.originalCulture = this.currentThread.CurrentCulture;
-            this.originalUICulture = this.currentThread.CurrentUICulture;
+            originalCulture = currentThread.CurrentCulture;
+            originalUICulture = currentThread.CurrentUICulture;
 
             // Set both the culture and UI culture for this context.
-            this.currentThread.CurrentCulture = culture;
-            this.currentThread.CurrentUICulture = uiCulture;
+            currentThread.CurrentCulture = culture ?? throw new ArgumentNullException(nameof(culture));
+            currentThread.CurrentUICulture = uiCulture ?? throw new ArgumentNullException(nameof(uiCulture));
         }
 
         private readonly Thread currentThread;
@@ -40,19 +35,19 @@ namespace MvcSiteMapProvider.Globalization
 
         public CultureInfo OriginalCulture
         {
-            get { return this.originalCulture; }
+            get { return originalCulture; }
         }
 
         public CultureInfo OriginalUICulture
         {
-            get { return this.originalUICulture; }
+            get { return originalUICulture; }
         }
 
         public void Dispose()
         {
             // Restore the culture to the way it was before the constructor was called.
-            this.currentThread.CurrentCulture = this.originalCulture;
-            this.currentThread.CurrentUICulture = this.originalUICulture;
+            currentThread.CurrentCulture = originalCulture;
+            currentThread.CurrentUICulture = originalUICulture;
         }
     }
 }

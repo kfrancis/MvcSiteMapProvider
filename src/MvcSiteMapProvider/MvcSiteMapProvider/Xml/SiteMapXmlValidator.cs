@@ -7,7 +7,7 @@ namespace MvcSiteMapProvider.Xml
     /// <summary>
     /// Validates an XML file against an XSD schema. Throws an exception if it fails.
     /// </summary>
-    public class SiteMapXmlValidator 
+    public class SiteMapXmlValidator
         : ISiteMapXmlValidator
     {
         public void ValidateXml(string xmlPath)
@@ -16,14 +16,16 @@ namespace MvcSiteMapProvider.Xml
             const string resourceFileName = "MvcSiteMapSchema.xsd";
 
             var xsdPath = resourceNamespace + "." + resourceFileName;
-            var xsdStream = this.GetType().Assembly.GetManifestResourceStream(xsdPath);
+            var xsdStream = GetType().Assembly.GetManifestResourceStream(xsdPath);
             using (XmlReader xsd = XmlReader.Create(xsdStream))
             {
                 XmlSchemaSet schema = new XmlSchemaSet();
                 schema.Add(null, xsd);
 
-                XmlReaderSettings xmlReaderSettings = new XmlReaderSettings();
-                xmlReaderSettings.ValidationType = ValidationType.Schema;
+                XmlReaderSettings xmlReaderSettings = new XmlReaderSettings
+                {
+                    ValidationType = ValidationType.Schema
+                };
                 xmlReaderSettings.Schemas.Add(schema);
                 //xmlReaderSettings.ValidationEventHandler += new ValidationEventHandler(ValidationHandler);
 

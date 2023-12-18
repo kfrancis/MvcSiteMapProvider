@@ -23,7 +23,9 @@ namespace MvcSiteMapProvider.Collections.Specialized
         void AddRange(IEnumerable<string> collection);
 
         string GetMetaRobotsContentString();
+
         bool HasNoIndexAndNoFollow { get; }
+
         void CopyTo(IList<string> destination);
     }
 }

@@ -14,6 +14,6 @@
             get { return null; }
         }
 
-        #endregion
+        #endregion ICacheDependency Members
     }
 }

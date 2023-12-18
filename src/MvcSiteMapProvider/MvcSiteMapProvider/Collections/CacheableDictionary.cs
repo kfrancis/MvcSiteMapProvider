@@ -1,8 +1,11 @@
 ﻿using MvcSiteMapProvider.Caching;
 using System;
 using System.Collections.Generic;
+
 #if !NET35
+
 using System.Collections.Specialized;
+
 #endif
 
 namespace MvcSiteMapProvider.Collections
@@ -21,10 +24,7 @@ namespace MvcSiteMapProvider.Collections
             )
             : base(siteMap)
         {
-            if (cache == null)
-                throw new ArgumentNullException("cache");
-
-            this.cache = cache;
+            this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
         }
 
         protected readonly ICache cache;
@@ -34,44 +34,44 @@ namespace MvcSiteMapProvider.Collections
 
         public override void Add(KeyValuePair<TKey, TValue> item)
         {
-            this.WriteOperationDictionary.Add(item);
+            WriteOperationDictionary.Add(item);
         }
 
         public override void Add(TKey key, TValue value)
         {
-            this.WriteOperationDictionary.Add(key, value);
+            WriteOperationDictionary.Add(key, value);
         }
 
         public override void AddRange(IDictionary<TKey, TValue> items)
         {
             foreach (var item in items)
             {
-                this.WriteOperationDictionary.Add(item);
+                WriteOperationDictionary.Add(item);
             }
         }
 
         public override void Clear()
         {
-            this.WriteOperationDictionary.Clear();
+            WriteOperationDictionary.Clear();
         }
 
         protected override void Insert(TKey key, TValue value, bool add)
         {
-            if (key == null) throw new ArgumentNullException("key");
+            if (key == null) throw new ArgumentNullException(nameof(key));
 
             TValue item;
-            if (this.ReadOperationDictionary.TryGetValue(key, out item))
+            if (ReadOperationDictionary.TryGetValue(key, out item))
             {
                 if (add) throw new ArgumentException(Resources.Messages.DictionaryAlreadyContainsKey);
                 if (Equals(item, value)) return;
-                this.WriteOperationDictionary[key] = value;
+                WriteOperationDictionary[key] = value;
 #if !NET35
                 OnCollectionChanged(NotifyCollectionChangedAction.Replace, new KeyValuePair<TKey, TValue>(key, value), new KeyValuePair<TKey, TValue>(key, item));
 #endif
             }
             else
             {
-                this.WriteOperationDictionary[key] = value;
+                WriteOperationDictionary[key] = value;
 #if !NET35
                 OnCollectionChanged(NotifyCollectionChangedAction.Add, new KeyValuePair<TKey, TValue>(key, value));
 #endif
@@ -80,81 +80,80 @@ namespace MvcSiteMapProvider.Collections
 
         public override bool Remove(KeyValuePair<TKey, TValue> item)
         {
-            return this.WriteOperationDictionary.Remove(item);
+            return WriteOperationDictionary.Remove(item);
         }
 
         public override bool Remove(TKey key)
         {
-            return this.WriteOperationDictionary.Remove(key);
+            return WriteOperationDictionary.Remove(key);
         }
 
-        #endregion
+        #endregion Write Operations
 
         public override TValue this[TKey key]
         {
-            get { return this.ReadOperationDictionary[key]; }
-            set { this.WriteOperationDictionary[key] = value; }
+            get { return ReadOperationDictionary[key]; }
+            set { WriteOperationDictionary[key] = value; }
         }
 
         #region Read Operations
 
         public override bool Contains(KeyValuePair<TKey, TValue> item)
         {
-            return this.ReadOperationDictionary.Contains(item);
+            return ReadOperationDictionary.Contains(item);
         }
 
         public override bool ContainsKey(TKey key)
         {
-            return this.ReadOperationDictionary.ContainsKey(key);
+            return ReadOperationDictionary.ContainsKey(key);
         }
 
         public override void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            this.ReadOperationDictionary.CopyTo(array, arrayIndex);
+            ReadOperationDictionary.CopyTo(array, arrayIndex);
         }
 
         public override int Count
         {
-            get { return this.ReadOperationDictionary.Count; }
+            get { return ReadOperationDictionary.Count; }
         }
 
         public override bool Equals(object obj)
         {
-            return this.ReadOperationDictionary.Equals(obj);
+            return ReadOperationDictionary.Equals(obj);
         }
 
         public override IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            return this.ReadOperationDictionary.GetEnumerator();
+            return ReadOperationDictionary.GetEnumerator();
         }
 
         public override int GetHashCode()
         {
-            return this.ReadOperationDictionary.GetHashCode();
+            return ReadOperationDictionary.GetHashCode();
         }
 
         public override ICollection<TKey> Keys
         {
-            get { return this.ReadOperationDictionary.Keys; }
+            get { return ReadOperationDictionary.Keys; }
         }
 
         public override string ToString()
         {
-            return this.ReadOperationDictionary.ToString();
+            return ReadOperationDictionary.ToString();
         }
 
         public override bool TryGetValue(TKey key, out TValue value)
         {
-            return this.ReadOperationDictionary.TryGetValue(key, out value);
+            return ReadOperationDictionary.TryGetValue(key, out value);
         }
 
         public override ICollection<TValue> Values
         {
-            get { return this.ReadOperationDictionary.Values; }
+            get { return ReadOperationDictionary.Values; }
         }
 
-        #endregion
-
+        #endregion Read Operations
 
         /// <summary>
         /// Override this property and set it to false to disable all caching operations.
@@ -164,12 +163,10 @@ namespace MvcSiteMapProvider.Collections
             get { return true; }
         }
 
-
         protected virtual string GetCacheKey()
         {
-            return "__CACHEABLE_DICTIONARY_" + this.instanceId.ToString();
+            return "__CACHEABLE_DICTIONARY_" + instanceId.ToString();
         }
-
 
         /// <summary>
         /// Gets a dictionary object that can be used to to perform a read operation.
@@ -179,10 +176,10 @@ namespace MvcSiteMapProvider.Collections
             get
             {
                 IDictionary<TKey, TValue> result = null;
-                if (this.CachingEnabled)
+                if (CachingEnabled)
                 {
-                    var key = this.GetCacheKey();
-                    result = this.cache.GetValue<IDictionary<TKey, TValue>>(key);
+                    var key = GetCacheKey();
+                    result = cache.GetValue<IDictionary<TKey, TValue>>(key);
                     if (result == null)
                     {
                         // Request is not cached, return base dictionary
@@ -205,18 +202,18 @@ namespace MvcSiteMapProvider.Collections
             get
             {
                 IDictionary<TKey, TValue> result = null;
-                if (this.IsReadOnly && this.CachingEnabled)
+                if (IsReadOnly && CachingEnabled)
                 {
-                    var key = this.GetCacheKey();
-                    result = this.cache.GetValue<IDictionary<TKey, TValue>>(key);
+                    var key = GetCacheKey();
+                    result = cache.GetValue<IDictionary<TKey, TValue>>(key);
                     if (result == null)
                     {
-                        // This is the first write operation request in read-only mode, 
+                        // This is the first write operation request in read-only mode,
                         // we need to create a new dictionary and cache it
                         // with a copy of the current values.
                         result = new Dictionary<TKey, TValue>();
                         base.CopyTo(result);
-                        this.cache.SetValue<IDictionary<TKey, TValue>>(key, result);
+                        cache.SetValue<IDictionary<TKey, TValue>>(key, result);
                     }
                 }
                 else

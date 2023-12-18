@@ -20,8 +20,8 @@ namespace MvcSiteMapProvider.Linq
 
         public static IQueryable Where(this IQueryable source, string predicate, params object[] values)
         {
-            if (source == null) throw new ArgumentNullException("source");
-            if (predicate == null) throw new ArgumentNullException("predicate");
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
             LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(bool), predicate, values);
             return source.Provider.CreateQuery(
                 Expression.Call(
@@ -32,8 +32,8 @@ namespace MvcSiteMapProvider.Linq
 
         public static IQueryable Select(this IQueryable source, string selector, params object[] values)
         {
-            if (source == null) throw new ArgumentNullException("source");
-            if (selector == null) throw new ArgumentNullException("selector");
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (selector == null) throw new ArgumentNullException(nameof(selector));
             LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, null, selector, values);
             return source.Provider.CreateQuery(
                 Expression.Call(
@@ -49,8 +49,8 @@ namespace MvcSiteMapProvider.Linq
 
         public static IQueryable OrderBy(this IQueryable source, string ordering, params object[] values)
         {
-            if (source == null) throw new ArgumentNullException("source");
-            if (ordering == null) throw new ArgumentNullException("ordering");
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (ordering == null) throw new ArgumentNullException(nameof(ordering));
             ParameterExpression[] parameters = new ParameterExpression[] {
                 Expression.Parameter(source.ElementType, "") };
             ExpressionParser parser = new ExpressionParser(parameters, ordering, values);
@@ -72,7 +72,7 @@ namespace MvcSiteMapProvider.Linq
 
         public static IQueryable Take(this IQueryable source, int count)
         {
-            if (source == null) throw new ArgumentNullException("source");
+            if (source == null) throw new ArgumentNullException(nameof(source));
             return source.Provider.CreateQuery(
                 Expression.Call(
                     typeof(Queryable), "Take",
@@ -82,7 +82,7 @@ namespace MvcSiteMapProvider.Linq
 
         public static IQueryable Skip(this IQueryable source, int count)
         {
-            if (source == null) throw new ArgumentNullException("source");
+            if (source == null) throw new ArgumentNullException(nameof(source));
             return source.Provider.CreateQuery(
                 Expression.Call(
                     typeof(Queryable), "Skip",
@@ -92,9 +92,9 @@ namespace MvcSiteMapProvider.Linq
 
         public static IQueryable GroupBy(this IQueryable source, string keySelector, string elementSelector, params object[] values)
         {
-            if (source == null) throw new ArgumentNullException("source");
-            if (keySelector == null) throw new ArgumentNullException("keySelector");
-            if (elementSelector == null) throw new ArgumentNullException("elementSelector");
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (keySelector == null) throw new ArgumentNullException(nameof(keySelector));
+            if (elementSelector == null) throw new ArgumentNullException(nameof(elementSelector));
             LambdaExpression keyLambda = DynamicExpression.ParseLambda(source.ElementType, null, keySelector, values);
             LambdaExpression elementLambda = DynamicExpression.ParseLambda(source.ElementType, null, elementSelector, values);
             return source.Provider.CreateQuery(
@@ -106,7 +106,7 @@ namespace MvcSiteMapProvider.Linq
 
         public static bool Any(this IQueryable source)
         {
-            if (source == null) throw new ArgumentNullException("source");
+            if (source == null) throw new ArgumentNullException(nameof(source));
             return (bool)source.Provider.Execute(
                 Expression.Call(
                     typeof(Queryable), "Any",
@@ -115,7 +115,7 @@ namespace MvcSiteMapProvider.Linq
 
         public static int Count(this IQueryable source)
         {
-            if (source == null) throw new ArgumentNullException("source");
+            if (source == null) throw new ArgumentNullException(nameof(source));
             return (int)source.Provider.Execute(
                 Expression.Call(
                     typeof(Queryable), "Count",
@@ -127,7 +127,7 @@ namespace MvcSiteMapProvider.Linq
     {
         public override string ToString()
         {
-            PropertyInfo[] props = this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            PropertyInfo[] props = GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
             StringBuilder sb = new StringBuilder();
             sb.Append("{");
             for (int i = 0; i < props.Length; i++)
@@ -144,15 +144,13 @@ namespace MvcSiteMapProvider.Linq
 
     public class DynamicProperty
     {
-        string name;
-        Type type;
+        private string name;
+        private Type type;
 
         public DynamicProperty(string name, Type type)
         {
-            if (name == null) throw new ArgumentNullException("name");
-            if (type == null) throw new ArgumentNullException("type");
-            this.name = name;
-            this.type = type;
+            this.name = name ?? throw new ArgumentNullException(nameof(name));
+            this.type = type ?? throw new ArgumentNullException(nameof(type));
         }
 
         public string Name
@@ -248,12 +246,14 @@ namespace MvcSiteMapProvider.Linq
     {
         public static readonly ClassFactory Instance = new ClassFactory();
 
-        static ClassFactory() { }  // Trigger lazy initialization of static fields
+        static ClassFactory()
+        {
+        }  // Trigger lazy initialization of static fields
 
-        ModuleBuilder module;
-        Dictionary<Signature, Type> classes;
-        int classCount;
-        ReaderWriterLock rwLock;
+        private ModuleBuilder module;
+        private Dictionary<Signature, Type> classes;
+        private int classCount;
+        private ReaderWriterLock rwLock;
 
         private ClassFactory()
         {
@@ -296,7 +296,7 @@ namespace MvcSiteMapProvider.Linq
             }
         }
 
-        Type CreateDynamicClass(DynamicProperty[] properties)
+        private Type CreateDynamicClass(DynamicProperty[] properties)
         {
             LockCookie cookie = rwLock.UpgradeToWriterLock(Timeout.Infinite);
             try
@@ -307,7 +307,7 @@ namespace MvcSiteMapProvider.Linq
 #endif
                 try
                 {
-                    TypeBuilder tb = this.module.DefineType(typeName, TypeAttributes.Class |
+                    TypeBuilder tb = module.DefineType(typeName, TypeAttributes.Class |
                         TypeAttributes.Public, typeof(DynamicClass));
                     FieldInfo[] fields = GenerateProperties(tb, properties);
                     GenerateEquals(tb, fields);
@@ -329,7 +329,7 @@ namespace MvcSiteMapProvider.Linq
             }
         }
 
-        FieldInfo[] GenerateProperties(TypeBuilder tb, DynamicProperty[] properties)
+        private FieldInfo[] GenerateProperties(TypeBuilder tb, DynamicProperty[] properties)
         {
             FieldInfo[] fields = new FieldBuilder[properties.Length];
             for (int i = 0; i < properties.Length; i++)
@@ -359,7 +359,7 @@ namespace MvcSiteMapProvider.Linq
             return fields;
         }
 
-        void GenerateEquals(TypeBuilder tb, FieldInfo[] fields)
+        private void GenerateEquals(TypeBuilder tb, FieldInfo[] fields)
         {
             MethodBuilder mb = tb.DefineMethod("Equals",
                 MethodAttributes.Public | MethodAttributes.ReuseSlot |
@@ -396,7 +396,7 @@ namespace MvcSiteMapProvider.Linq
             gen.Emit(OpCodes.Ret);
         }
 
-        void GenerateGetHashCode(TypeBuilder tb, FieldInfo[] fields)
+        private void GenerateGetHashCode(TypeBuilder tb, FieldInfo[] fields)
         {
             MethodBuilder mb = tb.DefineMethod("GetHashCode",
                 MethodAttributes.Public | MethodAttributes.ReuseSlot |
@@ -420,12 +420,24 @@ namespace MvcSiteMapProvider.Linq
 
     public sealed class ParseException : Exception
     {
-        int position;
+        private int position;
 
         public ParseException(string message, int position)
             : base(message)
         {
             this.position = position;
+        }
+
+        public ParseException() : base()
+        {
+        }
+
+        public ParseException(string message) : base(message)
+        {
+        }
+
+        public ParseException(string message, Exception innerException) : base(message, innerException)
+        {
         }
 
         public int Position
@@ -441,14 +453,14 @@ namespace MvcSiteMapProvider.Linq
 
     internal class ExpressionParser
     {
-        struct Token
+        private struct Token
         {
             public TokenId id;
             public string text;
             public int pos;
         }
 
-        enum TokenId
+        private enum TokenId
         {
             Unknown,
             End,
@@ -484,114 +496,176 @@ namespace MvcSiteMapProvider.Linq
             DoubleBar
         }
 
-        interface ILogicalSignatures
+        private interface ILogicalSignatures
         {
             void F(bool x, bool y);
+
             void F(bool? x, bool? y);
         }
 
-        interface IArithmeticSignatures
+        private interface IArithmeticSignatures
         {
             void F(int x, int y);
+
             void F(uint x, uint y);
+
             void F(long x, long y);
+
             void F(ulong x, ulong y);
+
             void F(float x, float y);
+
             void F(double x, double y);
+
             void F(decimal x, decimal y);
+
             void F(int? x, int? y);
+
             void F(uint? x, uint? y);
+
             void F(long? x, long? y);
+
             void F(ulong? x, ulong? y);
+
             void F(float? x, float? y);
+
             void F(double? x, double? y);
+
             void F(decimal? x, decimal? y);
         }
 
-        interface IRelationalSignatures : IArithmeticSignatures
+        private interface IRelationalSignatures : IArithmeticSignatures
         {
             void F(string x, string y);
+
             void F(char x, char y);
+
             void F(DateTime x, DateTime y);
+
             void F(TimeSpan x, TimeSpan y);
+
             void F(char? x, char? y);
+
             void F(DateTime? x, DateTime? y);
+
             void F(TimeSpan? x, TimeSpan? y);
         }
 
-        interface IEqualitySignatures : IRelationalSignatures
+        private interface IEqualitySignatures : IRelationalSignatures
         {
             void F(bool x, bool y);
+
             void F(bool? x, bool? y);
         }
 
-        interface IAddSignatures : IArithmeticSignatures
+        private interface IAddSignatures : IArithmeticSignatures
         {
             void F(DateTime x, TimeSpan y);
+
             void F(TimeSpan x, TimeSpan y);
+
             void F(DateTime? x, TimeSpan? y);
+
             void F(TimeSpan? x, TimeSpan? y);
         }
 
-        interface ISubtractSignatures : IAddSignatures
+        private interface ISubtractSignatures : IAddSignatures
         {
             void F(DateTime x, DateTime y);
+
             void F(DateTime? x, DateTime? y);
         }
 
-        interface INegationSignatures
+        private interface INegationSignatures
         {
             void F(int x);
+
             void F(long x);
+
             void F(float x);
+
             void F(double x);
+
             void F(decimal x);
+
             void F(int? x);
+
             void F(long? x);
+
             void F(float? x);
+
             void F(double? x);
+
             void F(decimal? x);
         }
 
-        interface INotSignatures
+        private interface INotSignatures
         {
             void F(bool x);
+
             void F(bool? x);
         }
 
-        interface IEnumerableSignatures
+        private interface IEnumerableSignatures
         {
             void Where(bool predicate);
+
             void Any();
+
             void Any(bool predicate);
+
             void All(bool predicate);
+
             void Count();
+
             void Count(bool predicate);
+
             void Min(object selector);
+
             void Max(object selector);
+
             void Sum(int selector);
+
             void Sum(int? selector);
+
             void Sum(long selector);
+
             void Sum(long? selector);
+
             void Sum(float selector);
+
             void Sum(float? selector);
+
             void Sum(double selector);
+
             void Sum(double? selector);
+
             void Sum(decimal selector);
+
             void Sum(decimal? selector);
+
             void Average(int selector);
+
             void Average(int? selector);
+
             void Average(long selector);
+
             void Average(long? selector);
+
             void Average(float selector);
+
             void Average(float? selector);
+
             void Average(double selector);
+
             void Average(double? selector);
+
             void Average(decimal selector);
+
             void Average(decimal? selector);
         }
 
-        static readonly Type[] predefinedTypes = {
+        private static readonly Type[] predefinedTypes = {
             typeof(Object),
             typeof(Boolean),
             typeof(Char),
@@ -614,41 +688,40 @@ namespace MvcSiteMapProvider.Linq
             typeof(Convert)
         };
 
-        static readonly Expression trueLiteral = Expression.Constant(true);
-        static readonly Expression falseLiteral = Expression.Constant(false);
-        static readonly Expression nullLiteral = Expression.Constant(null);
+        private static readonly Expression trueLiteral = Expression.Constant(true);
+        private static readonly Expression falseLiteral = Expression.Constant(false);
+        private static readonly Expression nullLiteral = Expression.Constant(null);
 
-        static readonly string keywordIt = "it";
-        static readonly string keywordIif = "iif";
-        static readonly string keywordNew = "new";
+        private static readonly string keywordIt = "it";
+        private static readonly string keywordIif = "iif";
+        private static readonly string keywordNew = "new";
 
-        static Dictionary<string, object> keywords;
+        private static Dictionary<string, object> keywords;
 
-        Dictionary<string, object> symbols;
-        IDictionary<string, object> externals;
-        Dictionary<Expression, string> literals;
-        ParameterExpression it;
-        string text;
-        int textPos;
-        int textLen;
-        char ch;
-        Token token;
+        private Dictionary<string, object> symbols;
+        private IDictionary<string, object> externals;
+        private Dictionary<Expression, string> literals;
+        private ParameterExpression it;
+        private string text;
+        private int textPos;
+        private int textLen;
+        private char ch;
+        private Token token;
 
         public ExpressionParser(ParameterExpression[] parameters, string expression, object[] values)
         {
-            if (expression == null) throw new ArgumentNullException("expression");
             if (keywords == null) keywords = CreateKeywords();
             symbols = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             literals = new Dictionary<Expression, string>();
             if (parameters != null) ProcessParameters(parameters);
             if (values != null) ProcessValues(values);
-            text = expression;
+            text = expression ?? throw new ArgumentNullException(nameof(expression));
             textLen = text.Length;
             SetTextPos(0);
             NextToken();
         }
 
-        void ProcessParameters(ParameterExpression[] parameters)
+        private void ProcessParameters(ParameterExpression[] parameters)
         {
             foreach (ParameterExpression pe in parameters)
                 if (!string.IsNullOrEmpty(pe.Name))
@@ -657,7 +730,7 @@ namespace MvcSiteMapProvider.Linq
                 it = parameters[0];
         }
 
-        void ProcessValues(object[] values)
+        private void ProcessValues(object[] values)
         {
             for (int i = 0; i < values.Length; i++)
             {
@@ -673,7 +746,7 @@ namespace MvcSiteMapProvider.Linq
             }
         }
 
-        void AddSymbol(string name, object value)
+        private void AddSymbol(string name, object value)
         {
             if (symbols.ContainsKey(name))
                 throw ParseError(Res.DuplicateIdentifier, name);
@@ -692,6 +765,7 @@ namespace MvcSiteMapProvider.Linq
         }
 
 #pragma warning disable 0219
+
         public IEnumerable<DynamicOrdering> ParseOrdering()
         {
             List<DynamicOrdering> orderings = new List<DynamicOrdering>();
@@ -715,10 +789,11 @@ namespace MvcSiteMapProvider.Linq
             ValidateToken(TokenId.End, Res.SyntaxError);
             return orderings;
         }
+
 #pragma warning restore 0219
 
         // ?: operator
-        Expression ParseExpression()
+        private Expression ParseExpression()
         {
             int errorPos = token.pos;
             Expression expr = ParseLogicalOr();
@@ -735,7 +810,7 @@ namespace MvcSiteMapProvider.Linq
         }
 
         // ||, or operator
-        Expression ParseLogicalOr()
+        private Expression ParseLogicalOr()
         {
             Expression left = ParseLogicalAnd();
             while (token.id == TokenId.DoubleBar || TokenIdentifierIs("or"))
@@ -750,7 +825,7 @@ namespace MvcSiteMapProvider.Linq
         }
 
         // &&, and operator
-        Expression ParseLogicalAnd()
+        private Expression ParseLogicalAnd()
         {
             Expression left = ParseComparison();
             while (token.id == TokenId.DoubleAmphersand || TokenIdentifierIs("and"))
@@ -765,7 +840,7 @@ namespace MvcSiteMapProvider.Linq
         }
 
         // =, ==, !=, <>, >, >=, <, <= operators
-        Expression ParseComparison()
+        private Expression ParseComparison()
         {
             Expression left = ParseAdditive();
             while (token.id == TokenId.Equal || token.id == TokenId.DoubleEqual ||
@@ -826,19 +901,24 @@ namespace MvcSiteMapProvider.Linq
                     case TokenId.DoubleEqual:
                         left = GenerateEqual(left, right);
                         break;
+
                     case TokenId.ExclamationEqual:
                     case TokenId.LessGreater:
                         left = GenerateNotEqual(left, right);
                         break;
+
                     case TokenId.GreaterThan:
                         left = GenerateGreaterThan(left, right);
                         break;
+
                     case TokenId.GreaterThanEqual:
                         left = GenerateGreaterThanEqual(left, right);
                         break;
+
                     case TokenId.LessThan:
                         left = GenerateLessThan(left, right);
                         break;
+
                     case TokenId.LessThanEqual:
                         left = GenerateLessThanEqual(left, right);
                         break;
@@ -848,7 +928,7 @@ namespace MvcSiteMapProvider.Linq
         }
 
         // +, -, & operators
-        Expression ParseAdditive()
+        private Expression ParseAdditive()
         {
             Expression left = ParseMultiplicative();
             while (token.id == TokenId.Plus || token.id == TokenId.Minus ||
@@ -865,10 +945,12 @@ namespace MvcSiteMapProvider.Linq
                         CheckAndPromoteOperands(typeof(IAddSignatures), op.text, ref left, ref right, op.pos);
                         left = GenerateAdd(left, right);
                         break;
+
                     case TokenId.Minus:
                         CheckAndPromoteOperands(typeof(ISubtractSignatures), op.text, ref left, ref right, op.pos);
                         left = GenerateSubtract(left, right);
                         break;
+
                     case TokenId.Amphersand:
                         left = GenerateStringConcat(left, right);
                         break;
@@ -878,7 +960,7 @@ namespace MvcSiteMapProvider.Linq
         }
 
         // *, /, %, mod operators
-        Expression ParseMultiplicative()
+        private Expression ParseMultiplicative()
         {
             Expression left = ParseUnary();
             while (token.id == TokenId.Asterisk || token.id == TokenId.Slash ||
@@ -893,9 +975,11 @@ namespace MvcSiteMapProvider.Linq
                     case TokenId.Asterisk:
                         left = Expression.Multiply(left, right);
                         break;
+
                     case TokenId.Slash:
                         left = Expression.Divide(left, right);
                         break;
+
                     case TokenId.Percent:
                     case TokenId.Identifier:
                         left = Expression.Modulo(left, right);
@@ -906,7 +990,7 @@ namespace MvcSiteMapProvider.Linq
         }
 
         // -, !, not unary operators
-        Expression ParseUnary()
+        private Expression ParseUnary()
         {
             if (token.id == TokenId.Minus || token.id == TokenId.Exclamation ||
                 TokenIdentifierIs("not"))
@@ -936,7 +1020,7 @@ namespace MvcSiteMapProvider.Linq
             return ParsePrimary();
         }
 
-        Expression ParsePrimary()
+        private Expression ParsePrimary()
         {
             Expression expr = ParsePrimaryStart();
             while (true)
@@ -958,26 +1042,31 @@ namespace MvcSiteMapProvider.Linq
             return expr;
         }
 
-        Expression ParsePrimaryStart()
+        private Expression ParsePrimaryStart()
         {
             switch (token.id)
             {
                 case TokenId.Identifier:
                     return ParseIdentifier();
+
                 case TokenId.StringLiteral:
                     return ParseStringLiteral();
+
                 case TokenId.IntegerLiteral:
                     return ParseIntegerLiteral();
+
                 case TokenId.RealLiteral:
                     return ParseRealLiteral();
+
                 case TokenId.OpenParen:
                     return ParseParenExpression();
+
                 default:
                     throw ParseError(Res.ExpressionExpected);
             }
         }
 
-        Expression ParseStringLiteral()
+        private Expression ParseStringLiteral()
         {
             ValidateToken(TokenId.StringLiteral);
             char quote = token.text[0];
@@ -1001,7 +1090,7 @@ namespace MvcSiteMapProvider.Linq
             return CreateLiteral(s, s);
         }
 
-        Expression ParseIntegerLiteral()
+        private Expression ParseIntegerLiteral()
         {
             ValidateToken(TokenId.IntegerLiteral);
             string tokenText = token.text;
@@ -1028,7 +1117,7 @@ namespace MvcSiteMapProvider.Linq
             }
         }
 
-        Expression ParseRealLiteral()
+        private Expression ParseRealLiteral()
         {
             ValidateToken(TokenId.RealLiteral);
             string text = token.text;
@@ -1049,14 +1138,14 @@ namespace MvcSiteMapProvider.Linq
             return CreateLiteral(value, text);
         }
 
-        Expression CreateLiteral(object value, string text)
+        private Expression CreateLiteral(object value, string text)
         {
             ConstantExpression expr = Expression.Constant(value);
             literals.Add(expr, text);
             return expr;
         }
 
-        Expression ParseParenExpression()
+        private Expression ParseParenExpression()
         {
             ValidateToken(TokenId.OpenParen, Res.OpenParenExpected);
             NextToken();
@@ -1066,7 +1155,7 @@ namespace MvcSiteMapProvider.Linq
             return e;
         }
 
-        Expression ParseIdentifier()
+        private Expression ParseIdentifier()
         {
             ValidateToken(TokenId.Identifier);
             object value;
@@ -1082,15 +1171,13 @@ namespace MvcSiteMapProvider.Linq
             if (symbols.TryGetValue(token.text, out value) ||
                 externals != null && externals.TryGetValue(token.text, out value))
             {
-                Expression expr = value as Expression;
-                if (expr == null)
+                if (!(value is Expression expr))
                 {
                     expr = Expression.Constant(value);
                 }
                 else
                 {
-                    LambdaExpression lambda = expr as LambdaExpression;
-                    if (lambda != null) return ParseLambdaInvocation(lambda);
+                    if (expr is LambdaExpression lambda) return ParseLambdaInvocation(lambda);
                 }
                 NextToken();
                 return expr;
@@ -1099,7 +1186,7 @@ namespace MvcSiteMapProvider.Linq
             throw ParseError(Res.UnknownIdentifier, token.text);
         }
 
-        Expression ParseIt()
+        private Expression ParseIt()
         {
             if (it == null)
                 throw ParseError(Res.NoItInScope);
@@ -1107,7 +1194,7 @@ namespace MvcSiteMapProvider.Linq
             return it;
         }
 
-        Expression ParseIif()
+        private Expression ParseIif()
         {
             int errorPos = token.pos;
             NextToken();
@@ -1117,7 +1204,7 @@ namespace MvcSiteMapProvider.Linq
             return GenerateConditional(args[0], args[1], args[2], errorPos);
         }
 
-        Expression GenerateConditional(Expression test, Expression expr1, Expression expr2, int errorPos)
+        private Expression GenerateConditional(Expression test, Expression expr1, Expression expr2, int errorPos)
         {
             if (test.Type != typeof(bool))
                 throw ParseError(errorPos, Res.FirstExprMustBeBool);
@@ -1145,7 +1232,7 @@ namespace MvcSiteMapProvider.Linq
             return Expression.Condition(test, expr1, expr2);
         }
 
-        Expression ParseNew()
+        private Expression ParseNew()
         {
             NextToken();
             ValidateToken(TokenId.OpenParen, Res.OpenParenExpected);
@@ -1165,8 +1252,7 @@ namespace MvcSiteMapProvider.Linq
                 }
                 else
                 {
-                    MemberExpression me = expr as MemberExpression;
-                    if (me == null) throw ParseError(exprPos, Res.MissingAsClause);
+                    MemberExpression me = expr as MemberExpression ?? throw ParseError(exprPos, Res.MissingAsClause);
                     propName = me.Member.Name;
                 }
                 expressions.Add(expr);
@@ -1183,7 +1269,7 @@ namespace MvcSiteMapProvider.Linq
             return Expression.MemberInit(Expression.New(type), bindings);
         }
 
-        Expression ParseLambdaInvocation(LambdaExpression lambda)
+        private Expression ParseLambdaInvocation(LambdaExpression lambda)
         {
             int errorPos = token.pos;
             NextToken();
@@ -1194,7 +1280,7 @@ namespace MvcSiteMapProvider.Linq
             return Expression.Invoke(lambda, args);
         }
 
-        Expression ParseTypeAccess(Type type)
+        private Expression ParseTypeAccess(Type type)
         {
             int errorPos = token.pos;
             NextToken();
@@ -1217,6 +1303,7 @@ namespace MvcSiteMapProvider.Linq
                         throw ParseError(errorPos, Res.NoMatchingConstructor, GetTypeName(type));
                     case 1:
                         return Expression.New((ConstructorInfo)method, args);
+
                     default:
                         throw ParseError(errorPos, Res.AmbiguousConstructorInvocation, GetTypeName(type));
                 }
@@ -1226,7 +1313,7 @@ namespace MvcSiteMapProvider.Linq
             return ParseMemberAccess(type, null);
         }
 
-        Expression GenerateConversion(Expression expr, Type type, int errorPos)
+        private Expression GenerateConversion(Expression expr, Type type, int errorPos)
         {
             Type exprType = expr.Type;
             if (exprType == type) return expr;
@@ -1246,7 +1333,7 @@ namespace MvcSiteMapProvider.Linq
                 GetTypeName(exprType), GetTypeName(type));
         }
 
-        Expression ParseMemberAccess(Type type, Expression instance)
+        private Expression ParseMemberAccess(Type type, Expression instance)
         {
             if (instance != null) type = instance.Type;
             int errorPos = token.pos;
@@ -1278,6 +1365,7 @@ namespace MvcSiteMapProvider.Linq
                             throw ParseError(errorPos, Res.MethodIsVoid,
                                 id, GetTypeName(method.DeclaringType));
                         return Expression.Call(instance, (MethodInfo)method, args);
+
                     default:
                         throw ParseError(errorPos, Res.AmbiguousMethodInvocation,
                             id, GetTypeName(type));
@@ -1285,9 +1373,7 @@ namespace MvcSiteMapProvider.Linq
             }
             else
             {
-                MemberInfo member = FindPropertyOrField(type, id, instance == null);
-                if (member == null)
-                    throw ParseError(errorPos, Res.UnknownPropertyOrField,
+                MemberInfo member = FindPropertyOrField(type, id, instance == null) ?? throw ParseError(errorPos, Res.UnknownPropertyOrField,
                         id, GetTypeName(type));
                 return member is PropertyInfo ?
                     Expression.Property(instance, (PropertyInfo)member) :
@@ -1295,7 +1381,7 @@ namespace MvcSiteMapProvider.Linq
             }
         }
 
-        static Type FindGenericType(Type generic, Type type)
+        private static Type FindGenericType(Type generic, Type type)
         {
             while (type != null && type != typeof(object))
             {
@@ -1313,7 +1399,7 @@ namespace MvcSiteMapProvider.Linq
             return null;
         }
 
-        Expression ParseAggregate(Expression instance, Type elementType, string methodName, int errorPos)
+        private Expression ParseAggregate(Expression instance, Type elementType, string methodName, int errorPos)
         {
             ParameterExpression outerIt = it;
             ParameterExpression innerIt = Expression.Parameter(elementType, "");
@@ -1343,7 +1429,7 @@ namespace MvcSiteMapProvider.Linq
             return Expression.Call(typeof(Enumerable), signature.Name, typeArgs, args);
         }
 
-        Expression[] ParseArgumentList()
+        private Expression[] ParseArgumentList()
         {
             ValidateToken(TokenId.OpenParen, Res.OpenParenExpected);
             NextToken();
@@ -1353,7 +1439,7 @@ namespace MvcSiteMapProvider.Linq
             return args;
         }
 
-        Expression[] ParseArguments()
+        private Expression[] ParseArguments()
         {
             List<Expression> argList = new List<Expression>();
             while (true)
@@ -1365,7 +1451,7 @@ namespace MvcSiteMapProvider.Linq
             return argList.ToArray();
         }
 
-        Expression ParseElementAccess(Expression expr)
+        private Expression ParseElementAccess(Expression expr)
         {
             int errorPos = token.pos;
             ValidateToken(TokenId.OpenBracket, Res.OpenParenExpected);
@@ -1377,9 +1463,7 @@ namespace MvcSiteMapProvider.Linq
             {
                 if (expr.Type.GetArrayRank() != 1 || args.Length != 1)
                     throw ParseError(errorPos, Res.CannotIndexMultiDimArray);
-                Expression index = PromoteExpression(args[0], typeof(int), true);
-                if (index == null)
-                    throw ParseError(errorPos, Res.InvalidIndex);
+                Expression index = PromoteExpression(args[0], typeof(int), true) ?? throw ParseError(errorPos, Res.InvalidIndex);
                 return Expression.ArrayIndex(expr, index);
             }
             else
@@ -1392,6 +1476,7 @@ namespace MvcSiteMapProvider.Linq
                             GetTypeName(expr.Type));
                     case 1:
                         return Expression.Call(expr, (MethodInfo)mb, args);
+
                     default:
                         throw ParseError(errorPos, Res.AmbiguousIndexerInvocation,
                             GetTypeName(expr.Type));
@@ -1399,23 +1484,23 @@ namespace MvcSiteMapProvider.Linq
             }
         }
 
-        static bool IsPredefinedType(Type type)
+        private static bool IsPredefinedType(Type type)
         {
             foreach (Type t in predefinedTypes) if (t == type) return true;
             return false;
         }
 
-        static bool IsNullableType(Type type)
+        private static bool IsNullableType(Type type)
         {
             return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
         }
 
-        static Type GetNonNullableType(Type type)
+        private static Type GetNonNullableType(Type type)
         {
             return IsNullableType(type) ? type.GetGenericArguments()[0] : type;
         }
 
-        static string GetTypeName(Type type)
+        private static string GetTypeName(Type type)
         {
             Type baseType = GetNonNullableType(type);
             string s = baseType.Name;
@@ -1423,22 +1508,22 @@ namespace MvcSiteMapProvider.Linq
             return s;
         }
 
-        static bool IsNumericType(Type type)
+        private static bool IsNumericType(Type type)
         {
             return GetNumericTypeKind(type) != 0;
         }
 
-        static bool IsSignedIntegralType(Type type)
+        private static bool IsSignedIntegralType(Type type)
         {
             return GetNumericTypeKind(type) == 2;
         }
 
-        static bool IsUnsignedIntegralType(Type type)
+        private static bool IsUnsignedIntegralType(Type type)
         {
             return GetNumericTypeKind(type) == 3;
         }
 
-        static int GetNumericTypeKind(Type type)
+        private static int GetNumericTypeKind(Type type)
         {
             type = GetNonNullableType(type);
             if (type.IsEnum) return 0;
@@ -1449,27 +1534,30 @@ namespace MvcSiteMapProvider.Linq
                 case TypeCode.Double:
                 case TypeCode.Decimal:
                     return 1;
+
                 case TypeCode.SByte:
                 case TypeCode.Int16:
                 case TypeCode.Int32:
                 case TypeCode.Int64:
                     return 2;
+
                 case TypeCode.Byte:
                 case TypeCode.UInt16:
                 case TypeCode.UInt32:
                 case TypeCode.UInt64:
                     return 3;
+
                 default:
                     return 0;
             }
         }
 
-        static bool IsEnumType(Type type)
+        private static bool IsEnumType(Type type)
         {
             return GetNonNullableType(type).IsEnum;
         }
 
-        void CheckAndPromoteOperand(Type signatures, string opName, ref Expression expr, int errorPos)
+        private void CheckAndPromoteOperand(Type signatures, string opName, ref Expression expr, int errorPos)
         {
             Expression[] args = new Expression[] { expr };
             MethodBase method;
@@ -1479,7 +1567,7 @@ namespace MvcSiteMapProvider.Linq
             expr = args[0];
         }
 
-        void CheckAndPromoteOperands(Type signatures, string opName, ref Expression left, ref Expression right, int errorPos)
+        private void CheckAndPromoteOperands(Type signatures, string opName, ref Expression left, ref Expression right, int errorPos)
         {
             Expression[] args = new Expression[] { left, right };
             MethodBase method;
@@ -1489,13 +1577,13 @@ namespace MvcSiteMapProvider.Linq
             right = args[1];
         }
 
-        Exception IncompatibleOperandsError(string opName, Expression left, Expression right, int pos)
+        private Exception IncompatibleOperandsError(string opName, Expression left, Expression right, int pos)
         {
             return ParseError(pos, Res.IncompatibleOperands,
                 opName, GetTypeName(left.Type), GetTypeName(right.Type));
         }
 
-        MemberInfo FindPropertyOrField(Type type, string memberName, bool staticAccess)
+        private MemberInfo FindPropertyOrField(Type type, string memberName, bool staticAccess)
         {
             BindingFlags flags = BindingFlags.Public | BindingFlags.DeclaredOnly |
                 (staticAccess ? BindingFlags.Static : BindingFlags.Instance);
@@ -1508,7 +1596,7 @@ namespace MvcSiteMapProvider.Linq
             return null;
         }
 
-        int FindMethod(Type type, string methodName, bool staticAccess, Expression[] args, out MethodBase method)
+        private int FindMethod(Type type, string methodName, bool staticAccess, Expression[] args, out MethodBase method)
         {
             BindingFlags flags = BindingFlags.Public | BindingFlags.DeclaredOnly |
                 (staticAccess ? BindingFlags.Static : BindingFlags.Instance);
@@ -1523,7 +1611,7 @@ namespace MvcSiteMapProvider.Linq
             return 0;
         }
 
-        int FindIndexer(Type type, Expression[] args, out MethodBase method)
+        private int FindIndexer(Type type, Expression[] args, out MethodBase method)
         {
             foreach (Type t in SelfAndBaseTypes(type))
             {
@@ -1542,7 +1630,7 @@ namespace MvcSiteMapProvider.Linq
             return 0;
         }
 
-        static IEnumerable<Type> SelfAndBaseTypes(Type type)
+        private static IEnumerable<Type> SelfAndBaseTypes(Type type)
         {
             if (type.IsInterface)
             {
@@ -1553,7 +1641,7 @@ namespace MvcSiteMapProvider.Linq
             return SelfAndBaseClasses(type);
         }
 
-        static IEnumerable<Type> SelfAndBaseClasses(Type type)
+        private static IEnumerable<Type> SelfAndBaseClasses(Type type)
         {
             while (type != null)
             {
@@ -1562,7 +1650,7 @@ namespace MvcSiteMapProvider.Linq
             }
         }
 
-        static void AddInterface(List<Type> types, Type type)
+        private static void AddInterface(List<Type> types, Type type)
         {
             if (!types.Contains(type))
             {
@@ -1571,14 +1659,14 @@ namespace MvcSiteMapProvider.Linq
             }
         }
 
-        class MethodData
+        private class MethodData
         {
             public MethodBase MethodBase;
             public ParameterInfo[] Parameters;
             public Expression[] Args;
         }
 
-        int FindBestMethod(IEnumerable<MethodBase> methods, Expression[] args, out MethodBase method)
+        private int FindBestMethod(IEnumerable<MethodBase> methods, Expression[] args, out MethodBase method)
         {
             MethodData[] applicable = methods.
                 Select(m => new MethodData { MethodBase = m, Parameters = m.GetParameters() }).
@@ -1603,7 +1691,7 @@ namespace MvcSiteMapProvider.Linq
             return applicable.Length;
         }
 
-        bool IsApplicable(MethodData method, Expression[] args)
+        private bool IsApplicable(MethodData method, Expression[] args)
         {
             if (method.Parameters.Length != args.Length) return false;
             Expression[] promotedArgs = new Expression[args.Length];
@@ -1619,7 +1707,7 @@ namespace MvcSiteMapProvider.Linq
             return true;
         }
 
-        Expression PromoteExpression(Expression expr, Type type, bool exact)
+        private Expression PromoteExpression(Expression expr, Type type, bool exact)
         {
             if (expr.Type == type) return expr;
             if (expr is ConstantExpression)
@@ -1645,9 +1733,11 @@ namespace MvcSiteMapProvider.Linq
                             case TypeCode.UInt64:
                                 value = ParseNumber(text, target);
                                 break;
+
                             case TypeCode.Double:
                                 if (target == typeof(decimal)) value = ParseNumber(text, target);
                                 break;
+
                             case TypeCode.String:
                                 value = ParseEnum(text, target);
                                 break;
@@ -1665,7 +1755,7 @@ namespace MvcSiteMapProvider.Linq
             return null;
         }
 
-        static object ParseNumber(string text, Type type)
+        private static object ParseNumber(string text, Type type)
         {
             switch (Type.GetTypeCode(GetNonNullableType(type)))
             {
@@ -1673,42 +1763,52 @@ namespace MvcSiteMapProvider.Linq
                     sbyte sb;
                     if (sbyte.TryParse(text, out sb)) return sb;
                     break;
+
                 case TypeCode.Byte:
                     byte b;
                     if (byte.TryParse(text, out b)) return b;
                     break;
+
                 case TypeCode.Int16:
                     short s;
                     if (short.TryParse(text, out s)) return s;
                     break;
+
                 case TypeCode.UInt16:
                     ushort us;
                     if (ushort.TryParse(text, out us)) return us;
                     break;
+
                 case TypeCode.Int32:
                     int i;
                     if (int.TryParse(text, out i)) return i;
                     break;
+
                 case TypeCode.UInt32:
                     uint ui;
                     if (uint.TryParse(text, out ui)) return ui;
                     break;
+
                 case TypeCode.Int64:
                     long l;
                     if (long.TryParse(text, out l)) return l;
                     break;
+
                 case TypeCode.UInt64:
                     ulong ul;
                     if (ulong.TryParse(text, out ul)) return ul;
                     break;
+
                 case TypeCode.Single:
                     float f;
                     if (float.TryParse(text, out f)) return f;
                     break;
+
                 case TypeCode.Double:
                     double d;
                     if (double.TryParse(text, out d)) return d;
                     break;
+
                 case TypeCode.Decimal:
                     decimal e;
                     if (decimal.TryParse(text, out e)) return e;
@@ -1717,7 +1817,7 @@ namespace MvcSiteMapProvider.Linq
             return null;
         }
 
-        static object ParseEnum(string name, Type type)
+        private static object ParseEnum(string name, Type type)
         {
             if (type.IsEnum)
             {
@@ -1729,7 +1829,7 @@ namespace MvcSiteMapProvider.Linq
             return null;
         }
 
-        static bool IsCompatibleWith(Type source, Type target)
+        private static bool IsCompatibleWith(Type source, Type target)
         {
             if (source == target) return true;
             if (!target.IsValueType) return target.IsAssignableFrom(source);
@@ -1753,6 +1853,7 @@ namespace MvcSiteMapProvider.Linq
                             return true;
                     }
                     break;
+
                 case TypeCode.Byte:
                     switch (tc)
                     {
@@ -1769,6 +1870,7 @@ namespace MvcSiteMapProvider.Linq
                             return true;
                     }
                     break;
+
                 case TypeCode.Int16:
                     switch (tc)
                     {
@@ -1781,6 +1883,7 @@ namespace MvcSiteMapProvider.Linq
                             return true;
                     }
                     break;
+
                 case TypeCode.UInt16:
                     switch (tc)
                     {
@@ -1795,6 +1898,7 @@ namespace MvcSiteMapProvider.Linq
                             return true;
                     }
                     break;
+
                 case TypeCode.Int32:
                     switch (tc)
                     {
@@ -1806,6 +1910,7 @@ namespace MvcSiteMapProvider.Linq
                             return true;
                     }
                     break;
+
                 case TypeCode.UInt32:
                     switch (tc)
                     {
@@ -1818,6 +1923,7 @@ namespace MvcSiteMapProvider.Linq
                             return true;
                     }
                     break;
+
                 case TypeCode.Int64:
                     switch (tc)
                     {
@@ -1828,6 +1934,7 @@ namespace MvcSiteMapProvider.Linq
                             return true;
                     }
                     break;
+
                 case TypeCode.UInt64:
                     switch (tc)
                     {
@@ -1838,6 +1945,7 @@ namespace MvcSiteMapProvider.Linq
                             return true;
                     }
                     break;
+
                 case TypeCode.Single:
                     switch (tc)
                     {
@@ -1846,6 +1954,7 @@ namespace MvcSiteMapProvider.Linq
                             return true;
                     }
                     break;
+
                 default:
                     if (st == tt) return true;
                     break;
@@ -1853,7 +1962,7 @@ namespace MvcSiteMapProvider.Linq
             return false;
         }
 
-        static bool IsBetterThan(Expression[] args, MethodData m1, MethodData m2)
+        private static bool IsBetterThan(Expression[] args, MethodData m1, MethodData m2)
         {
             bool better = false;
             for (int i = 0; i < args.Length; i++)
@@ -1870,7 +1979,7 @@ namespace MvcSiteMapProvider.Linq
         // Return 1 if s -> t1 is a better conversion than s -> t2
         // Return -1 if s -> t2 is a better conversion than s -> t1
         // Return 0 if neither conversion is better
-        static int CompareConversions(Type s, Type t1, Type t2)
+        private static int CompareConversions(Type s, Type t1, Type t2)
         {
             if (t1 == t2) return 0;
             if (s == t1) return 1;
@@ -1884,17 +1993,17 @@ namespace MvcSiteMapProvider.Linq
             return 0;
         }
 
-        Expression GenerateEqual(Expression left, Expression right)
+        private Expression GenerateEqual(Expression left, Expression right)
         {
             return Expression.Equal(left, right);
         }
 
-        Expression GenerateNotEqual(Expression left, Expression right)
+        private Expression GenerateNotEqual(Expression left, Expression right)
         {
             return Expression.NotEqual(left, right);
         }
 
-        Expression GenerateGreaterThan(Expression left, Expression right)
+        private Expression GenerateGreaterThan(Expression left, Expression right)
         {
             if (left.Type == typeof(string))
             {
@@ -1906,7 +2015,7 @@ namespace MvcSiteMapProvider.Linq
             return Expression.GreaterThan(left, right);
         }
 
-        Expression GenerateGreaterThanEqual(Expression left, Expression right)
+        private Expression GenerateGreaterThanEqual(Expression left, Expression right)
         {
             if (left.Type == typeof(string))
             {
@@ -1918,7 +2027,7 @@ namespace MvcSiteMapProvider.Linq
             return Expression.GreaterThanOrEqual(left, right);
         }
 
-        Expression GenerateLessThan(Expression left, Expression right)
+        private Expression GenerateLessThan(Expression left, Expression right)
         {
             if (left.Type == typeof(string))
             {
@@ -1930,7 +2039,7 @@ namespace MvcSiteMapProvider.Linq
             return Expression.LessThan(left, right);
         }
 
-        Expression GenerateLessThanEqual(Expression left, Expression right)
+        private Expression GenerateLessThanEqual(Expression left, Expression right)
         {
             if (left.Type == typeof(string))
             {
@@ -1942,7 +2051,7 @@ namespace MvcSiteMapProvider.Linq
             return Expression.LessThanOrEqual(left, right);
         }
 
-        Expression GenerateAdd(Expression left, Expression right)
+        private Expression GenerateAdd(Expression left, Expression right)
         {
             if (left.Type == typeof(string) && right.Type == typeof(string))
             {
@@ -1951,12 +2060,12 @@ namespace MvcSiteMapProvider.Linq
             return Expression.Add(left, right);
         }
 
-        Expression GenerateSubtract(Expression left, Expression right)
+        private Expression GenerateSubtract(Expression left, Expression right)
         {
             return Expression.Subtract(left, right);
         }
 
-        Expression GenerateStringConcat(Expression left, Expression right)
+        private Expression GenerateStringConcat(Expression left, Expression right)
         {
             return Expression.Call(
                 null,
@@ -1964,29 +2073,29 @@ namespace MvcSiteMapProvider.Linq
                 new[] { left, right });
         }
 
-        MethodInfo GetStaticMethod(string methodName, Expression left, Expression right)
+        private MethodInfo GetStaticMethod(string methodName, Expression left, Expression right)
         {
             return left.Type.GetMethod(methodName, new[] { left.Type, right.Type });
         }
 
-        Expression GenerateStaticMethodCall(string methodName, Expression left, Expression right)
+        private Expression GenerateStaticMethodCall(string methodName, Expression left, Expression right)
         {
             return Expression.Call(null, GetStaticMethod(methodName, left, right), new[] { left, right });
         }
 
-        void SetTextPos(int pos)
+        private void SetTextPos(int pos)
         {
             textPos = pos;
             ch = textPos < textLen ? text[textPos] : '\0';
         }
 
-        void NextChar()
+        private void NextChar()
         {
             if (textPos < textLen) textPos++;
             ch = textPos < textLen ? text[textPos] : '\0';
         }
 
-        void NextToken()
+        private void NextToken()
         {
             while (Char.IsWhiteSpace(ch)) NextChar();
             TokenId t;
@@ -2005,10 +2114,12 @@ namespace MvcSiteMapProvider.Linq
                         t = TokenId.Exclamation;
                     }
                     break;
+
                 case '%':
                     NextChar();
                     t = TokenId.Percent;
                     break;
+
                 case '&':
                     NextChar();
                     if (ch == '&')
@@ -2021,42 +2132,52 @@ namespace MvcSiteMapProvider.Linq
                         t = TokenId.Amphersand;
                     }
                     break;
+
                 case '(':
                     NextChar();
                     t = TokenId.OpenParen;
                     break;
+
                 case ')':
                     NextChar();
                     t = TokenId.CloseParen;
                     break;
+
                 case '*':
                     NextChar();
                     t = TokenId.Asterisk;
                     break;
+
                 case '+':
                     NextChar();
                     t = TokenId.Plus;
                     break;
+
                 case ',':
                     NextChar();
                     t = TokenId.Comma;
                     break;
+
                 case '-':
                     NextChar();
                     t = TokenId.Minus;
                     break;
+
                 case '.':
                     NextChar();
                     t = TokenId.Dot;
                     break;
+
                 case '/':
                     NextChar();
                     t = TokenId.Slash;
                     break;
+
                 case ':':
                     NextChar();
                     t = TokenId.Colon;
                     break;
+
                 case '<':
                     NextChar();
                     if (ch == '=')
@@ -2074,6 +2195,7 @@ namespace MvcSiteMapProvider.Linq
                         t = TokenId.LessThan;
                     }
                     break;
+
                 case '=':
                     NextChar();
                     if (ch == '=')
@@ -2086,6 +2208,7 @@ namespace MvcSiteMapProvider.Linq
                         t = TokenId.Equal;
                     }
                     break;
+
                 case '>':
                     NextChar();
                     if (ch == '=')
@@ -2098,18 +2221,22 @@ namespace MvcSiteMapProvider.Linq
                         t = TokenId.GreaterThan;
                     }
                     break;
+
                 case '?':
                     NextChar();
                     t = TokenId.Question;
                     break;
+
                 case '[':
                     NextChar();
                     t = TokenId.OpenBracket;
                     break;
+
                 case ']':
                     NextChar();
                     t = TokenId.CloseBracket;
                     break;
+
                 case '|':
                     NextChar();
                     if (ch == '|')
@@ -2122,6 +2249,7 @@ namespace MvcSiteMapProvider.Linq
                         t = TokenId.Bar;
                     }
                     break;
+
                 case '"':
                 case '\'':
                     char quote = ch;
@@ -2135,6 +2263,7 @@ namespace MvcSiteMapProvider.Linq
                     } while (ch == quote);
                     t = TokenId.StringLiteral;
                     break;
+
                 default:
                     if (Char.IsLetter(ch) || ch == '@' || ch == '_')
                     {
@@ -2188,12 +2317,12 @@ namespace MvcSiteMapProvider.Linq
             token.pos = tokenPos;
         }
 
-        bool TokenIdentifierIs(string id)
+        private bool TokenIdentifierIs(string id)
         {
             return token.id == TokenId.Identifier && string.Equals(id, token.text, StringComparison.OrdinalIgnoreCase);
         }
 
-        string GetIdentifier()
+        private string GetIdentifier()
         {
             ValidateToken(TokenId.Identifier, Res.IdentifierExpected);
             string id = token.text;
@@ -2201,32 +2330,32 @@ namespace MvcSiteMapProvider.Linq
             return id;
         }
 
-        void ValidateDigit()
+        private void ValidateDigit()
         {
             if (!Char.IsDigit(ch)) throw ParseError(textPos, Res.DigitExpected);
         }
 
-        void ValidateToken(TokenId t, string errorMessage)
+        private void ValidateToken(TokenId t, string errorMessage)
         {
             if (token.id != t) throw ParseError(errorMessage);
         }
 
-        void ValidateToken(TokenId t)
+        private void ValidateToken(TokenId t)
         {
             if (token.id != t) throw ParseError(Res.SyntaxError);
         }
 
-        Exception ParseError(string format, params object[] args)
+        private Exception ParseError(string format, params object[] args)
         {
             return ParseError(token.pos, format, args);
         }
 
-        Exception ParseError(int pos, string format, params object[] args)
+        private Exception ParseError(int pos, string format, params object[] args)
         {
             return new ParseException(string.Format(System.Globalization.CultureInfo.CurrentCulture, format, args), pos);
         }
 
-        static Dictionary<string, object> CreateKeywords()
+        private static Dictionary<string, object> CreateKeywords()
         {
             Dictionary<string, object> d = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             d.Add("true", trueLiteral);
@@ -2240,7 +2369,7 @@ namespace MvcSiteMapProvider.Linq
         }
     }
 
-    static class Res
+    internal static class Res
     {
         public const string DuplicateIdentifier = "The identifier '{0}' was defined more than once";
         public const string ExpressionTypeMismatch = "Expression of type '{0}' expected";

@@ -5,37 +5,29 @@ namespace MvcSiteMapProvider.Builder
     public class SiteMapNodeCreatorFactory
         : ISiteMapNodeCreatorFactory
     {
+        protected readonly INodeKeyGenerator nodeKeyGenerator;
+
+        protected readonly ISiteMapNodeFactory siteMapNodeFactory;
+
+        protected readonly ISiteMapNodeToParentRelationFactory siteMapNodeToParentRelationFactory;
+
         public SiteMapNodeCreatorFactory(
-            ISiteMapNodeFactory siteMapNodeFactory,
+                                    ISiteMapNodeFactory siteMapNodeFactory,
             INodeKeyGenerator nodeKeyGenerator,
             ISiteMapNodeToParentRelationFactory siteMapNodeToParentRelationFactory)
         {
-            if (siteMapNodeFactory == null)
-                throw new ArgumentNullException("siteMapNodeFactory");
-            if (nodeKeyGenerator == null)
-                throw new ArgumentNullException("nodeKeyGenerator");
-            if (siteMapNodeToParentRelationFactory == null)
-                throw new ArgumentNullException("siteMapNodeToParentRelationFactory");
-
-            this.siteMapNodeFactory = siteMapNodeFactory;
-            this.nodeKeyGenerator = nodeKeyGenerator;
-            this.siteMapNodeToParentRelationFactory = siteMapNodeToParentRelationFactory;
+            this.siteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
+            this.nodeKeyGenerator = nodeKeyGenerator ?? throw new ArgumentNullException(nameof(nodeKeyGenerator));
+            this.siteMapNodeToParentRelationFactory = siteMapNodeToParentRelationFactory ?? throw new ArgumentNullException(nameof(siteMapNodeToParentRelationFactory));
         }
-        protected readonly ISiteMapNodeFactory siteMapNodeFactory;
-        protected readonly INodeKeyGenerator nodeKeyGenerator;
-        protected readonly ISiteMapNodeToParentRelationFactory siteMapNodeToParentRelationFactory;
-
-        #region ISiteMapNodeCreatorFactory Members
 
         public ISiteMapNodeCreator Create(ISiteMap siteMap)
         {
             return new SiteMapNodeCreator(
-                siteMap, 
-                this.siteMapNodeFactory, 
-                this.nodeKeyGenerator, 
-                this.siteMapNodeToParentRelationFactory);
+                siteMap,
+                siteMapNodeFactory,
+                nodeKeyGenerator,
+                siteMapNodeToParentRelationFactory);
         }
-
-        #endregion
     }
 }

@@ -9,6 +9,7 @@ namespace MvcSiteMapProvider.Web.Mvc
     public interface IMvcResolver
     {
         Type ResolveControllerType(string areaName, string controllerName);
+
         IEnumerable<string> ResolveActionMethodParameters(string areaName, string controllerName, string actionMethodName);
     }
 }

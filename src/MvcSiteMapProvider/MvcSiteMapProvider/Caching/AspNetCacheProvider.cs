@@ -6,7 +6,7 @@ using System.Web.Caching;
 namespace MvcSiteMapProvider.Caching
 {
     /// <summary>
-    /// A cache provider that uses the <see cref="T:System.Web.HttpContext.Current.Cache"/> instance to 
+    /// A cache provider that uses the <see cref="T:System.Web.HttpContext.Current.Cache"/> instance to
     /// cache items that are added.
     /// </summary>
     /// <typeparam name="T">The type of item that will be stored in the cache.</typeparam>
@@ -17,17 +17,16 @@ namespace MvcSiteMapProvider.Caching
             IMvcContextFactory mvcContextFactory
             )
         {
-            if (mvcContextFactory == null)
-                throw new ArgumentNullException("mvcContextFactory");
-            this.mvcContextFactory = mvcContextFactory;
+            this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
         }
+
         private readonly IMvcContextFactory mvcContextFactory;
 
         protected HttpContextBase Context
         {
             get
             {
-                return this.mvcContextFactory.CreateHttpContext();
+                return mvcContextFactory.CreateHttpContext();
             }
         }
 
@@ -37,7 +36,7 @@ namespace MvcSiteMapProvider.Caching
 
         public bool Contains(string key)
         {
-            return (Context.Cache[key] != null);
+            return Context.Cache[key] != null;
         }
 
         public LazyLock Get(string key)
@@ -47,12 +46,8 @@ namespace MvcSiteMapProvider.Caching
 
         public bool TryGetValue(string key, out LazyLock value)
         {
-            value = this.Get(key);
-            if (value != null)
-            {
-                return true;
-            }
-            return false;
+            value = Get(key);
+            return value != null;
         }
 
         public void Add(string key, LazyLock item, ICacheDetails cacheDetails)
@@ -69,7 +64,7 @@ namespace MvcSiteMapProvider.Caching
             }
             var dependency = (CacheDependency)cacheDetails.CacheDependency.Dependency;
 
-            Context.Cache.Insert(key, item, dependency, absolute, sliding, CacheItemPriority.NotRemovable, this.OnItemRemoved);
+            Context.Cache.Insert(key, item, dependency, absolute, sliding, CacheItemPriority.NotRemovable, OnItemRemoved);
         }
 
         public void Remove(string key)
@@ -77,11 +72,11 @@ namespace MvcSiteMapProvider.Caching
             Context.Cache.Remove(key);
         }
 
-        #endregion
+        #endregion ICacheProvider<T> Members
 
         private bool IsTimespanSet(TimeSpan timeSpan)
         {
-            return (!timeSpan.Equals(TimeSpan.MinValue));
+            return !timeSpan.Equals(TimeSpan.MinValue);
         }
 
         /// <summary>
@@ -98,7 +93,7 @@ namespace MvcSiteMapProvider.Caching
 
         protected virtual void OnCacheItemRemoved(MicroCacheItemRemovedEventArgs<T> e)
         {
-            if (this.ItemRemoved != null)
+            if (ItemRemoved != null)
             {
                 ItemRemoved(this, e);
             }

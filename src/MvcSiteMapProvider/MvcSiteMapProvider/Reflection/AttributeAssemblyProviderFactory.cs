@@ -15,6 +15,6 @@ namespace MvcSiteMapProvider.Reflection
             return new AttributeAssemblyProvider(includeAssemblies, excludeAssemblies);
         }
 
-        #endregion
+        #endregion IAttributeAssemblyProviderFactory Members
     }
 }

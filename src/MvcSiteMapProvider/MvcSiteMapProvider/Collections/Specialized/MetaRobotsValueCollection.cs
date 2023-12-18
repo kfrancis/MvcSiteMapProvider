@@ -81,7 +81,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
     ///     <item>
     ///         <term>noydir</term>
     ///         <description>
-    ///             Blocks Yahoo! from using the description for this page in the Yahoo! directory as the snippet for your page in the search results. 
+    ///             Blocks Yahoo! from using the description for this page in the Yahoo! directory as the snippet for your page in the search results.
     ///             No other search engines use the Yahoo! directory for this purpose, so they don’t support the tag.
     ///         </description>
     ///     </item>
@@ -102,9 +102,9 @@ namespace MvcSiteMapProvider.Collections.Specialized
         public override void Add(string item)
         {
             item = item.ToLowerInvariant();
-            this.ValidateValue(item);
+            ValidateValue(item);
             // skip duplicates
-            if (!this.Contains(item))
+            if (!Contains(item))
             {
                 base.Add(item);
             }
@@ -122,7 +122,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
                 var parameters = stringToSplit.Split(separator, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var parameter in parameters)
                 {
-                    this.Add(parameter.Trim());
+                    Add(parameter.Trim());
                 }
             }
         }
@@ -137,7 +137,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
             {
                 foreach (var item in collection)
                 {
-                    this.Add(item);
+                    Add(item);
                 }
             }
         }
@@ -145,9 +145,9 @@ namespace MvcSiteMapProvider.Collections.Specialized
         public override void Insert(int index, string item)
         {
             item = item.ToLowerInvariant();
-            this.ValidateValue(item);
+            ValidateValue(item);
             // skip duplicates
-            if (!this.Contains(item))
+            if (!Contains(item))
             {
                 base.Insert(index, item);
             }
@@ -157,14 +157,14 @@ namespace MvcSiteMapProvider.Collections.Specialized
         {
             foreach (var item in collection)
             {
-                this.Insert(index, item);
+                Insert(index, item);
                 index += 2;
             }
         }
 
         public virtual string GetMetaRobotsContentString()
         {
-            if (this.HasDefaultValue) return string.Empty;
+            if (HasDefaultValue) return string.Empty;
             string result = string.Empty;
             bool first = true;
             foreach (var item in this)
@@ -182,9 +182,9 @@ namespace MvcSiteMapProvider.Collections.Specialized
         {
             get
             {
-                if (this.Contains("none"))
+                if (Contains("none"))
                     return true;
-                if (this.Contains("noindex") && this.Contains("nofollow"))
+                if (Contains("noindex") && Contains("nofollow"))
                     return true;
                 return false;
             }
@@ -194,9 +194,8 @@ namespace MvcSiteMapProvider.Collections.Specialized
         {
             get
             {
-                return (this.Count == 2 && this.Contains("index") && this.Contains("follow")) ||
-                    (this.Count == 1 && (this[0].Equals("index") || this[0].Equals("follow")));
-
+                return (Count == 2 && Contains("index") && Contains("follow")) ||
+                    (Count == 1 && (this[0].Equals("index") || this[0].Equals("follow")));
             }
         }
 
@@ -205,63 +204,68 @@ namespace MvcSiteMapProvider.Collections.Specialized
             switch (item)
             {
                 case "index":
-                    if (this.Contains("noindex"))
+                    if (Contains("noindex"))
                     {
                         throw new ArgumentException(string.Format(Resources.Messages.MetaRobotsValueIndexAmbiguous, "noindex"));
                     }
-                    if (this.Contains("none"))
+                    if (Contains("none"))
                     {
                         throw new ArgumentException(string.Format(Resources.Messages.MetaRobotsValueNoneAmbiguous, "none"));
                     }
                     break;
+
                 case "noindex":
-                    if (this.Contains("index"))
+                    if (Contains("index"))
                     {
                         throw new ArgumentException(string.Format(Resources.Messages.MetaRobotsValueIndexAmbiguous, "index"));
                     }
-                    if (this.Contains("none"))
+                    if (Contains("none"))
                     {
                         throw new ArgumentException(string.Format(Resources.Messages.MetaRobotsValueNoneAmbiguous, "none"));
                     }
                     break;
+
                 case "follow":
-                    if (this.Contains("nofollow"))
+                    if (Contains("nofollow"))
                     {
                         throw new ArgumentException(string.Format(Resources.Messages.MetaRobotsValueFollowAmbiguous, "nofollow"));
                     }
-                    if (this.Contains("none"))
+                    if (Contains("none"))
                     {
                         throw new ArgumentException(string.Format(Resources.Messages.MetaRobotsValueNoneAmbiguous, "none"));
                     }
                     break;
+
                 case "nofollow":
-                    if (this.Contains("follow"))
+                    if (Contains("follow"))
                     {
                         throw new ArgumentException(string.Format(Resources.Messages.MetaRobotsValueFollowAmbiguous, "follow"));
                     }
-                    if (this.Contains("none"))
+                    if (Contains("none"))
                     {
                         throw new ArgumentException(string.Format(Resources.Messages.MetaRobotsValueNoneAmbiguous, "none"));
                     }
                     break;
+
                 case "none":
-                    if (this.Contains("index"))
+                    if (Contains("index"))
                     {
                         throw new ArgumentException(string.Format(Resources.Messages.MetaRobotsValueNoneAmbiguous, "index"));
                     }
-                    if (this.Contains("noindex"))
+                    if (Contains("noindex"))
                     {
                         throw new ArgumentException(string.Format(Resources.Messages.MetaRobotsValueNoneAmbiguous, "noindex"));
                     }
-                    if (this.Contains("follow"))
+                    if (Contains("follow"))
                     {
                         throw new ArgumentException(string.Format(Resources.Messages.MetaRobotsValueNoneAmbiguous, "follow"));
                     }
-                    if (this.Contains("nofollow"))
+                    if (Contains("nofollow"))
                     {
                         throw new ArgumentException(string.Format(Resources.Messages.MetaRobotsValueNoneAmbiguous, "nofollow"));
                     }
                     break;
+
                 case "noarchive":
                 case "nocache":
                 case "nosnippet":
@@ -270,10 +274,11 @@ namespace MvcSiteMapProvider.Collections.Specialized
                 case "noydir":
                     // Do nothing - these are valid
                     break;
+
                 default:
                     throw new ArgumentException(string.Format(Resources.Messages.MetaRobotsValueUnrecognized, item));
 
-                // For information on these values, see http://yoast.com/articles/robots-meta-tags/
+                    // For information on these values, see http://yoast.com/articles/robots-meta-tags/
             }
         }
     }

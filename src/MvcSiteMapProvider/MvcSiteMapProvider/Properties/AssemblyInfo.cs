@@ -1,7 +1,5 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitleAttribute("MvcSiteMapProvider")]
 [assembly: AssemblyDescriptionAttribute("An ASP.NET SiteMapProvider implementation for the ASP.NET MVC framework.")]

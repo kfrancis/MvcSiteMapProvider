@@ -8,22 +8,26 @@ using System.Web;
 namespace MvcSiteMapProvider.Builder
 {
     /// <summary>
-    /// AspNetSiteMapBuilder class. Builds a <see cref="T:MvcSiteMapProvider.ISiteMapNode"/> tree based on a 
+    /// AspNetSiteMapBuilder class. Builds a <see cref="T:MvcSiteMapProvider.ISiteMapNode"/> tree based on a
     /// <see cref="T:System.Web.SiteMapProvider"/> instance.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Use this class for interoperability with ASP.NET classic. To get a sitemap instance, you will need
     /// to configure a Web.sitemap XML file using the ASP.NET classic schema, then configure it for use in the
     /// sitemap/providers section of the Web.config file. Consult MSDN for information on how to do this.
-    /// 
-    /// The sitemap provider can be retrieved from ASP.NET classic for injection into this class using 
+    /// </para>
+    /// <para>
+    /// The sitemap provider can be retrieved from ASP.NET classic for injection into this class using
     /// an implementation of IAspNetSiteMapProvider. You may implement this interface to provide custom
-    /// logic for retrieving a provider by name or other means by using 
+    /// logic for retrieving a provider by name or other means by using
     /// System.Web.SiteMap.Providers[providerName] or for the default provider System.Web.SiteMap.Provider.
-    /// 
-    /// Attributes and route values are obtained from a protected member variable of the 
-    /// System.Web.SiteMapProvider named _attributes using reflection. You may disable this functionality for 
+    /// </para>
+    /// <para>
+    /// Attributes and route values are obtained from a protected member variable of the
+    /// System.Web.SiteMapProvider named _attributes using reflection. You may disable this functionality for
     /// performance reasons if the data is not required by setting reflectAttributes and/or reflectRouteValues to false.
+    /// </para>
     /// </remarks>
     [Obsolete("AspNetSiteMapBuilder is deprecated and will be removed in version 5. Use AspNetSiteMapNodeProvider in conjunction with SiteMapBuilder instead.")]
     public class AspNetSiteMapBuilder
@@ -37,18 +41,11 @@ namespace MvcSiteMapProvider.Builder
             ISiteMapNodeFactory siteMapNodeFactory
             )
         {
-            if (reservedAttributeNameProvider == null)
-                throw new ArgumentNullException("reservedAttributeNameProvider");
-            if (siteMapProvider == null)
-                throw new ArgumentNullException("siteMapProvider");
-            if (siteMapNodeFactory == null)
-                throw new ArgumentNullException("siteMapNodeFactory");
-
             this.reflectAttributes = reflectAttributes;
             this.reflectRouteValues = reflectRouteValues;
-            this.reservedAttributeNameProvider = reservedAttributeNameProvider;
-            this.siteMapProvider = siteMapProvider;
-            this.siteMapNodeFactory = siteMapNodeFactory;
+            this.reservedAttributeNameProvider = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
+            this.siteMapProvider = siteMapProvider ?? throw new ArgumentNullException(nameof(siteMapProvider));
+            this.siteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
         }
 
         protected readonly bool reflectAttributes;
@@ -76,7 +73,7 @@ namespace MvcSiteMapProvider.Builder
             return rootNode;
         }
 
-        #endregion
+        #endregion ISiteMapBuilder Members
 
         protected virtual ISiteMapNode GetRootNode(ISiteMap siteMap, SiteMapProvider provider)
         {
@@ -109,7 +106,7 @@ namespace MvcSiteMapProvider.Builder
 
             siteMapNode.Title = node.Title;
             siteMapNode.Description = node.Description;
-            if (this.reflectAttributes)
+            if (reflectAttributes)
             {
                 // Unfortunately, the ASP.NET implementation uses a protected member variable to store
                 // the attributes, so there is no way to loop through them without reflection or some
@@ -145,7 +142,7 @@ namespace MvcSiteMapProvider.Builder
 
             // Assign to node
             siteMapNode.Route = node.GetAttributeValue("route");
-            if (this.reflectRouteValues)
+            if (reflectRouteValues)
             {
                 // Unfortunately, the ASP.NET implementation uses a protected member variable to store
                 // the attributes, so there is no way to loop through them without reflection or some
@@ -155,7 +152,7 @@ namespace MvcSiteMapProvider.Builder
             }
             siteMapNode.PreservedRouteParameters.AddRange(node.GetAttributeValue("preservedRouteParameters"), new[] { ',', ';' });
             siteMapNode.UrlResolver = node.GetAttributeValue("urlResolver");
-            
+
             // Add inherited route values to sitemap node
             foreach (var inheritedRouteParameter in node.GetAttributeValue("inheritedRouteParameters").Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
             {
@@ -169,8 +166,8 @@ namespace MvcSiteMapProvider.Builder
             // Handle MVC details
 
             // Get area and controller from node declaration
-            siteMapNode.Area = this.InheritAreaIfNotProvided(node, parentNode);
-            siteMapNode.Controller = this.InheritControllerIfNotProvided(node, parentNode);
+            siteMapNode.Area = InheritAreaIfNotProvided(node, parentNode);
+            siteMapNode.Controller = InheritControllerIfNotProvided(node, parentNode);
 
             return siteMapNode;
         }
@@ -185,7 +182,7 @@ namespace MvcSiteMapProvider.Builder
         {
             var result = node.GetAttributeValue("area");
 
-            // NOTE: Since there is no way to determine if an attribute exists without using reflection, 
+            // NOTE: Since there is no way to determine if an attribute exists without using reflection,
             // using area="" to override the parent area is not supported.
             if (string.IsNullOrEmpty(result) && parentNode != null)
             {

@@ -4,8 +4,11 @@ using System.IO;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+
 #if !NET35
+
 using System.Web.UI;
+
 #endif
 
 namespace MvcSiteMapProvider.Web.Mvc
@@ -32,13 +35,13 @@ namespace MvcSiteMapProvider.Web.Mvc
         public virtual HttpContextBase CreateHttpContext(ISiteMapNode node, Uri uri, TextWriter writer)
         {
             if (uri == null)
-                throw new ArgumentNullException("uri");
+                throw new ArgumentNullException(nameof(uri));
             if (writer == null)
-                throw new ArgumentNullException("writer");
+                throw new ArgumentNullException(nameof(writer));
 
             var request = new HttpRequest(
-                filename: string.Empty, 
-                url: uri.ToString(), 
+                filename: string.Empty,
+                url: uri.ToString(),
                 queryString: string.IsNullOrEmpty(uri.Query) ? string.Empty : uri.Query.Substring(1));
             var response = new HttpResponse(writer);
             var httpContext = new HttpContext(request, response);
@@ -47,13 +50,13 @@ namespace MvcSiteMapProvider.Web.Mvc
 
         public virtual RequestContext CreateRequestContext(ISiteMapNode node, RouteData routeData)
         {
-            var httpContext = this.CreateHttpContext(node);
+            var httpContext = CreateHttpContext(node);
             return new RequestContext(httpContext, routeData);
         }
 
         public virtual RequestContext CreateRequestContext()
         {
-            var httpContext = this.CreateHttpContext();
+            var httpContext = CreateHttpContext();
             if (httpContext.Handler is MvcHandler)
                 return ((MvcHandler)httpContext.Handler).RequestContext;
 #if !NET35
@@ -77,9 +80,9 @@ namespace MvcSiteMapProvider.Web.Mvc
         public virtual ControllerContext CreateControllerContext(RequestContext requestContext, ControllerBase controller)
         {
             if (requestContext == null)
-                throw new ArgumentNullException("requestContext");
+                throw new ArgumentNullException(nameof(requestContext));
             if (controller == null)
-                throw new ArgumentNullException("controller");
+                throw new ArgumentNullException(nameof(controller));
 
             var result = new ControllerContext(requestContext, controller);
 
@@ -101,25 +104,25 @@ namespace MvcSiteMapProvider.Web.Mvc
 
         public virtual IUrlHelper CreateUrlHelper(RequestContext requestContext)
         {
-            return new UrlHelperAdapter(requestContext, this.GetRoutes());
+            return new UrlHelperAdapter(requestContext, GetRoutes());
         }
 
         public virtual IUrlHelper CreateUrlHelper()
         {
-            var requestContext = this.CreateRequestContext();
-            return new UrlHelperAdapter(requestContext, this.GetRoutes());
+            var requestContext = CreateRequestContext();
+            return new UrlHelperAdapter(requestContext, GetRoutes());
         }
 
         public virtual AuthorizationContext CreateAuthorizationContext(ControllerContext controllerContext, ActionDescriptor actionDescriptor)
         {
             if (controllerContext == null)
-                throw new ArgumentNullException("controllerContext");
+                throw new ArgumentNullException(nameof(controllerContext));
             if (actionDescriptor == null)
-                throw new ArgumentNullException("actionDescriptor");
+                throw new ArgumentNullException(nameof(actionDescriptor));
 
             return new AuthorizationContext(controllerContext, actionDescriptor);
         }
 
-        #endregion
+        #endregion IMvcContextFactory Members
     }
 }

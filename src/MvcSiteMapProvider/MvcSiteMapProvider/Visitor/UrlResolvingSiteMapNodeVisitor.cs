@@ -14,6 +14,6 @@
             node.ResolveUrl();
         }
 
-        #endregion
+        #endregion ISiteMapNodeVisitor Members
     }
 }

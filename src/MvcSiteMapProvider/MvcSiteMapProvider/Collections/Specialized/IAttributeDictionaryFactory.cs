@@ -3,7 +3,7 @@
 namespace MvcSiteMapProvider.Collections.Specialized
 {
     /// <summary>
-    /// Contract for an abstract factory that creates new instances of <see cref="T:MvcSiteMapProvider.Collections.Specialized.IAttributeDictionary"/> 
+    /// Contract for an abstract factory that creates new instances of <see cref="T:MvcSiteMapProvider.Collections.Specialized.IAttributeDictionary"/>
     /// at runtime.
     /// </summary>
     public interface IAttributeDictionaryFactory

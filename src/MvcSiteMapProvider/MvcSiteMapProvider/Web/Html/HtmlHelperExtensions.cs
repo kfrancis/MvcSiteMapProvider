@@ -12,7 +12,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// </summary>
         /// <param name="helper">The helper.</param>
         /// <returns>
-        /// A <see cref="MvcSiteMapHtmlHelper"/> instance 
+        /// A <see cref="MvcSiteMapHtmlHelper"/> instance
         /// </returns>
         public static MvcSiteMapHtmlHelper MvcSiteMap(this HtmlHelper helper)
         {
@@ -42,11 +42,8 @@ namespace MvcSiteMapProvider.Web.Html
         /// </returns>
         public static MvcSiteMapHtmlHelper MvcSiteMap(this HtmlHelper helper, string siteMapCacheKey)
         {
-            ISiteMap siteMap = SiteMaps.GetSiteMap(siteMapCacheKey);
-            if (siteMap == null)
-                throw new UnknownSiteMapException();
+            ISiteMap siteMap = SiteMaps.GetSiteMap(siteMapCacheKey) ?? throw new UnknownSiteMapException();
             return MvcSiteMap(helper, siteMap);
         }
-
     }
 }

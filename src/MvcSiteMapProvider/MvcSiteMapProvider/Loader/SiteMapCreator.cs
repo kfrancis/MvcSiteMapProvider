@@ -7,7 +7,7 @@ namespace MvcSiteMapProvider.Loader
     /// <summary>
     /// Builds a specific <see cref="T:MvcSiteMapProvider.ISiteMap"/> instance based on a cache key.
     /// </summary>
-    public class SiteMapCreator 
+    public class SiteMapCreator
         : ISiteMapCreator
     {
         public SiteMapCreator(
@@ -16,16 +16,9 @@ namespace MvcSiteMapProvider.Loader
             ISiteMapFactory siteMapFactory
             )
         {
-            if (siteMapCacheKeyToBuilderSetMapper == null)
-                throw new ArgumentNullException("siteMapCacheKeyToBuilderSetMapper");
-            if (siteMapBuilderSetStrategy == null)
-                throw new ArgumentNullException("siteMapBuilderSetStrategy");
-            if (siteMapFactory == null)
-                throw new ArgumentNullException("siteMapFactory");
-            
-            this.siteMapCacheKeyToBuilderSetMapper = siteMapCacheKeyToBuilderSetMapper;
-            this.siteMapBuilderSetStrategy = siteMapBuilderSetStrategy;
-            this.siteMapFactory = siteMapFactory;
+            this.siteMapCacheKeyToBuilderSetMapper = siteMapCacheKeyToBuilderSetMapper ?? throw new ArgumentNullException(nameof(siteMapCacheKeyToBuilderSetMapper));
+            this.siteMapBuilderSetStrategy = siteMapBuilderSetStrategy ?? throw new ArgumentNullException(nameof(siteMapBuilderSetStrategy));
+            this.siteMapFactory = siteMapFactory ?? throw new ArgumentNullException(nameof(siteMapFactory));
         }
 
         protected readonly ISiteMapCacheKeyToBuilderSetMapper siteMapCacheKeyToBuilderSetMapper;
@@ -38,10 +31,10 @@ namespace MvcSiteMapProvider.Loader
         {
             if (string.IsNullOrEmpty(siteMapCacheKey))
             {
-                throw new ArgumentNullException("siteMapCacheKey");
+                throw new ArgumentNullException(nameof(siteMapCacheKey));
             }
 
-            var builderSet = this.GetBuilderSet(siteMapCacheKey);
+            var builderSet = GetBuilderSet(siteMapCacheKey);
             var siteMap = siteMapFactory.Create(builderSet.Builder, builderSet);
             siteMap.BuildSiteMap();
 
@@ -50,11 +43,11 @@ namespace MvcSiteMapProvider.Loader
 
         public virtual ICacheDetails GetCacheDetails(string siteMapCacheKey)
         {
-            var builderSet = this.GetBuilderSet(siteMapCacheKey);
+            var builderSet = GetBuilderSet(siteMapCacheKey);
             return builderSet.CacheDetails;
         }
 
-        #endregion
+        #endregion ISiteMapCreator Members
 
         protected virtual ISiteMapBuilderSet GetBuilderSet(string siteMapCacheKey)
         {

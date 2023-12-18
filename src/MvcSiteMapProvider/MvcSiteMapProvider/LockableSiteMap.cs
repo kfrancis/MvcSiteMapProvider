@@ -5,8 +5,8 @@ using System;
 namespace MvcSiteMapProvider
 {
     /// <summary>
-    /// Provides the means to make the <see cref="T:MvcSiteMapProvider.SiteMap"/> instance read-only so it cannot be 
-    /// inadvertently altered while it is in the cache. 
+    /// Provides the means to make the <see cref="T:MvcSiteMapProvider.SiteMap"/> instance read-only so it cannot be
+    /// inadvertently altered while it is in the cache.
     /// </summary>
     public class LockableSiteMap
         : SiteMap
@@ -24,36 +24,36 @@ namespace MvcSiteMapProvider
 
         public override void AddNode(ISiteMapNode node)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.AddNode(node);
         }
 
         public override void AddNode(ISiteMapNode node, ISiteMapNode parentNode)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.AddNode(node, parentNode);
         }
 
         public override void RemoveNode(ISiteMapNode node)
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base.RemoveNode(node);
         }
 
         public override void Clear()
         {
             // Set the sitemap to read-write so we can destroy it.
-            this.IsReadOnly = false;
+            IsReadOnly = false;
             base.Clear();
         }
 
         public override void BuildSiteMap()
         {
             // Set the sitemap to read-write so we can populate it.
-            this.IsReadOnly = false;
+            IsReadOnly = false;
             base.BuildSiteMap();
             // Set the sitemap to read-only so the nodes cannot be inadvertantly modified by the UI layer.
-            this.IsReadOnly = true;
+            IsReadOnly = true;
         }
 
         public override string ResourceKey
@@ -61,14 +61,14 @@ namespace MvcSiteMapProvider
             get { return base.ResourceKey; }
             set
             {
-                this.ThrowIfReadOnly();
+                ThrowIfReadOnly();
                 base.ResourceKey = value;
             }
         }
 
         protected virtual void ThrowIfReadOnly()
         {
-            if (this.IsReadOnly)
+            if (IsReadOnly)
             {
                 throw new InvalidOperationException(Resources.Messages.SiteMapReadOnly);
             }

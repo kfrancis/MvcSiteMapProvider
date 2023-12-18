@@ -6,7 +6,7 @@ using System.Linq;
 namespace MvcSiteMapProvider.Builder
 {
     /// <summary>
-    /// Tracks all of the registered instances of <see cref="T:MvcSiteMapProvider.Builder.ISiteMapBuilderSet"/> and 
+    /// Tracks all of the registered instances of <see cref="T:MvcSiteMapProvider.Builder.ISiteMapBuilderSet"/> and
     /// allows the caller to get a specific named instance of this interface at runtime.
     /// </summary>
     [ExcludeFromAutoRegistration]
@@ -17,9 +17,7 @@ namespace MvcSiteMapProvider.Builder
             ISiteMapBuilderSet[] siteMapBuilderSets
             )
         {
-            if (siteMapBuilderSets == null)
-                throw new ArgumentNullException("siteMapBuilderSets");
-            this.siteMapBuilderSets = siteMapBuilderSets;
+            this.siteMapBuilderSets = siteMapBuilderSets ?? throw new ArgumentNullException(nameof(siteMapBuilderSets));
         }
 
         protected readonly ISiteMapBuilderSet[] siteMapBuilderSets;
@@ -28,26 +26,22 @@ namespace MvcSiteMapProvider.Builder
 
         public virtual ISiteMapBuilderSet GetBuilderSet(string builderSetName)
         {
-            var builderSet = siteMapBuilderSets.FirstOrDefault(x => x.AppliesTo(builderSetName));
-            if (builderSet == null)
-            {
-                throw new MvcSiteMapException(string.Format(Resources.Messages.NamedBuilderSetNotFound, builderSetName));
-            }
+            var builderSet = siteMapBuilderSets.FirstOrDefault(x => x.AppliesTo(builderSetName)) ?? throw new MvcSiteMapException(string.Format(Resources.Messages.NamedBuilderSetNotFound, builderSetName));
             return builderSet;
         }
 
         public virtual ISiteMapBuilder GetBuilder(string builderSetName)
         {
-            var builderSet = this.GetBuilderSet(builderSetName);
+            var builderSet = GetBuilderSet(builderSetName);
             return builderSet.Builder;
         }
 
         public virtual ICacheDetails GetCacheDetails(string builderSetName)
         {
-            var builderSet = this.GetBuilderSet(builderSetName);
+            var builderSet = GetBuilderSet(builderSetName);
             return builderSet.CacheDetails;
         }
 
-        #endregion
+        #endregion ISiteMapBuilderSetStrategy Members
     }
 }

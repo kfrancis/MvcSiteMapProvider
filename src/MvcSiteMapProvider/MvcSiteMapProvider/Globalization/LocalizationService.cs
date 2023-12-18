@@ -5,9 +5,9 @@ using System.Linq;
 namespace MvcSiteMapProvider.Globalization
 {
     /// <summary>
-    /// Provides services to extract meta-keys and to later use the keys to localize text into different cultures. 
+    /// Provides services to extract meta-keys and to later use the keys to localize text into different cultures.
     /// </summary>
-    public class LocalizationService 
+    public class LocalizationService
         : ILocalizationService
     {
         public LocalizationService(
@@ -16,14 +16,9 @@ namespace MvcSiteMapProvider.Globalization
             IStringLocalizer stringLocalizer
             )
         {
-            if (explicitResourceKeyParser == null)
-                throw new ArgumentNullException("explicitResourceKeyParser");
-            if (stringLocalizer == null)
-                throw new ArgumentNullException("stringLocalizer");
-
-            this.ResourceKey = implicitResourceKey;
-            this.explicitResourceKeyParser = explicitResourceKeyParser;
-            this.stringLocalizer = stringLocalizer;
+            ResourceKey = implicitResourceKey;
+            this.explicitResourceKeyParser = explicitResourceKeyParser ?? throw new ArgumentNullException(nameof(explicitResourceKeyParser));
+            this.stringLocalizer = stringLocalizer ?? throw new ArgumentNullException(nameof(stringLocalizer));
         }
 
         protected readonly IExplicitResourceKeyParser explicitResourceKeyParser;
@@ -60,7 +55,7 @@ namespace MvcSiteMapProvider.Globalization
         public virtual string GetResourceString(string attributeName, string value, ISiteMap siteMap)
         {
             return stringLocalizer.GetResourceString(
-                attributeName, value, siteMap.EnableLocalization, siteMap.ResourceKey, this.ResourceKey, this.explicitResourceKeys);
+                attributeName, value, siteMap.EnableLocalization, siteMap.ResourceKey, ResourceKey, explicitResourceKeys);
         }
     }
 }

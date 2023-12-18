@@ -8,7 +8,7 @@ namespace MvcSiteMapProvider.Web.Routing
     public static class RouteDataExtensions
     {
         /// <summary>
-        /// Retrieves the value with the specified identifier. Unlike GetRequiredString, this 
+        /// Retrieves the value with the specified identifier. Unlike GetRequiredString, this
         /// method does not throw an exception if the value does not exist or is null.
         /// </summary>
         /// <param name="routeData">The route data.</param>
@@ -74,7 +74,7 @@ namespace MvcSiteMapProvider.Web.Routing
         }
 
         /// <summary>
-        /// Adds the MvcCodeRouting.RouteContext DataToken necessary for interoperability 
+        /// Adds the MvcCodeRouting.RouteContext DataToken necessary for interoperability
         /// with the MvcCodeRouting library https://github.com/maxtoroq/MvcCodeRouting
         /// </summary>
         /// <param name="routeData">The route data.</param>

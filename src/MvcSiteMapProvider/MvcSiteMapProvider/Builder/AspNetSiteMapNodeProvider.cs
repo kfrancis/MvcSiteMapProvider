@@ -8,51 +8,56 @@ using System.Web;
 namespace MvcSiteMapProvider.Builder
 {
     /// <summary>
-    /// AspNetSiteMapNodeProvider class. Builds a <see cref="T:MvcSiteMapProvider.Builder.ISiteMapNodeToParentRelation"/> list based on a 
+    /// AspNetSiteMapNodeProvider class. Builds a <see cref="T:MvcSiteMapProvider.Builder.ISiteMapNodeToParentRelation"/> list based on a
     /// <see cref="T:System.Web.SiteMapProvider"/> instance.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Use this class for interoperability with ASP.NET. To get a sitemap instance, you will need
     /// to configure a Web.sitemap XML file using the ASP.NET classic schema, then configure it for use in the
     /// sitemap/providers section of the Web.config file. Consult MSDN for information on how to do this.
-    /// 
-    /// The sitemap provider can be retrieved from ASP.NET for injection into this class using 
+    /// </para>
+    /// <para>
+    /// The sitemap provider can be retrieved from ASP.NET for injection into this class using
     /// an implementation of IAspNetSiteMapProvider. You may implement this interface to provide custom
-    /// logic for retrieving a provider by name or other means by using 
+    /// logic for retrieving a provider by name or other means by using
     /// System.Web.SiteMap.Providers[providerName] or for the default provider System.Web.SiteMap.Provider.
-    /// 
-    /// We have provided the <see cref="T:MvcSiteMapProvider.Builder.AspNetDefaultSiteMapProvider"/> and 
+    /// </para>
+    /// <para>
+    /// We have provided the <see cref="T:MvcSiteMapProvider.Builder.AspNetDefaultSiteMapProvider"/> and
     /// <see cref="T:MvcSiteMapProvider.Builder.AspNetNamedSiteMapProvider"/> that you can use as well.
-    /// 
-    /// Attributes and route values are obtained from a protected member variable of the 
-    /// System.Web.SiteMapProvider named _attributes using reflection. You may disable this functionality for 
+    /// </para>
+    /// <para>
+    /// Attributes and route values are obtained from a protected member variable of the
+    /// System.Web.SiteMapProvider named _attributes using reflection. You may disable this functionality for
     /// performance reasons if the data is not required by setting reflectAttributes and/or reflectRouteValues to false.
+    /// </para>
     /// </remarks>
     public class AspNetSiteMapNodeProvider
         : ISiteMapNodeProvider
     {
+        protected const string SourceName = "ASP.NET SiteMap Provider";
+
+        protected readonly bool includeRootNode;
+
+        protected readonly bool reflectAttributes;
+
+        protected readonly bool reflectRouteValues;
+
+        protected readonly IAspNetSiteMapProvider siteMapProvider;
+
         public AspNetSiteMapNodeProvider(
-            bool includeRootNode,
+                                                    bool includeRootNode,
             bool reflectAttributes,
             bool reflectRouteValues,
             IAspNetSiteMapProvider siteMapProvider
             )
         {
-            if (siteMapProvider == null)
-                throw new ArgumentNullException("siteMapProvider");
-
             this.includeRootNode = includeRootNode;
             this.reflectAttributes = reflectAttributes;
             this.reflectRouteValues = reflectRouteValues;
-            this.siteMapProvider = siteMapProvider;
+            this.siteMapProvider = siteMapProvider ?? throw new ArgumentNullException(nameof(siteMapProvider));
         }
-        protected readonly bool includeRootNode;
-        protected readonly bool reflectAttributes;
-        protected readonly bool reflectRouteValues;
-        protected readonly IAspNetSiteMapProvider siteMapProvider;
-        protected const string SourceName = "ASP.NET SiteMap Provider";
-
-        #region ISiteMapNodeProvider Members
 
         public IEnumerable<ISiteMapNodeToParentRelation> GetSiteMapNodes(ISiteMapNodeHelper helper)
         {
@@ -60,7 +65,7 @@ namespace MvcSiteMapProvider.Builder
             var provider = siteMapProvider.GetProvider();
 
             var rootNode = GetRootNode(provider, helper);
-            if (this.includeRootNode)
+            if (includeRootNode)
             {
                 result.Add(rootNode);
             }
@@ -70,28 +75,10 @@ namespace MvcSiteMapProvider.Builder
             return result;
         }
 
-        #endregion
-
         protected virtual ISiteMapNodeToParentRelation GetRootNode(SiteMapProvider provider, ISiteMapNodeHelper helper)
         {
             var root = provider.RootNode;
             return helper.CreateNode(root.Key, null, SourceName, root.ResourceKey);
-        }
-
-        protected virtual IEnumerable<ISiteMapNodeToParentRelation> ProcessNodes(ISiteMapNodeToParentRelation parentNode, System.Web.SiteMapNode providerParentNode, ISiteMapNodeHelper helper)
-        {
-            var result = new List<ISiteMapNodeToParentRelation>();
-
-            foreach (System.Web.SiteMapNode childNode in providerParentNode.ChildNodes)
-            {
-                var node = GetSiteMapNodeFromProviderNode(childNode, parentNode.Node, helper);
-
-                result.Add(node);
-
-                // Continue recursively processing
-                ProcessNodes(node, childNode, helper);
-            }
-            return result;
         }
 
         protected virtual ISiteMapNodeToParentRelation GetSiteMapNodeFromProviderNode(System.Web.SiteMapNode node, ISiteMapNode parentNode, ISiteMapNodeHelper helper)
@@ -106,7 +93,7 @@ namespace MvcSiteMapProvider.Builder
 
             siteMapNode.Title = node.Title;
             siteMapNode.Description = node.Description;
-            if (this.reflectAttributes)
+            if (reflectAttributes)
             {
                 // Unfortunately, the ASP.NET implementation uses a protected member variable to store
                 // the attributes, so there is no way to loop through them without reflection or some
@@ -142,7 +129,7 @@ namespace MvcSiteMapProvider.Builder
 
             // Assign to node
             siteMapNode.Route = node.GetAttributeValue("route");
-            if (this.reflectRouteValues)
+            if (reflectRouteValues)
             {
                 // Unfortunately, the ASP.NET implementation uses a protected member variable to store
                 // the attributes, so there is no way to loop through them without reflection or some
@@ -166,8 +153,8 @@ namespace MvcSiteMapProvider.Builder
             // Handle MVC details
 
             // Get area and controller from node declaration
-            siteMapNode.Area = this.InheritAreaIfNotProvided(node, parentNode);
-            siteMapNode.Controller = this.InheritControllerIfNotProvided(node, parentNode);
+            siteMapNode.Area = InheritAreaIfNotProvided(node, parentNode);
+            siteMapNode.Controller = InheritControllerIfNotProvided(node, parentNode);
 
             return nodeParentMap;
         }
@@ -182,7 +169,7 @@ namespace MvcSiteMapProvider.Builder
         {
             var result = node.GetAttributeValue("area");
 
-            // NOTE: Since there is no way to determine if an attribute exists without using reflection, 
+            // NOTE: Since there is no way to determine if an attribute exists without using reflection,
             // using area="" to override the parent area is not supported.
             if (string.IsNullOrEmpty(result) && parentNode != null)
             {
@@ -206,6 +193,22 @@ namespace MvcSiteMapProvider.Builder
                 result = parentNode.Controller;
             }
 
+            return result;
+        }
+
+        protected virtual IEnumerable<ISiteMapNodeToParentRelation> ProcessNodes(ISiteMapNodeToParentRelation parentNode, System.Web.SiteMapNode providerParentNode, ISiteMapNodeHelper helper)
+        {
+            var result = new List<ISiteMapNodeToParentRelation>();
+
+            foreach (System.Web.SiteMapNode childNode in providerParentNode.ChildNodes)
+            {
+                var node = GetSiteMapNodeFromProviderNode(childNode, parentNode.Node, helper);
+
+                result.Add(node);
+
+                // Continue recursively processing
+                ProcessNodes(node, childNode, helper);
+            }
             return result;
         }
     }

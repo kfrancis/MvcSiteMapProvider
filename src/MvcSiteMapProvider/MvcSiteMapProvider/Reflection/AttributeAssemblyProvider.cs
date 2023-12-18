@@ -14,14 +14,10 @@ namespace MvcSiteMapProvider.Reflection
             IEnumerable<string> includeAssemblies,
             IEnumerable<string> excludeAssemblies)
         {
-            if (includeAssemblies == null)
-                throw new ArgumentNullException("includeAssemblies");
-            if (excludeAssemblies == null)
-                throw new ArgumentNullException("excludeAssemblies");
-
-            this.includeAssemblies = includeAssemblies;
-            this.excludeAssemblies = excludeAssemblies;
+            this.includeAssemblies = includeAssemblies ?? throw new ArgumentNullException(nameof(includeAssemblies));
+            this.excludeAssemblies = excludeAssemblies ?? throw new ArgumentNullException(nameof(excludeAssemblies));
         }
+
         protected readonly IEnumerable<string> includeAssemblies;
         protected readonly IEnumerable<string> excludeAssemblies;
 
@@ -59,6 +55,6 @@ namespace MvcSiteMapProvider.Reflection
                 );
         }
 
-        #endregion
+        #endregion IAttributeAssemblyProvider Members
     }
 }

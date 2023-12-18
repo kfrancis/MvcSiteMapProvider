@@ -16,7 +16,7 @@ namespace MvcSiteMapProvider.Xml
     {
         public SiteMapXmlReservedAttributeNameProvider(
             IEnumerable<string> attributesToIgnore
-            ) 
+            )
             : base(attributesToIgnore)
         {
         }

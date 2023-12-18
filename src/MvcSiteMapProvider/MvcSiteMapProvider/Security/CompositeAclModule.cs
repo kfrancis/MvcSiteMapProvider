@@ -3,7 +3,7 @@
 namespace MvcSiteMapProvider.Security
 {
     /// <summary>
-    /// Used to chain multiple <see cref="T:MvcSiteMapProvider.Security.IAclModule"/> instances in succession. 
+    /// Used to chain multiple <see cref="T:MvcSiteMapProvider.Security.IAclModule"/> instances in succession.
     /// The builders will be processed in the same order as they are specified in the constructor.
     /// </summary>
     public class CompositeAclModule
@@ -13,10 +13,7 @@ namespace MvcSiteMapProvider.Security
             params IAclModule[] aclModules
             )
         {
-            if (aclModules == null)
-                throw new ArgumentNullException("aclModules");
-
-            this.aclModules = aclModules;
+            this.aclModules = aclModules ?? throw new ArgumentNullException(nameof(aclModules));
         }
 
         protected readonly IAclModule[] aclModules;
@@ -43,6 +40,6 @@ namespace MvcSiteMapProvider.Security
             return true;
         }
 
-        #endregion
+        #endregion IAclModule Members
     }
 }

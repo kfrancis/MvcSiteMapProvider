@@ -7,7 +7,7 @@ namespace MvcSiteMapProvider.Web.Mvc
     /// <summary>
     /// MvcSiteMapProviderViewEngineVirtualFile class.
     /// </summary>
-    internal class MvcSiteMapProviderViewEngineVirtualFile 
+    internal class MvcSiteMapProviderViewEngineVirtualFile
         : VirtualFile
     {
         /// <summary>
@@ -23,7 +23,7 @@ namespace MvcSiteMapProvider.Web.Mvc
         public MvcSiteMapProviderViewEngineVirtualFile(string filePath)
             : base(filePath)
         {
-            this.FilePath = filePath;
+            FilePath = filePath;
         }
 
         /// <summary>

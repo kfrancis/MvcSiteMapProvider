@@ -41,14 +41,14 @@ namespace MvcSiteMapProvider.Collections.Specialized
         /// <summary>
         /// Adds the elements from a JSON string representing the attributes. If the key exists, the value will be overwritten.
         /// </summary>
-        /// <param name="jsonString">A JSON string that represents a dictionary of key-value pairs. Example: @"{ ""key-1"": ""value-1""[, ""key-x"": ""value-x""] }". 
+        /// <param name="jsonString">A JSON string that represents a dictionary of key-value pairs. Example: @"{ ""key-1"": ""value-1""[, ""key-x"": ""value-x""] }".
         /// The value may be a string or primitive type (by leaving off the quotes).</param>
         void AddRange(string jsonString);
 
         /// <summary>
         /// Adds the elements from a JSON string representing the attributes. If the key exists, the value will be overwritten.
         /// </summary>
-        /// <param name="jsonString">A JSON string that represents a dictionary of key-value pairs. Example: @"{ ""key-1"": ""value-1""[, ""key-x"": ""value-x""] }". 
+        /// <param name="jsonString">A JSON string that represents a dictionary of key-value pairs. Example: @"{ ""key-1"": ""value-1""[, ""key-x"": ""value-x""] }".
         /// The value may be a string or primitive type (by leaving off the quotes).</param>
         /// <param name="throwIfReservedKey"><c>true</c> to throw an exception if one of the keys being added is a reserved key name; otherwise, <c>false</c>.</param>
         void AddRange(string jsonString, bool throwIfReservedKey);

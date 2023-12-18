@@ -15,9 +15,7 @@ namespace MvcSiteMapProvider.Caching
             params ICacheDependency[] cacheDependencies
             )
         {
-            if (cacheDependencies == null)
-                throw new ArgumentNullException("cacheDependencies");
-            this.cacheDependencies = cacheDependencies;
+            this.cacheDependencies = cacheDependencies ?? throw new ArgumentNullException(nameof(cacheDependencies));
         }
 
         protected readonly ICacheDependency[] cacheDependencies;
@@ -26,12 +24,12 @@ namespace MvcSiteMapProvider.Caching
 
         public object Dependency
         {
-            get 
+            get
             {
-                if (this.cacheDependencies.Count() > 0)
+                if (cacheDependencies.Count() > 0)
                 {
                     var list = new AggregateCacheDependency();
-                    foreach (var item in this.cacheDependencies)
+                    foreach (var item in cacheDependencies)
                     {
                         list.Add((CacheDependency)item.Dependency);
                     }
@@ -41,6 +39,6 @@ namespace MvcSiteMapProvider.Caching
             }
         }
 
-        #endregion
+        #endregion ICacheDependency Members
     }
 }

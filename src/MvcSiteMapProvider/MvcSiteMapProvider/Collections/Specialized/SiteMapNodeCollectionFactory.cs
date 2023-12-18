@@ -7,11 +7,14 @@
     public class SiteMapNodeCollectionFactory
         : ISiteMapNodeCollectionFactory
     {
-        #region ISiteMapNodeCollectionFactory Members
-
         public virtual ISiteMapNodeCollection Create()
         {
             return new SiteMapNodeCollection();
+        }
+
+        public virtual ISiteMapNodeCollection CreateEmptyReadOnly()
+        {
+            return new ReadOnlySiteMapNodeCollection(new SiteMapNodeCollection());
         }
 
         public virtual ISiteMapNodeCollection CreateLockable(ISiteMap siteMap)
@@ -23,12 +26,5 @@
         {
             return new ReadOnlySiteMapNodeCollection(siteMapNodeCollection);
         }
-
-        public virtual ISiteMapNodeCollection CreateEmptyReadOnly()
-        {
-            return new ReadOnlySiteMapNodeCollection(new SiteMapNodeCollection());
-        }
-
-        #endregion
     }
 }

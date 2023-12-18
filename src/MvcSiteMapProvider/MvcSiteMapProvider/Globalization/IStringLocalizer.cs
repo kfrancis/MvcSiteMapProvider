@@ -8,11 +8,11 @@ namespace MvcSiteMapProvider.Globalization
     public interface IStringLocalizer
     {
         string GetResourceString(
-            string attributeName, 
-            string value, 
-            bool enableLocalization, 
-            string classKey, 
-            string implicitResourceKey, 
+            string attributeName,
+            string value,
+            bool enableLocalization,
+            string classKey,
+            string implicitResourceKey,
             NameValueCollection explicitResourceKeys);
     }
 }

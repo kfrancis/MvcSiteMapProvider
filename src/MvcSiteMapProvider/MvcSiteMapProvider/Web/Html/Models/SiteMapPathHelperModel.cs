@@ -6,7 +6,7 @@ namespace MvcSiteMapProvider.Web.Html.Models
     /// <summary>
     /// SiteMapPathHelperModel
     /// </summary>
-    public class SiteMapPathHelperModel 
+    public class SiteMapPathHelperModel
         : IEnumerable<SiteMapNodeModel>
     {
         /// <summary>

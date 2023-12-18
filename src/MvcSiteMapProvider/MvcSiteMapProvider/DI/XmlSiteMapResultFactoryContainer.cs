@@ -13,12 +13,12 @@ namespace MvcSiteMapProvider.DI
         public XmlSiteMapResultFactoryContainer(ConfigurationSettings settings)
         {
             var siteMapLoaderContainer = new SiteMapLoaderContainer(settings);
-            this.siteMapLoader = siteMapLoaderContainer.ResolveSiteMapLoader();
-            this.mvcContextFactory = new MvcContextFactory();
-            this.bindingFactory = new BindingFactory();
-            this.bindingProvider = new BindingProvider(this.bindingFactory, this.mvcContextFactory);
-            this.urlPath = new UrlPath(this.mvcContextFactory, this.bindingProvider);
-            this.cultureContextFactory = new CultureContextFactory();
+            siteMapLoader = siteMapLoaderContainer.ResolveSiteMapLoader();
+            mvcContextFactory = new MvcContextFactory();
+            bindingFactory = new BindingFactory();
+            bindingProvider = new BindingProvider(bindingFactory, mvcContextFactory);
+            urlPath = new UrlPath(mvcContextFactory, bindingProvider);
+            cultureContextFactory = new CultureContextFactory();
         }
 
         private readonly ISiteMapLoader siteMapLoader;
@@ -31,9 +31,9 @@ namespace MvcSiteMapProvider.DI
         public IXmlSiteMapResultFactory ResolveXmlSiteMapResultFactory()
         {
             return new XmlSiteMapResultFactory(
-                this.siteMapLoader,
-                this.urlPath,
-                this.cultureContextFactory);
+                siteMapLoader,
+                urlPath,
+                cultureContextFactory);
         }
     }
 }

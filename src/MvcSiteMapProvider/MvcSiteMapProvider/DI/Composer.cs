@@ -3,8 +3,11 @@ using MvcSiteMapProvider.Xml;
 using System.Web.Hosting;
 using System.Web.Mvc;
 using System.Web.Routing;
+
 #if !MVC2
+
 using System.Web.WebPages.Razor;
+
 #endif
 
 namespace MvcSiteMapProvider.DI
@@ -13,7 +16,7 @@ namespace MvcSiteMapProvider.DI
     /// This is the default dependency injection composer for the MvcSiteMapProvider that is fired automatically
     /// using a WebActivatorEx.PostApplicationStartMethodAttribute during application startup.
     /// </summary>
-    public class Composer
+    public static class Composer
     {
         public static void Compose()
         {

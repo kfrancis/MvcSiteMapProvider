@@ -21,10 +21,7 @@ namespace MvcSiteMapProvider.Web.Mvc
             IControllerDescriptorFactory controllerDescriptorFactory
             )
         {
-            if (controllerDescriptorFactory == null)
-                throw new ArgumentNullException("controllerDescriptorFactory");
-
-            this.controllerDescriptorFactory = controllerDescriptorFactory;
+            this.controllerDescriptorFactory = controllerDescriptorFactory ?? throw new ArgumentNullException(nameof(controllerDescriptorFactory));
 
             Cache = new ThreadSafeDictionary<string, IEnumerable<string>>();
         }
@@ -72,7 +69,7 @@ namespace MvcSiteMapProvider.Web.Mvc
                 ActionDescriptor[] actionDescriptors = controllerDescriptor.GetCanonicalActions()
                     .Where(a => a.ActionName == actionMethodName).ToArray();
 
-                if (actionDescriptors != null && actionDescriptors.Length > 0)
+                if (actionDescriptors?.Length > 0)
                 {
                     foreach (ActionDescriptor actionDescriptor in actionDescriptors)
                     {
@@ -98,6 +95,6 @@ namespace MvcSiteMapProvider.Web.Mvc
             return actionParameters;
         }
 
-        #endregion
+        #endregion IActionMethodParameterResolver Members
     }
 }

@@ -7,7 +7,7 @@ namespace MvcSiteMapProvider.Web.Mvc
     /// <summary>
     /// HttpRequest wrapper.
     /// </summary>
-    public class SiteMapHttpRequest 
+    public class SiteMapHttpRequest
         : HttpRequestWrapper
     {
         private readonly ISiteMapNode node;
@@ -37,7 +37,7 @@ namespace MvcSiteMapProvider.Web.Mvc
         {
             get
             {
-                return VirtualPathUtility.ToAppRelative(this.CurrentExecutionFilePath);
+                return VirtualPathUtility.ToAppRelative(CurrentExecutionFilePath);
             }
         }
 
@@ -63,14 +63,14 @@ namespace MvcSiteMapProvider.Web.Mvc
         {
             get
             {
-                bool useRequest = this.node == null || 
-                    string.Equals(this.node.HttpMethod, "*") || 
-                    string.Equals(this.node.HttpMethod, "request", StringComparison.OrdinalIgnoreCase);
+                bool useRequest = node == null ||
+                    string.Equals(node.HttpMethod, "*") ||
+                    string.Equals(node.HttpMethod, "request", StringComparison.OrdinalIgnoreCase);
                 if (!useRequest)
                 {
-                    return string.IsNullOrEmpty(this.node.HttpMethod)
+                    return string.IsNullOrEmpty(node.HttpMethod)
                         ? HttpVerbs.Get.ToString().ToUpperInvariant()
-                        : this.node.HttpMethod.ToUpperInvariant();
+                        : node.HttpMethod.ToUpperInvariant();
                 }
                 return base.HttpMethod;
             }

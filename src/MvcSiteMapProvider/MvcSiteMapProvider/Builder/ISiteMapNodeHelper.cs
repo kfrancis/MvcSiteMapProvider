@@ -72,14 +72,14 @@ namespace MvcSiteMapProvider.Builder
         string SiteMapCacheKey { get; }
 
         /// <summary>
-        /// The current culture context. This object keeps track of the original 
+        /// The current culture context. This object keeps track of the original
         /// culture and original UI culture of the request so they can be restored if necessary.
         /// The <see cref="T:ISiteMapNodeProvider"/> is run under the invariant culture.
         /// </summary>
         ICultureContext CultureContext { get; }
 
         /// <summary>
-        /// Creates a new culture context object that can be used in a using block 
+        /// Creates a new culture context object that can be used in a using block
         /// to temporarily override the culture and UI culture of the current thread.
         /// </summary>
         /// <param name="cultureName">The new culture. Can be any valid .NET culture name.</param>
@@ -88,7 +88,7 @@ namespace MvcSiteMapProvider.Builder
         ICultureContext CreateCultureContext(string cultureName, string uiCultureName);
 
         /// <summary>
-        /// Creates a new culture context object that can be used in a using block 
+        /// Creates a new culture context object that can be used in a using block
         /// to temporarily override the culture and UI culture of the current thread.
         /// </summary>
         /// <param name="culture">The new culture.</param>
@@ -97,8 +97,8 @@ namespace MvcSiteMapProvider.Builder
         ICultureContext CreateCultureContext(CultureInfo culture, CultureInfo uiCulture);
 
         /// <summary>
-        /// Creates a new culture context object that can be used in a using block 
-        /// to temporarily override the culture and UI culture of the current thread 
+        /// Creates a new culture context object that can be used in a using block
+        /// to temporarily override the culture and UI culture of the current thread
         /// using the invariant culture.
         /// </summary>
         /// <returns>A new invariant culture context.</returns>

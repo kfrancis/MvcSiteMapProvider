@@ -87,7 +87,6 @@ namespace MvcSiteMapProvider.Web.Html
             return SiteMapPath(helper, templateName, string.Empty, sourceMetadata);
         }
 
-
         /// <summary>
         /// Gets SiteMap path for the current request
         /// </summary>
@@ -201,7 +200,6 @@ namespace MvcSiteMapProvider.Web.Html
             model.Nodes.Reverse();
 
             return model;
-
         }
 
         /// <summary>

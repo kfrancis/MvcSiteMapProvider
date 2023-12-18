@@ -18,9 +18,9 @@ namespace MvcSiteMapProvider.Globalization
         public ICultureContext Create(string cultureName, string uiCultureName)
         {
             if (string.IsNullOrEmpty(cultureName))
-                throw new ArgumentNullException("cultureName");
+                throw new ArgumentNullException(nameof(cultureName));
             if (string.IsNullOrEmpty(uiCultureName))
-                throw new ArgumentNullException("uiCultureName");
+                throw new ArgumentNullException(nameof(uiCultureName));
 
             return new CultureContext(new CultureInfo(cultureName), new CultureInfo(uiCultureName));
         }
@@ -28,9 +28,9 @@ namespace MvcSiteMapProvider.Globalization
         public ICultureContext Create(CultureInfo culture, CultureInfo uiCulture)
         {
             if (culture == null)
-                throw new ArgumentNullException("culture");
+                throw new ArgumentNullException(nameof(culture));
             if (uiCulture == null)
-                throw new ArgumentNullException("uiCulture");
+                throw new ArgumentNullException(nameof(uiCulture));
 
             return new CultureContext(culture, uiCulture);
         }

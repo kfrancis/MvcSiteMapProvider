@@ -13,39 +13,38 @@ namespace MvcSiteMapProvider.Matching
                 IUrlPath urlPath
             )
         {
-            if (urlPath == null)
-                throw new ArgumentNullException("urlPath");
-
-            this.urlPath = urlPath;
+            this.urlPath = urlPath ?? throw new ArgumentNullException(nameof(urlPath));
         }
 
         protected IUrlPath urlPath;
         protected string hostName;
         protected string rootRelativeUrl;
 
-        public virtual string HostName { get { return this.hostName; } }
+        public virtual string HostName
+        { get { return hostName; } }
 
-        public virtual string RootRelativeUrl { get { return this.rootRelativeUrl; } }
+        public virtual string RootRelativeUrl
+        { get { return rootRelativeUrl; } }
 
         protected virtual void SetUrlValues(string relativeOrAbsoluteUrl)
         {
-            if (this.urlPath.IsAbsolutePhysicalPath(relativeOrAbsoluteUrl) || this.urlPath.IsAppRelativePath(relativeOrAbsoluteUrl))
+            if (urlPath.IsAbsolutePhysicalPath(relativeOrAbsoluteUrl) || urlPath.IsAppRelativePath(relativeOrAbsoluteUrl))
             {
-                this.rootRelativeUrl = this.urlPath.ResolveVirtualApplicationToRootRelativeUrl(relativeOrAbsoluteUrl);
+                rootRelativeUrl = urlPath.ResolveVirtualApplicationToRootRelativeUrl(relativeOrAbsoluteUrl);
             }
-            else if (this.urlPath.IsAbsoluteUrl(relativeOrAbsoluteUrl))
+            else if (urlPath.IsAbsoluteUrl(relativeOrAbsoluteUrl))
             {
                 var absoluteUri = new Uri(relativeOrAbsoluteUrl, UriKind.Absolute);
 
                 // NOTE: this will cut off any fragments, but since they are not passed
                 // to the server, this is desired.
-                this.rootRelativeUrl = absoluteUri.PathAndQuery;
-                this.hostName = absoluteUri.Host;
+                rootRelativeUrl = absoluteUri.PathAndQuery;
+                hostName = absoluteUri.Host;
             }
             else
             {
                 // We must assume we already have a relative root URL
-                this.rootRelativeUrl = relativeOrAbsoluteUrl;
+                rootRelativeUrl = relativeOrAbsoluteUrl;
             }
         }
 
@@ -57,8 +56,8 @@ namespace MvcSiteMapProvider.Matching
                 int hashCode = 0;
 
                 // String properties
-                hashCode = (hashCode * 397) ^ (this.HostName != null ? this.HostName.GetHashCode() : string.Empty.GetHashCode());
-                hashCode = (hashCode * 397) ^ (this.RootRelativeUrl != null ? this.RootRelativeUrl.GetHashCode() : string.Empty.GetHashCode());
+                hashCode = (hashCode * 397) ^ (HostName != null ? HostName.GetHashCode() : string.Empty.GetHashCode());
+                hashCode = (hashCode * 397) ^ (RootRelativeUrl != null ? RootRelativeUrl.GetHashCode() : string.Empty.GetHashCode());
 
                 //// int properties
                 //hashCode = (hashCode * 397) ^ intProperty;
@@ -73,8 +72,7 @@ namespace MvcSiteMapProvider.Matching
             {
                 return false;
             }
-            IUrlKey objB = obj as IUrlKey;
-            if (objB == null)
+            if (!(obj is IUrlKey objB))
             {
                 return false;
             }
@@ -82,11 +80,11 @@ namespace MvcSiteMapProvider.Matching
             {
                 return true;
             }
-            if (!string.Equals(this.RootRelativeUrl, objB.RootRelativeUrl, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(RootRelativeUrl, objB.RootRelativeUrl, StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
-            if (!string.Equals(this.HostName, objB.HostName, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(HostName, objB.HostName, StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
@@ -95,7 +93,7 @@ namespace MvcSiteMapProvider.Matching
 
         public override string ToString()
         {
-            return string.Format("[HostName: {0}, RootRelativeUrl: {1}]", this.HostName, this.RootRelativeUrl);
+            return string.Format("[HostName: {0}, RootRelativeUrl: {1}]", HostName, RootRelativeUrl);
         }
     }
 }

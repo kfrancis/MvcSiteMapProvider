@@ -23,9 +23,9 @@ namespace MvcSiteMapProvider.DI
         {
             this.settings = settings;
             this.mvcContextFactory = mvcContextFactory;
-            this.requestCache = this.mvcContextFactory.GetRequestCache();
+            requestCache = this.mvcContextFactory.GetRequestCache();
             this.urlPath = urlPath;
-            this.urlKeyFactory = new UrlKeyFactory(this.urlPath);
+            urlKeyFactory = new UrlKeyFactory(this.urlPath);
         }
 
         private readonly ConfigurationSettings settings;
@@ -37,12 +37,12 @@ namespace MvcSiteMapProvider.DI
         public ISiteMapFactory ResolveSiteMapFactory()
         {
             return new SiteMapFactory(
-                this.ResolveSiteMapPluginProviderFactory(),
+                ResolveSiteMapPluginProviderFactory(),
                 new MvcResolverFactory(),
-                this.mvcContextFactory,
-                this.ResolveSiteMapChildStateFactory(),
-                this.urlPath,
-                this.ResolveControllerTypeResolverFactory(),
+                mvcContextFactory,
+                ResolveSiteMapChildStateFactory(),
+                urlPath,
+                ResolveControllerTypeResolverFactory(),
                 new ActionMethodParameterResolverFactory(new ControllerDescriptorFactory())
                 );
         }
@@ -50,7 +50,7 @@ namespace MvcSiteMapProvider.DI
         private ISiteMapPluginProviderFactory ResolveSiteMapPluginProviderFactory()
         {
             return new SiteMapPluginProviderFactory(
-                this.ResolveAclModule()
+                ResolveAclModule()
                 );
         }
 
@@ -58,13 +58,13 @@ namespace MvcSiteMapProvider.DI
         {
             return new CompositeAclModule(
                 new AuthorizeAttributeAclModule(
-                    this.mvcContextFactory,
+                    mvcContextFactory,
                     new ControllerDescriptorFactory(),
                     new ControllerBuilderAdapter(ControllerBuilder.Current),
                     new GlobalFilterProvider()
                 ),
                 new XmlRolesAclModule(
-                    this.mvcContextFactory
+                    mvcContextFactory
                     )
                 );
         }
@@ -74,7 +74,7 @@ namespace MvcSiteMapProvider.DI
             return new SiteMapChildStateFactory(
                 new GenericDictionaryFactory(),
                 new SiteMapNodeCollectionFactory(),
-                this.urlKeyFactory
+                urlKeyFactory
                 );
         }
 

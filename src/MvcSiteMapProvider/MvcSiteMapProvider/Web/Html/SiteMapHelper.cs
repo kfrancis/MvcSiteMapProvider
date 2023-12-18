@@ -304,7 +304,6 @@ namespace MvcSiteMapProvider.Web.Html
             return SiteMap(helper, templateName, startingNode, rootInChildLevel, helper.SiteMap.VisibilityAffectsDescendants, sourceMetadata);
         }
 
-
         /// <summary>
         /// Build a sitemap tree, based on the MvcSiteMap
         /// </summary>

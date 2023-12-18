@@ -9,7 +9,7 @@ namespace MvcSiteMapProvider
     /// An abstract factory that can be used to create new instances of <see cref="T:MvcSiteMapProvider.RequestCacheableSiteMapNode"/>
     /// at runtime.
     /// </summary>
-    public class SiteMapNodeFactory 
+    public class SiteMapNodeFactory
         : ISiteMapNodeFactory
     {
         public SiteMapNodeFactory(
@@ -18,33 +18,22 @@ namespace MvcSiteMapProvider
             ISiteMapNodePluginProvider pluginProvider,
             IUrlPath urlPath,
             IMvcContextFactory mvcContextFactory
-            ) 
+            )
         {
-            if (siteMapNodeChildStateFactory == null)
-                throw new ArgumentNullException("siteMapNodeChildStateFactory");
-            if (localizationServiceFactory == null)
-                throw new ArgumentNullException("localizationServiceFactory");
-            if (pluginProvider == null)
-                throw new ArgumentNullException("pluginProvider");
-            if (urlPath == null)
-                throw new ArgumentNullException("urlPath");
-            if (mvcContextFactory == null)
-                throw new ArgumentNullException("mvcContextFactory");
-
-            this.siteMapNodeChildStateFactory = siteMapNodeChildStateFactory;
-            this.localizationServiceFactory = localizationServiceFactory;
-            this.pluginProvider = pluginProvider;
-            this.urlPath = urlPath;
-            this.mvcContextFactory = mvcContextFactory;
+            this.siteMapNodeChildStateFactory = siteMapNodeChildStateFactory ?? throw new ArgumentNullException(nameof(siteMapNodeChildStateFactory));
+            this.localizationServiceFactory = localizationServiceFactory ?? throw new ArgumentNullException(nameof(localizationServiceFactory));
+            this.pluginProvider = pluginProvider ?? throw new ArgumentNullException(nameof(pluginProvider));
+            this.urlPath = urlPath ?? throw new ArgumentNullException(nameof(urlPath));
+            this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
         }
 
         // Services
         protected readonly ISiteMapNodeChildStateFactory siteMapNodeChildStateFactory;
+
         protected readonly ILocalizationServiceFactory localizationServiceFactory;
         protected readonly ISiteMapNodePluginProvider pluginProvider;
         protected readonly IUrlPath urlPath;
         protected readonly IMvcContextFactory mvcContextFactory;
-
 
         #region ISiteMapNodeFactory Members
 
@@ -74,6 +63,6 @@ namespace MvcSiteMapProvider
                 urlPath);
         }
 
-        #endregion
+        #endregion ISiteMapNodeFactory Members
     }
 }

@@ -1,5 +1,4 @@
-﻿
-// This class has infinite recursion problems. This was avoided in the CacheableDictionary class because its base
+﻿// This class has infinite recursion problems. This was avoided in the CacheableDictionary class because its base
 // class stores the dictionary in a wrapped instance that has protected access. Unfortunately, with List<T> that isn't the case.
 // So for this to work, its base class needs to wrap a List<T> and override all members of List<T> or it needs to inherit
 // from a base class that does same and exposes the internal list at least at the protected level.
@@ -304,7 +303,6 @@
 
 //        #endregion
 
-
 //        /// <summary>
 //        /// Override this property and set it to false to disable all caching operations.
 //        /// </summary>
@@ -313,12 +311,10 @@
 //            get { return true; }
 //        }
 
-
 //        protected virtual string GetCacheKey()
 //        {
 //            return "__CACHEABLE_LIST_" + this.instanceId.ToString();
 //        }
-
 
 //        /// <summary>
 //        /// Gets a list object that can be used to to perform a read operation.
@@ -361,7 +357,7 @@
 //                    result = this.cache.GetValue<LockableList<T>>(key);
 //                    if (result == null)
 //                    {
-//                        // This is the first write operation request in read-only mode, 
+//                        // This is the first write operation request in read-only mode,
 //                        // we need to create a new dictionary and cache it
 //                        // with a copy of the current values.
 //                        result = new LockableList<T>(this.siteMap);
@@ -377,7 +373,6 @@
 //                return result;
 //            }
 //        }
-
 
 //    }
 //}

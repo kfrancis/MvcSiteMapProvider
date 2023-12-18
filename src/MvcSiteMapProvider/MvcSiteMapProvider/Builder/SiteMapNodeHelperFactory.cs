@@ -9,45 +9,36 @@ namespace MvcSiteMapProvider.Builder
     public class SiteMapNodeHelperFactory
         : ISiteMapNodeHelperFactory
     {
+        protected readonly ICultureContextFactory cultureContextFactory;
+
+        protected readonly IDynamicSiteMapNodeBuilderFactory dynamicSiteMapNodeBuilderFactory;
+
+        protected readonly IReservedAttributeNameProvider reservedAttributeNameProvider;
+
+        protected readonly ISiteMapNodeCreatorFactory siteMapNodeCreatorFactory;
+
         public SiteMapNodeHelperFactory(
-            ISiteMapNodeCreatorFactory siteMapNodeCreatorFactory,
+                                            ISiteMapNodeCreatorFactory siteMapNodeCreatorFactory,
             IDynamicSiteMapNodeBuilderFactory dynamicSiteMapNodeBuilderFactory,
             IReservedAttributeNameProvider reservedAttributeNameProvider,
             ICultureContextFactory cultureContextFactory
             )
         {
-            if (siteMapNodeCreatorFactory == null)
-                throw new ArgumentNullException("siteMapNodeCreatorFactory");
-            if (dynamicSiteMapNodeBuilderFactory == null)
-                throw new ArgumentNullException("dynamicSiteMapNodeBuilderFactory");
-            if (reservedAttributeNameProvider == null)
-                throw new ArgumentNullException("reservedAttributeNameProvider");
-            if (cultureContextFactory == null)
-                throw new ArgumentNullException("cultureContextFactory");
-
-            this.siteMapNodeCreatorFactory = siteMapNodeCreatorFactory;
-            this.dynamicSiteMapNodeBuilderFactory = dynamicSiteMapNodeBuilderFactory;
-            this.reservedAttributeNameProvider = reservedAttributeNameProvider;
-            this.cultureContextFactory = cultureContextFactory;
+            this.siteMapNodeCreatorFactory = siteMapNodeCreatorFactory ?? throw new ArgumentNullException(nameof(siteMapNodeCreatorFactory));
+            this.dynamicSiteMapNodeBuilderFactory = dynamicSiteMapNodeBuilderFactory ?? throw new ArgumentNullException(nameof(dynamicSiteMapNodeBuilderFactory));
+            this.reservedAttributeNameProvider = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
+            this.cultureContextFactory = cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
         }
-        protected readonly ISiteMapNodeCreatorFactory siteMapNodeCreatorFactory;
-        protected readonly IDynamicSiteMapNodeBuilderFactory dynamicSiteMapNodeBuilderFactory;
-        protected readonly IReservedAttributeNameProvider reservedAttributeNameProvider;
-        protected readonly ICultureContextFactory cultureContextFactory;
-
-        #region ISiteMapNodeHelperFactory Members
 
         public ISiteMapNodeHelper Create(ISiteMap siteMap, ICultureContext cultureContext)
         {
             return new SiteMapNodeHelper(
                 siteMap,
                 cultureContext,
-                this.siteMapNodeCreatorFactory,
-                this.dynamicSiteMapNodeBuilderFactory,
-                this.reservedAttributeNameProvider,
-                this.cultureContextFactory);
+                siteMapNodeCreatorFactory,
+                dynamicSiteMapNodeBuilderFactory,
+                reservedAttributeNameProvider,
+                cultureContextFactory);
         }
-
-        #endregion
     }
 }

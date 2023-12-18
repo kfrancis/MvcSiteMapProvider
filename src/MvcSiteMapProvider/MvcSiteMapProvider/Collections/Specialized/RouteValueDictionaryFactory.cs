@@ -6,7 +6,7 @@ using System;
 namespace MvcSiteMapProvider.Collections.Specialized
 {
     /// <summary>
-    /// An abstract factory that can be used to create new instances of 
+    /// An abstract factory that can be used to create new instances of
     /// <see cref="T:MvcSiteMapProvider.Collections.Specialized.RouteValueDictionary"/>
     /// at runtime.
     /// </summary>
@@ -19,16 +19,9 @@ namespace MvcSiteMapProvider.Collections.Specialized
             IJsonToDictionaryDeserializer jsonToDictionaryDeserializer
             )
         {
-            if (requestCache == null)
-                throw new ArgumentNullException("requestCache");
-            if (reservedAttributeNameProvider == null)
-                throw new ArgumentNullException("reservedAttributeNameProvider");
-            if (jsonToDictionaryDeserializer == null)
-                throw new ArgumentNullException("jsonToDictionaryDeserializer");
-
-            this.requestCache = requestCache;
-            this.reservedAttributeNameProvider = reservedAttributeNameProvider;
-            this.jsonToDictionaryDeserializer = jsonToDictionaryDeserializer;
+            this.requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
+            this.reservedAttributeNameProvider = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
+            this.jsonToDictionaryDeserializer = jsonToDictionaryDeserializer ?? throw new ArgumentNullException(nameof(jsonToDictionaryDeserializer));
         }
 
         protected readonly IRequestCache requestCache;
@@ -39,9 +32,9 @@ namespace MvcSiteMapProvider.Collections.Specialized
 
         public IRouteValueDictionary Create(string siteMapNodeKey, string memberName, ISiteMap siteMap)
         {
- 	        return new RouteValueDictionary(siteMapNodeKey, memberName, siteMap, this.reservedAttributeNameProvider, this.jsonToDictionaryDeserializer, this.requestCache);
+            return new RouteValueDictionary(siteMapNodeKey, memberName, siteMap, reservedAttributeNameProvider, jsonToDictionaryDeserializer, requestCache);
         }
 
-        #endregion
+        #endregion IRouteValueDictionaryFactory Members
     }
 }

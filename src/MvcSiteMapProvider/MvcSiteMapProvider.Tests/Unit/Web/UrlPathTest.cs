@@ -53,7 +53,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = false;
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -68,7 +68,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = false;
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = true;
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = false;
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = false;
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         /// <summary>
@@ -150,7 +150,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = true;
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = false;
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = true;
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
 
@@ -231,7 +231,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = false;
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         /// <summary>
@@ -257,7 +257,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = true;
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         /// <summary>
@@ -283,7 +283,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = true;
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         /// <summary>
@@ -308,7 +308,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = false;
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         /// <summary>
@@ -333,7 +333,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = true;
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
 
@@ -357,7 +357,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
         ////    // assert
         ////    var actual = result;
         ////    var expected = "http://testing.com:333/directory/subdirectory/page.aspx?a=b";
-        ////    Assert.AreEqual(expected, actual);
+        ////    Affirm.That(expected).IsEqualTo(actual);
         ////}
 
         ////[Test]
@@ -380,7 +380,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
         ////    // assert
         ////    var actual = result;
         ////    var expected = "https://somehost/some-application/directory/subdirectory/page.aspx?a=b";
-        ////    Assert.AreEqual(expected, actual);
+        ////    Affirm.That(expected).IsEqualTo(actual);
         ////}
 
         /////// <summary>
@@ -408,7 +408,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
         ////    // assert
         ////    var actual = result;
         ////    var expected = "https://somehost/directory/subdirectory/page.aspx?a=b";
-        ////    Assert.AreEqual(expected, actual);
+        ////    Affirm.That(expected).IsEqualTo(actual);
         ////}
 
         ////[Test]
@@ -431,7 +431,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
         ////    // assert
         ////    var actual = result;
         ////    var expected = "https://somehost/some-application/directory/subdirectory/page.aspx?a=b";
-        ////    Assert.AreEqual(expected, actual);
+        ////    Affirm.That(expected).IsEqualTo(actual);
         ////}
 
         /// <summary>
@@ -455,7 +455,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = "http://www.somewhere.com/directory/subdirectory/page.aspx?a=b";
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         /// <summary>
@@ -479,7 +479,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = "/some-application/directory/subdirectory/page.aspx?a=b";
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -502,7 +502,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = "/some-application/directory/subdirectory/page.aspx?a=b";
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -525,7 +525,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = "/directory/subdirectory/page.aspx?a=b";
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -548,7 +548,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = "http://somewhere.com/directory/subdirectory/page.aspx?a=b";
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -571,7 +571,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = "http://somewhere.com/directory/subdirectory/page.aspx?a=b";
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -593,7 +593,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = "http://somehost/directory/subdirectory/page.aspx?a=b";
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -615,7 +615,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = "http://somewhere.com/directory/subdirectory/page.aspx?a=b";
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         /// <summary>
@@ -641,7 +641,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = "https://somehost/some-application/directory/subdirectory/page.aspx?a=b";
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -664,7 +664,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = "https://somewhere.com/directory/subdirectory/page.aspx?a=b";
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -687,7 +687,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             var actual = result;
             var expected = "https://somewhere.com/directory/subdirectory/page.aspx?a=b";
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         /// <summary>
@@ -715,7 +715,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             Uri actual = result;
             Uri expected = new Uri("https://somehost/a.aspx?a=b");
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         /// <summary>
@@ -743,7 +743,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             Uri actual = result;
             Uri expected = new Uri("https://somehost:999/a.aspx?a=b");
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         /// <summary>
@@ -770,7 +770,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             Uri actual = result;
             Uri expected = new Uri("http://somehost/a.aspx?a=b");
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         /// <summary>
@@ -797,7 +797,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web
             // assert
             Uri actual = result;
             Uri expected = new Uri("http://somehost:79/a.aspx?a=b");
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         #endregion

@@ -6,8 +6,11 @@
     public interface ISiteMapNodeCollectionFactory
     {
         ISiteMapNodeCollection Create();
+
         ISiteMapNodeCollection CreateLockable(ISiteMap siteMap);
+
         ISiteMapNodeCollection CreateReadOnly(ISiteMapNodeCollection siteMapNodeCollection);
+
         ISiteMapNodeCollection CreateEmptyReadOnly();
     }
 }

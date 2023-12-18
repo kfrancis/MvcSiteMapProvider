@@ -5,7 +5,6 @@
     /// </summary>
     public interface ISiteMapNodeCreator
     {
-
         /// <summary>
         /// Creates an instance of <see cref="T:MvcSiteMapProvider.Builder.ISiteMapNodeToParentRelation"/>.
         /// </summary>
@@ -25,7 +24,6 @@
         /// <param name="implicitResourceKey">The implicit resource key for localization of the node's properties.</param>
         /// <returns>An <see cref="T:MvcSiteMapProvider.Builder.ISiteMapNodeToParentRelation"/> instance.</returns>
         ISiteMapNodeToParentRelation CreateDynamicSiteMapNode(string key, string parentKey, string sourceName, string implicitResourceKey);
-
 
         /// <summary>
         /// Generates a key based on the properties that are passed. The combination of values should be unique within the sitemap.

@@ -68,7 +68,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Collections.Specialized
             var actual = result;
             var expected = true;
 
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -90,7 +90,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Collections.Specialized
             var actual = result;
             var expected = true;
 
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -112,7 +112,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Collections.Specialized
             var actual = result;
             var expected = false;
 
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -136,7 +136,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Collections.Specialized
             var actual = result;
             var expected = true;
 
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -160,7 +160,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Collections.Specialized
             var actual = result;
             var expected = false;
 
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -184,7 +184,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Collections.Specialized
             var actual = result;
             var expected = false;
 
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -206,7 +206,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Collections.Specialized
             var actual = result;
             var expected = false;
 
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -229,7 +229,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Collections.Specialized
             var actual = result;
             var expected = false;
 
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -253,7 +253,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Collections.Specialized
             var actual = result;
             var expected = true;
 
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -277,7 +277,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Collections.Specialized
             var actual = result;
             var expected = false;
 
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -300,7 +300,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Collections.Specialized
             var actual = result;
             var expected = false;
 
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -324,7 +324,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Collections.Specialized
             var actual = result;
             var expected = false;
 
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test]
@@ -348,7 +348,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Collections.Specialized
             var actual = result;
             var expected = true;
 
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test(Description = "Ensures that all configured route keys with values are considered in the match")]
@@ -373,7 +373,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Collections.Specialized
             var actual = result;
             var expected = false;
 
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         [Test(Description = "Ensures that empty configured route keys are not considered in the match")]
@@ -398,7 +398,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Collections.Specialized
             var actual = result;
             var expected = true;
 
-            Assert.AreEqual(expected, actual);
+            Affirm.That(expected).IsEqualTo(actual);
         }
 
         #endregion

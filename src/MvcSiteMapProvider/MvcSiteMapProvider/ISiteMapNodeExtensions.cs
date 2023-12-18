@@ -4,7 +4,7 @@ using System;
 namespace MvcSiteMapProvider
 {
     /// <summary>
-    /// Contains extension logic for the ISiteMapNode interface that is not user 
+    /// Contains extension logic for the ISiteMapNode interface that is not user
     /// overridable.
     /// </summary>
     public static class ISiteMapNodeExtensions

@@ -11,7 +11,7 @@ namespace MvcSiteMapProvider.Web
         string AppDomainAppVirtualPath { get; }
 
         /// <summary>
-        /// Combines multiple strings into a URL, fixing any problems with forward 
+        /// Combines multiple strings into a URL, fixing any problems with forward
         /// and backslashes.
         /// </summary>
         /// <param name="uriParts">An array of strings to combine.</param>
@@ -20,12 +20,19 @@ namespace MvcSiteMapProvider.Web
         string CombineUrl(params string[] uriParts);
 
         string Combine(string basepath, string relative);
+
         bool IsAbsolutePhysicalPath(string path);
+
         bool IsAppRelativePath(string path);
+
         bool IsRooted(string basepath);
+
         string MakeVirtualPathAppAbsolute(string virtualPath);
+
         string MakeVirtualPathAppAbsolute(string virtualPath, string applicationPath);
+
         string UrlEncode(string url);
+
         string UrlDecode(string url);
 
         /// <summary>
@@ -67,7 +74,7 @@ namespace MvcSiteMapProvider.Web
         /// </summary>
         /// <param name="baseUrl">An absolute URL beginning with protocol.</param>
         /// <param name="url">
-        /// Any Url including those starting with "/", "~", or protocol. 
+        /// Any Url including those starting with "/", "~", or protocol.
         /// If an absolute URL is provided in this field, the baseUrl will be ignored.
         /// </param>
         /// <returns>The absolute URL.</returns>
@@ -83,7 +90,7 @@ namespace MvcSiteMapProvider.Web
 
         /// <summary>
         /// Resolves a URL, similar to how it would on Control.ResolveUrl() in ASP.NET.
-        /// If the URL begins with a "/", it will be resolved to the web root. If the 
+        /// If the URL begins with a "/", it will be resolved to the web root. If the
         /// URL begins with a "~", it will be resolved to the virtual application root.
         /// Absolute URLs will be passed through unchanged.
         /// </summary>
@@ -93,24 +100,24 @@ namespace MvcSiteMapProvider.Web
 
         /// <summary>
         /// Resolves a URL, similar to how it would on Control.ResolveUrl() in ASP.NET.
-        /// If the URL begins with a "/", it will be resolved to the web root. If the 
+        /// If the URL begins with a "/", it will be resolved to the web root. If the
         /// URL begins with a "~", it will be resolved to the virtual application root.
         /// Absolute URLs will be passed through unchanged.
         /// </summary>
         /// <param name="url">Any Url including those starting with "/", "~", or protocol.</param>
-        /// <param name="protocol">The protocol such as http, https, or ftp. Defaults to http 
+        /// <param name="protocol">The protocol such as http, https, or ftp. Defaults to http
         /// protocol if null or empty string. To use the protocol of the current request, use *.</param>
         /// <returns>The resolved URL.</returns>
         string ResolveUrl(string url, string protocol);
 
         /// <summary>
         /// Resolves a URL, similar to how it would on Control.ResolveUrl() in ASP.NET.
-        /// If the URL begins with a "/", it will be resolved to the web root. If the 
+        /// If the URL begins with a "/", it will be resolved to the web root. If the
         /// URL begins with a "~", it will be resolved to the virtual application root.
         /// Absolute URLs will be passed through unchanged.
         /// </summary>
         /// <param name="url">Any Url including those starting with "/", "~", or protocol.</param>
-        /// <param name="protocol">The protocol such as http, https, or ftp. Defaults to http 
+        /// <param name="protocol">The protocol such as http, https, or ftp. Defaults to http
         /// protocol if null or empty string. To use the protocol of the current request, use *.</param>
         /// <param name="hostName">The host name such as www.somewhere.com.</param>
         /// <returns>The resolved URL.</returns>
@@ -118,21 +125,21 @@ namespace MvcSiteMapProvider.Web
 
         /// <summary>
         /// Resolves a URL, similar to how it would on Control.ResolveUrl() in ASP.NET.
-        /// If the URL begins with a "/", it will be resolved to the web root. If the 
+        /// If the URL begins with a "/", it will be resolved to the web root. If the
         /// URL begins with a "~", it will be resolved to the virtual application root.
         /// Absolute URLs will be passed through unchanged.
         /// </summary>
         /// <param name="url">Any Url including those starting with "/", "~", or protocol.</param>
-        /// <param name="protocol">The protocol such as http, https, or ftp. Defaults to http 
+        /// <param name="protocol">The protocol such as http, https, or ftp. Defaults to http
         /// protocol if null or empty string. To use the protocol of the current request, use *.</param>
         /// <param name="hostName">The host name such as www.somewhere.com.</param>
         /// <param name="httpContext">The HTTP context representing the context of the request.</param>
         /// <returns>The resolved URL.</returns>
         string ResolveUrl(string url, string protocol, string hostName, HttpContextBase httpContext);
 
-                /// <summary>
+        /// <summary>
         /// Resolves a URL, similar to how it would on Control.ResolveUrl() in ASP.NET.
-        /// If the URL begins with a "/", it will be resolved to the web root. If the 
+        /// If the URL begins with a "/", it will be resolved to the web root. If the
         /// URL begins with a "~", it will be resolved to the virtual application root.
         /// Absolute URLs will be passed through unchanged.
         /// </summary>
@@ -142,7 +149,7 @@ namespace MvcSiteMapProvider.Web
 
         /// <summary>
         /// Resolves a URL, similar to how it would on Control.ResolveUrl() in ASP.NET.
-        /// If the URL begins with a "/", it will be resolved to the web root. If the 
+        /// If the URL begins with a "/", it will be resolved to the web root. If the
         /// URL begins with a "~", it will be resolved to the virtual application root.
         /// Absolute URLs will be passed through unchanged. Uses the protocol of the request.
         /// </summary>
@@ -154,9 +161,9 @@ namespace MvcSiteMapProvider.Web
 
         /// <summary>
         /// Resolves a URL, similar to how it would on Control.ResolveUrl() in ASP.NET.
-        /// If the URL begins with a "/", it will be resolved to the web root. If the 
+        /// If the URL begins with a "/", it will be resolved to the web root. If the
         /// URL begins with a "~", it will be resolved to the virtual application root.
-        /// Absolute URLs will be passed through unchanged. 
+        /// Absolute URLs will be passed through unchanged.
         /// </summary>
         /// <param name="url">Any Url including those starting with "/", "~", or protocol.</param>
         /// <param name="protocol">The protocol such as http, https, or ftp. Defaults to protocol of the
@@ -167,7 +174,7 @@ namespace MvcSiteMapProvider.Web
 
         /// <summary>
         /// Resolves a URL, similar to how it would on Control.ResolveUrl() in ASP.NET.
-        /// If the URL begins with a "/", it will be resolved to the web root. If the 
+        /// If the URL begins with a "/", it will be resolved to the web root. If the
         /// URL begins with a "~", it will be resolved to the virtual application root.
         /// Absolute URLs will be passed through unchanged.
         /// </summary>
@@ -187,13 +194,13 @@ namespace MvcSiteMapProvider.Web
         /// <remarks>Source: http://stackoverflow.com/questions/7795910/how-do-i-get-url-action-to-use-the-right-port-number#11888846 </remarks>
         Uri GetPublicFacingUrl(HttpContextBase httpContext);
 
-        [Obsolete(@"Use MakeUrlAbsolute(string) instead. Example: This method will be removed in version 5.")]
+        [Obsolete("Use MakeUrlAbsolute(string) instead. Example: This method will be removed in version 5.")]
         string MakeRelativeUrlAbsolute(string url);
 
-        [Obsolete(@"Use MakeUrlAbsolute(string, string) instead. Example: This method will be removed in version 5.")]
+        [Obsolete("Use MakeUrlAbsolute(string, string) instead. Example: This method will be removed in version 5.")]
         string ResolveServerUrl(string serverUrl, bool forceHttps);
 
-        [Obsolete(@"Use MakeUrlAbsolute(string) instead. Example: This method will be removed in version 5.")]
+        [Obsolete("Use MakeUrlAbsolute(string) instead. Example: This method will be removed in version 5.")]
         string ResolveServerUrl(string serverUrl);
     }
 }

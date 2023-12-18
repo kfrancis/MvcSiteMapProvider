@@ -71,12 +71,13 @@ namespace MvcSiteMapProvider
         string ImageUrlHostName { get; set; }
 
         /// <summary>
-        /// Gets or sets the attributes (optional).
-        /// 
-        /// The value must be a JSON string that represents a dictionary of key-value pairs. Example: @"{ ""key-1"": ""value-1""[, ""key-x"": ""value-x""] }". 
+        /// <para>Gets or sets the attributes (optional).</para>
+        /// <para>
+        /// The value must be a JSON string that represents a dictionary of key-value pairs. Example: @"{ ""key-1"": ""value-1""[, ""key-x"": ""value-x""] }".
         /// The value may be a string or primitive type (by leaving off the quotes).
+        /// </para>
         /// </summary>
-        /// <value>A JSON string that represents a dictionary of key-value pairs. Example: @"{ ""key-1"": ""value-1""[, ""key-x"": ""value-x""] }". 
+        /// <value>A JSON string that represents a dictionary of key-value pairs. Example: @"{ ""key-1"": ""value-1""[, ""key-x"": ""value-x""] }".
         /// The value may be a string or primitive type (by leaving off the quotes).</value>
         string Attributes { get; set; }
 
@@ -86,9 +87,8 @@ namespace MvcSiteMapProvider
         string[] Roles { get; set; }
 
         /// <summary>
-        /// Gets or sets a string representation of the last modified date.
-        /// 
-        /// The value may be any date format supported by the invariant culture.
+        /// <para>Gets or sets a string representation of the last modified date.</para>
+        /// <para>The value may be any date format supported by the invariant culture.</para>
         /// </summary>
         /// <value>A string representation of the last modified date. May be any date format that is supported by the invariant culture.</value>
         string LastModifiedDate { get; set; }
@@ -133,13 +133,13 @@ namespace MvcSiteMapProvider
         string Url { get; set; }
 
         /// <summary>
-        /// A value indicating to cache the resolved URL. If false, the URL will be 
+        /// A value indicating to cache the resolved URL. If false, the URL will be
         /// resolved every time it is accessed.
         /// </summary>
         bool CacheResolvedUrl { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to include ambient request values 
+        /// Gets or sets a value indicating whether to include ambient request values
         /// (from the RouteValues and/or query string) when resolving URLs.
         /// </summary>
         /// <value><b>true</b> to include ambient values (like MVC does); otherwise <b>false</b>.</value>

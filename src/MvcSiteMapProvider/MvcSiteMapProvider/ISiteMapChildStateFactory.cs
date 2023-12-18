@@ -11,14 +11,23 @@ namespace MvcSiteMapProvider
     public interface ISiteMapChildStateFactory
     {
         IDictionary<ISiteMapNode, ISiteMapNodeCollection> CreateChildNodeCollectionDictionary();
+
         IDictionary<string, ISiteMapNode> CreateKeyDictionary();
+
         IDictionary<ISiteMapNode, ISiteMapNode> CreateParentNodeDictionary();
+
         IDictionary<IUrlKey, ISiteMapNode> CreateUrlDictionary();
+
         IUrlKey CreateUrlKey(ISiteMapNode node);
+
         IUrlKey CreateUrlKey(string relativeOrAbsoluteUrl, string hostName);
+
         ISiteMapNodeCollection CreateSiteMapNodeCollection();
+
         ISiteMapNodeCollection CreateLockableSiteMapNodeCollection(ISiteMap siteMap);
+
         ISiteMapNodeCollection CreateReadOnlySiteMapNodeCollection(ISiteMapNodeCollection siteMapNodeCollection);
+
         ISiteMapNodeCollection CreateEmptyReadOnlySiteMapNodeCollection();
     }
 }

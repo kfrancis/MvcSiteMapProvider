@@ -7,7 +7,7 @@ namespace MvcSiteMapProvider.Loader
     /// <see cref="T:MvcSiteMapProvider.Loader.SiteMapLoader"/> is responsible for loading or unloading
     /// an <see cref="T:MvcSitemapProvider.ISiteMap"/> instance from the cache.
     /// </summary>
-    public class SiteMapLoader 
+    public class SiteMapLoader
         : ISiteMapLoader
     {
         public SiteMapLoader(
@@ -16,16 +16,9 @@ namespace MvcSiteMapProvider.Loader
             ISiteMapCreator siteMapCreator
             )
         {
-            if (siteMapCache == null)
-                throw new ArgumentNullException("siteMapCache");
-            if (siteMapCacheKeyGenerator == null)
-                throw new ArgumentNullException("siteMapCacheKeyGenerator");
-            if (siteMapCreator == null)
-                throw new ArgumentNullException("siteMapCreator");
-
-            this.siteMapCache = siteMapCache;
-            this.siteMapCacheKeyGenerator = siteMapCacheKeyGenerator;
-            this.siteMapCreator = siteMapCreator;
+            this.siteMapCache = siteMapCache ?? throw new ArgumentNullException(nameof(siteMapCache));
+            this.siteMapCacheKeyGenerator = siteMapCacheKeyGenerator ?? throw new ArgumentNullException(nameof(siteMapCacheKeyGenerator));
+            this.siteMapCreator = siteMapCreator ?? throw new ArgumentNullException(nameof(siteMapCreator));
         }
 
         protected readonly ISiteMapCache siteMapCache;
@@ -65,6 +58,6 @@ namespace MvcSiteMapProvider.Loader
             siteMapCache.Remove(siteMapCacheKey);
         }
 
-        #endregion
+        #endregion ISiteMapLoader Members
     }
 }

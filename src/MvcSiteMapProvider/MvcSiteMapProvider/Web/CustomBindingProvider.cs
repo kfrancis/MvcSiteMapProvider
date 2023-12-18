@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace MvcSiteMapProvider.Web
 {
     /// <summary>
-    /// Class that can be used to explicitly specify binding configuration by passing 
+    /// Class that can be used to explicitly specify binding configuration by passing
     /// <see cref="T:MvcSiteMapProvider.Web.IBinding"/> instances into the constructor.
     /// </summary>
     public class CustomBindingProvider
@@ -14,9 +14,7 @@ namespace MvcSiteMapProvider.Web
             IEnumerable<IBinding> bindings
             )
         {
-            if (bindings == null)
-                throw new ArgumentNullException("bindings");
-            this.bindings = bindings;
+            this.bindings = bindings ?? throw new ArgumentNullException(nameof(bindings));
         }
 
         protected readonly IEnumerable<IBinding> bindings;
@@ -25,9 +23,9 @@ namespace MvcSiteMapProvider.Web
 
         public IEnumerable<IBinding> GetBindings()
         {
-            return this.bindings;
+            return bindings;
         }
 
-        #endregion
+        #endregion IBindingProvider Members
     }
 }

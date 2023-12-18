@@ -6,7 +6,7 @@ using System;
 namespace MvcSiteMapProvider
 {
     /// <summary>
-    /// Provides the means to make the <see cref="T:MvcSiteMapProvider.SiteMapNode"/> instance read-only so it cannot be 
+    /// Provides the means to make the <see cref="T:MvcSiteMapProvider.SiteMapNode"/> instance read-only so it cannot be
     /// inadvertently altered while it is in the cache.
     /// </summary>
     public class LockableSiteMapNode
@@ -23,13 +23,13 @@ namespace MvcSiteMapProvider
             IUrlPath urlPath
             )
             : base(
-                siteMap, 
-                key, 
+                siteMap,
+                key,
                 isDynamic,
                 pluginProvider,
                 mvcContextFactory,
-                siteMapNodeChildStateFactory, 
-                localizationService, 
+                siteMapNodeChildStateFactory,
+                localizationService,
                 urlPath
             )
         {
@@ -38,12 +38,12 @@ namespace MvcSiteMapProvider
         /// <summary>
         /// Gets or sets the display sort order for the node relative to its sibling nodes.
         /// </summary>
-        public override int Order 
+        public override int Order
         {
             get { return base.Order; }
             set
             {
-                this.ThrowIfReadOnly("Order");
+                ThrowIfReadOnly("Order");
                 base.Order = value;
             }
         }
@@ -59,7 +59,7 @@ namespace MvcSiteMapProvider
             get { return base.HttpMethod; }
             set
             {
-                this.ThrowIfReadOnly("HttpMethod");
+                ThrowIfReadOnly("HttpMethod");
                 base.HttpMethod = value;
             }
         }
@@ -73,7 +73,7 @@ namespace MvcSiteMapProvider
             get { return base.Title; }
             set
             {
-                this.ThrowIfReadOnly("Title");
+                ThrowIfReadOnly("Title");
                 base.Title = value;
             }
         }
@@ -87,7 +87,7 @@ namespace MvcSiteMapProvider
             get { return base.Description; }
             set
             {
-                this.ThrowIfReadOnly("Description");
+                ThrowIfReadOnly("Description");
                 base.Description = value;
             }
         }
@@ -101,7 +101,7 @@ namespace MvcSiteMapProvider
             get { return base.TargetFrame; }
             set
             {
-                this.ThrowIfReadOnly("TargetFrame");
+                ThrowIfReadOnly("TargetFrame");
                 base.TargetFrame = value;
             }
         }
@@ -115,7 +115,7 @@ namespace MvcSiteMapProvider
             get { return base.ImageUrl; }
             set
             {
-                this.ThrowIfReadOnly("ImageUrl");
+                ThrowIfReadOnly("ImageUrl");
                 base.ImageUrl = value;
             }
         }
@@ -125,12 +125,12 @@ namespace MvcSiteMapProvider
         /// If not provided, it will default to the protocol of the current request.
         /// </summary>
         /// <value>The protocol of the image URL.</value>
-        public override string ImageUrlProtocol 
+        public override string ImageUrlProtocol
         {
             get { return base.ImageUrlProtocol; }
             set
             {
-                this.ThrowIfReadOnly("ImageUrlProtocol");
+                ThrowIfReadOnly("ImageUrlProtocol");
                 base.ImageUrlProtocol = value;
             }
         }
@@ -139,12 +139,12 @@ namespace MvcSiteMapProvider
         /// Gets or sets the image URL host name, such as www.somewhere.com (optional).
         /// </summary>
         /// <value>The protocol of the image URL.</value>
-        public override string ImageUrlHostName 
+        public override string ImageUrlHostName
         {
             get { return base.ImageUrlHostName; }
             set
             {
-                this.ThrowIfReadOnly("ImageUrlHostName");
+                ThrowIfReadOnly("ImageUrlHostName");
                 base.ImageUrlHostName = value;
             }
         }
@@ -158,7 +158,7 @@ namespace MvcSiteMapProvider
             get { return base.LastModifiedDate; }
             set
             {
-                this.ThrowIfReadOnly("LastModifiedDate");
+                ThrowIfReadOnly("LastModifiedDate");
                 base.LastModifiedDate = value;
             }
         }
@@ -172,7 +172,7 @@ namespace MvcSiteMapProvider
             get { return base.ChangeFrequency; }
             set
             {
-                this.ThrowIfReadOnly("ChangeFrequency");
+                ThrowIfReadOnly("ChangeFrequency");
                 base.ChangeFrequency = value;
             }
         }
@@ -186,11 +186,10 @@ namespace MvcSiteMapProvider
             get { return base.UpdatePriority; }
             set
             {
-                this.ThrowIfReadOnly("UpdatePriority");
+                ThrowIfReadOnly("UpdatePriority");
                 base.UpdatePriority = value;
             }
         }
-
 
         #region Visibility
 
@@ -207,12 +206,12 @@ namespace MvcSiteMapProvider
             get { return base.VisibilityProvider; }
             set
             {
-                this.ThrowIfReadOnly("VisibilityProvider");
+                ThrowIfReadOnly("VisibilityProvider");
                 base.VisibilityProvider = value;
             }
         }
 
-        #endregion
+        #endregion Visibility
 
         #region Dynamic Nodes
 
@@ -227,12 +226,12 @@ namespace MvcSiteMapProvider
             get { return base.DynamicNodeProvider; }
             set
             {
-                this.ThrowIfReadOnly("DynamicNodeProvider");
+                ThrowIfReadOnly("DynamicNodeProvider");
                 base.DynamicNodeProvider = value;
             }
         }
 
-        #endregion
+        #endregion Dynamic Nodes
 
         #region URL Resolver
 
@@ -247,7 +246,7 @@ namespace MvcSiteMapProvider
             get { return base.Clickable; }
             set
             {
-                this.ThrowIfReadOnly("Clickable");
+                ThrowIfReadOnly("Clickable");
                 base.Clickable = value;
             }
         }
@@ -263,7 +262,7 @@ namespace MvcSiteMapProvider
             get { return base.UrlResolver; }
             set
             {
-                this.ThrowIfReadOnly("UrlResolver");
+                ThrowIfReadOnly("UrlResolver");
                 base.UrlResolver = value;
             }
         }
@@ -279,27 +278,27 @@ namespace MvcSiteMapProvider
             get { return base.Url; }
             set
             {
-                this.ThrowIfReadOnly("Url");
+                ThrowIfReadOnly("Url");
                 base.Url = value;
             }
         }
 
         /// <summary>
-        /// A value indicating to cache the resolved URL. If false, the URL will be 
+        /// A value indicating to cache the resolved URL. If false, the URL will be
         /// resolved every time it is accessed.
         /// </summary>
-        public override bool CacheResolvedUrl 
+        public override bool CacheResolvedUrl
         {
             get { return base.CacheResolvedUrl; }
             set
             {
-                this.ThrowIfReadOnly("CacheResolvedUrl");
+                ThrowIfReadOnly("CacheResolvedUrl");
                 base.CacheResolvedUrl = value;
             }
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to include ambient request values 
+        /// Gets or sets a value indicating whether to include ambient request values
         /// (from the RouteValues and/or query string) when resolving URLs.
         /// </summary>
         /// <value><b>true</b> to include ambient values (like MVC does); otherwise <b>false</b>.</value>
@@ -308,13 +307,13 @@ namespace MvcSiteMapProvider
             get { return base.IncludeAmbientValuesInUrl; }
             set
             {
-                this.ThrowIfReadOnly("IncludeAmbientValuesInUrl");
+                ThrowIfReadOnly("IncludeAmbientValuesInUrl");
                 base.IncludeAmbientValuesInUrl = value;
             }
         }
 
         /// <summary>
-        /// Gets or sets the protocol, such as http or https that will 
+        /// Gets or sets the protocol, such as http or https that will
         /// be built into the URL.
         /// </summary>
         /// <value>The protocol.</value>
@@ -323,7 +322,7 @@ namespace MvcSiteMapProvider
             get { return base.Protocol; }
             set
             {
-                this.ThrowIfReadOnly("Protocol");
+                ThrowIfReadOnly("Protocol");
                 base.Protocol = value;
             }
         }
@@ -337,7 +336,7 @@ namespace MvcSiteMapProvider
             get { return base.HostName; }
             set
             {
-                this.ThrowIfReadOnly("HostName");
+                ThrowIfReadOnly("HostName");
                 base.HostName = value;
             }
         }
@@ -347,11 +346,11 @@ namespace MvcSiteMapProvider
         /// </summary>
         public override void ResolveUrl()
         {
-            this.ThrowIfReadOnly("ResolveUrl");
+            ThrowIfReadOnly("ResolveUrl");
             base.ResolveUrl();
         }
 
-        #endregion
+        #endregion URL Resolver
 
         #region Canonical Tag
 
@@ -364,7 +363,7 @@ namespace MvcSiteMapProvider
             get { return base.CanonicalKey; }
             set
             {
-                this.ThrowIfReadOnly("CanonicalKey");
+                ThrowIfReadOnly("CanonicalKey");
                 base.CanonicalKey = value;
             }
         }
@@ -378,7 +377,7 @@ namespace MvcSiteMapProvider
             get { return base.CanonicalUrl; }
             set
             {
-                this.ThrowIfReadOnly("CanonicalUrl");
+                ThrowIfReadOnly("CanonicalUrl");
                 base.CanonicalUrl = value;
             }
         }
@@ -387,12 +386,12 @@ namespace MvcSiteMapProvider
         /// Gets or sets the canonical URL protocol, such as http, https (optional).
         /// </summary>
         /// <value>The protocol of the image URL.</value>
-        public override string CanonicalUrlProtocol 
+        public override string CanonicalUrlProtocol
         {
             get { return base.CanonicalUrlProtocol; }
             set
             {
-                this.ThrowIfReadOnly("CanonicalUrlProtocol");
+                ThrowIfReadOnly("CanonicalUrlProtocol");
                 base.CanonicalUrlProtocol = value;
             }
         }
@@ -401,17 +400,17 @@ namespace MvcSiteMapProvider
         /// Gets or sets the canonical URL host name, such as www.somewhere.com (optional).
         /// </summary>
         /// <value>The protocol of the image URL.</value>
-        public override string CanonicalUrlHostName 
+        public override string CanonicalUrlHostName
         {
             get { return base.CanonicalUrlHostName; }
             set
             {
-                this.ThrowIfReadOnly("CanonicalUrlHostName");
+                ThrowIfReadOnly("CanonicalUrlHostName");
                 base.CanonicalUrlHostName = value;
             }
         }
 
-        #endregion
+        #endregion Canonical Tag
 
         #region Route
 
@@ -424,12 +423,12 @@ namespace MvcSiteMapProvider
             get { return base.Route; }
             set
             {
-                this.ThrowIfReadOnly("Route");
+                ThrowIfReadOnly("Route");
                 base.Route = value;
             }
         }
 
-        #endregion
+        #endregion Route
 
         #region MVC
 
@@ -442,7 +441,7 @@ namespace MvcSiteMapProvider
             get { return base.Area; }
             set
             {
-                this.ThrowIfReadOnly("Area");
+                ThrowIfReadOnly("Area");
                 base.Area = value;
             }
         }
@@ -456,7 +455,7 @@ namespace MvcSiteMapProvider
             get { return base.Controller; }
             set
             {
-                this.ThrowIfReadOnly("Controller");
+                ThrowIfReadOnly("Controller");
                 base.Controller = value;
             }
         }
@@ -470,17 +469,16 @@ namespace MvcSiteMapProvider
             get { return base.Action; }
             set
             {
-                this.ThrowIfReadOnly("Action");
+                ThrowIfReadOnly("Action");
                 base.Action = value;
             }
         }
 
-        #endregion
-
+        #endregion MVC
 
         protected virtual void ThrowIfReadOnly(string memberName)
         {
-            if (this.IsReadOnly)
+            if (IsReadOnly)
             {
                 throw new InvalidOperationException(string.Format(Resources.Messages.SiteMapNodeReadOnly, memberName));
             }

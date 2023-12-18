@@ -4,7 +4,7 @@ using System;
 namespace MvcSiteMapProvider.Builder
 {
     /// <summary>
-    /// Provides a means of optimizing <see cref="T:MvcSiteMapProvider.ISiteMapNode"/> instances before they 
+    /// Provides a means of optimizing <see cref="T:MvcSiteMapProvider.ISiteMapNode"/> instances before they
     /// are placed in the cahce.
     /// </summary>
     [Obsolete("VisitingSiteMapBuilder has been deprecated and will be removed in version 5. This functionality was merged into the SiteMapBuilder class, as it only makes sense to run this after the sitemap is completely built.")]
@@ -15,14 +15,10 @@ namespace MvcSiteMapProvider.Builder
             ISiteMapNodeVisitor siteMapNodeVisitor
             )
         {
-            if (siteMapNodeVisitor == null)
-                throw new ArgumentNullException("siteMapNodeVisitor");
-
-            this.siteMapNodeVisitor = siteMapNodeVisitor;
+            this.siteMapNodeVisitor = siteMapNodeVisitor ?? throw new ArgumentNullException(nameof(siteMapNodeVisitor));
         }
 
         protected readonly ISiteMapNodeVisitor siteMapNodeVisitor;
-
 
         #region ISiteMapBuilder Members
 
@@ -30,7 +26,7 @@ namespace MvcSiteMapProvider.Builder
         {
             if (rootNode == null)
             {
-                throw new ArgumentNullException("rootNode", Resources.Messages.VisitingSiteMapBuilderRequiresRootNode);
+                throw new ArgumentNullException(nameof(rootNode), Resources.Messages.VisitingSiteMapBuilderRequiresRootNode);
             }
 
             VisitNodes(rootNode);
@@ -39,7 +35,7 @@ namespace MvcSiteMapProvider.Builder
 
         protected virtual void VisitNodes(ISiteMapNode node)
         {
-            this.siteMapNodeVisitor.Execute(node);
+            siteMapNodeVisitor.Execute(node);
 
             if (node.HasChildNodes)
             {
@@ -50,6 +46,6 @@ namespace MvcSiteMapProvider.Builder
             }
         }
 
-        #endregion
+        #endregion ISiteMapBuilder Members
     }
 }

@@ -15,13 +15,8 @@ namespace MvcSiteMapProvider.Builder
             ISiteMapNodeFactory siteMapNodeFactory
             )
         {
-            if (nodeKeyGenerator == null)
-                throw new ArgumentNullException("nodeKeyGenerator");
-            if (siteMapNodeFactory == null)
-                throw new ArgumentNullException("siteMapNodeFactory");
-
-            this.nodeKeyGenerator = nodeKeyGenerator;
-            this.siteMapNodeFactory = siteMapNodeFactory;
+            this.nodeKeyGenerator = nodeKeyGenerator ?? throw new ArgumentNullException(nameof(nodeKeyGenerator));
+            this.siteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
         }
 
         private readonly INodeKeyGenerator nodeKeyGenerator;
@@ -49,12 +44,12 @@ namespace MvcSiteMapProvider.Builder
                 if (string.IsNullOrEmpty(key))
                 {
                     key = nodeKeyGenerator.GenerateKey(
-                        parentNode == null ? "" : parentNode.Key, 
-                        Guid.NewGuid().ToString(), 
-                        node.Url, 
-                        node.Title, 
-                        node.Area, 
-                        node.Controller, 
+                        parentNode == null ? "" : parentNode.Key,
+                        Guid.NewGuid().ToString(),
+                        node.Url,
+                        node.Title,
+                        node.Area,
+                        node.Controller,
                         node.Action,
                         node.HttpMethod,
                         node.Clickable);

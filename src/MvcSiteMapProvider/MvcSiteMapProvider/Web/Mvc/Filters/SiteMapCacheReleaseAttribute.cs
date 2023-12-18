@@ -23,7 +23,7 @@ namespace MvcSiteMapProvider.Web.Mvc.Filters
         /// <param name="filterContext">The filter context.</param>
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
-            SiteMaps.ReleaseSiteMap(this.SiteMapCacheKey);
+            SiteMaps.ReleaseSiteMap(SiteMapCacheKey);
         }
     }
 }

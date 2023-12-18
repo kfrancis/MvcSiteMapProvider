@@ -6,7 +6,7 @@ using System.Xml.Linq;
 namespace MvcSiteMapProvider.Builder
 {
     /// <summary>
-    /// XmlSiteMapBuilder class. Builds a <see cref="T:MvcSiteMapProvider.ISiteMapNode"/> tree based on a 
+    /// XmlSiteMapBuilder class. Builds a <see cref="T:MvcSiteMapProvider.ISiteMapNode"/> tree based on a
     /// <see cref="T:MvcSiteMapProvider.Xml.IXmlSource"/> instance.
     /// </summary>
     [Obsolete("XmlSiteMapBuilder has been deprecated and will be removed in version 5. Use XmlSiteMapNodeProvider in conjunction with SiteMapBuilder instead.")]
@@ -22,25 +22,12 @@ namespace MvcSiteMapProvider.Builder
             ISiteMapXmlNameProvider xmlNameProvider
             )
         {
-            if (xmlSource == null)
-                throw new ArgumentNullException("xmlSource");
-            if (reservedAttributeNameProvider == null)
-                throw new ArgumentNullException("reservedAttributeNameProvider");
-            if (nodeKeyGenerator == null)
-                throw new ArgumentNullException("nodeKeyGenerator");
-            if (dynamicNodeBuilder == null)
-                throw new ArgumentNullException("dynamicNodeBuilder");
-            if (siteMapNodeFactory == null)
-                throw new ArgumentNullException("siteMapNodeFactory");
-            if (xmlNameProvider == null)
-                throw new ArgumentNullException("xmlNameProvider");
-
-            this.xmlSource = xmlSource;
-            this.reservedAttributeNameProvider = reservedAttributeNameProvider;
-            this.nodeKeyGenerator = nodeKeyGenerator;
-            this.dynamicNodeBuilder = dynamicNodeBuilder;
-            this.siteMapNodeFactory = siteMapNodeFactory;
-            this.xmlNameProvider = xmlNameProvider;
+            this.xmlSource = xmlSource ?? throw new ArgumentNullException(nameof(xmlSource));
+            this.reservedAttributeNameProvider = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
+            this.nodeKeyGenerator = nodeKeyGenerator ?? throw new ArgumentNullException(nameof(nodeKeyGenerator));
+            this.dynamicNodeBuilder = dynamicNodeBuilder ?? throw new ArgumentNullException(nameof(dynamicNodeBuilder));
+            this.siteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
+            this.xmlNameProvider = xmlNameProvider ?? throw new ArgumentNullException(nameof(xmlNameProvider));
         }
 
         protected readonly IXmlSource xmlSource;
@@ -49,7 +36,6 @@ namespace MvcSiteMapProvider.Builder
         protected readonly IDynamicNodeBuilder dynamicNodeBuilder;
         protected readonly ISiteMapNodeFactory siteMapNodeFactory;
         protected readonly ISiteMapXmlNameProvider xmlNameProvider;
-
 
         #region ISiteMapBuilder Members
 
@@ -65,7 +51,7 @@ namespace MvcSiteMapProvider.Builder
             return rootNode;
         }
 
-        #endregion
+        #endregion ISiteMapBuilder Members
 
         protected virtual ISiteMapNode LoadSiteMapFromXml(ISiteMap siteMap, XDocument xml)
         {
@@ -100,7 +86,6 @@ namespace MvcSiteMapProvider.Builder
             return GetSiteMapNodeFromXmlElement(siteMap, rootElement, null);
         }
 
-
         /// <summary>
         /// Maps an XMLElement from the XML file to an MvcSiteMapNode.
         /// </summary>
@@ -112,8 +97,8 @@ namespace MvcSiteMapProvider.Builder
             // Get data required to generate the node instance
 
             // Get area and controller from node declaration or the parent node
-            var area = this.InheritAreaIfNotProvided(node, parentNode);
-            var controller = this.InheritControllerIfNotProvided(node, parentNode);
+            var area = InheritAreaIfNotProvided(node, parentNode);
+            var controller = InheritControllerIfNotProvided(node, parentNode);
             var action = node.GetAttributeValue("action");
             var url = node.GetAttributeValue("url");
             var explicitKey = node.GetAttributeValue("key");
@@ -173,7 +158,7 @@ namespace MvcSiteMapProvider.Builder
             siteMapNode.RouteValues.AddRange(node, false);
             siteMapNode.PreservedRouteParameters.AddRange(node.GetAttributeValue("preservedRouteParameters"), new[] { ',', ';' });
             siteMapNode.UrlResolver = node.GetAttributeValue("urlResolver");
-            
+
             // Area and controller may need inheriting from the parent node, so set (or reset) them explicitly
             siteMapNode.Area = area;
             siteMapNode.Controller = controller;

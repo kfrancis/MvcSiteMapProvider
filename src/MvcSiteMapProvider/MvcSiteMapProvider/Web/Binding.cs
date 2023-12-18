@@ -5,7 +5,7 @@ namespace MvcSiteMapProvider.Web
 {
     /// <summary>
     /// Represents a binding between host name, protocol, and port.
-    /// This class can be used to determine the port when generating a URL by 
+    /// This class can be used to determine the port when generating a URL by
     /// matching the host name and protocol.
     /// </summary>
     [ExcludeFromAutoRegistration]
@@ -19,13 +19,13 @@ namespace MvcSiteMapProvider.Web
             )
         {
             if (string.IsNullOrEmpty(hostName))
-                throw new ArgumentNullException("hostName");
+                throw new ArgumentNullException(nameof(hostName));
             if (string.IsNullOrEmpty(protocol))
-                throw new ArgumentNullException("protocol");
+                throw new ArgumentNullException(nameof(protocol));
 
-            this.HostName = hostName;
-            this.Protocol = protocol;
-            this.Port = port;
+            HostName = hostName;
+            Protocol = protocol;
+            Port = port;
         }
 
         #region IBinding Members
@@ -36,6 +36,6 @@ namespace MvcSiteMapProvider.Web
 
         public int Port { get; private set; }
 
-        #endregion
+        #endregion IBinding Members
     }
 }

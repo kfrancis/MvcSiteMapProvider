@@ -13,6 +13,6 @@
             return new Binding(hostName, protocol, port);
         }
 
-        #endregion
+        #endregion IBindingFactory Members
     }
 }

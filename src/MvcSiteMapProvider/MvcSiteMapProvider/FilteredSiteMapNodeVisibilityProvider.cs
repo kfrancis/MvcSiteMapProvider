@@ -5,9 +5,8 @@ using System.Linq;
 namespace MvcSiteMapProvider
 {
     /// <summary>
-    /// Filtered SiteMapNode Visibility Provider.
-    /// 
-    /// Rules are parsed left-to-right, first match wins. Asterisk can be used to match any control. Exclamation mark can be used to negate a match.
+    /// <para>Filtered SiteMapNode Visibility Provider.</para>
+    /// <para>Rules are parsed left-to-right, first match wins. Asterisk can be used to match any control. Exclamation mark can be used to negate a match.</para>
     /// </summary>
     public class FilteredSiteMapNodeVisibilityProvider
         : SiteMapNodeVisibilityProviderBase
@@ -68,9 +67,9 @@ namespace MvcSiteMapProvider
                 {
                     return true;
                 }
-                else if ((visibilityKeyword == htmlHelper + "IfSelected" || 
+                else if ((visibilityKeyword == htmlHelper + "IfSelected" ||
                     visibilityKeyword == name + "IfSelected" ||
-                    visibilityKeyword == "IfSelected") && 
+                    visibilityKeyword == "IfSelected") &&
                     node.IsInCurrentPath())
                 {
                     return true;
@@ -85,7 +84,6 @@ namespace MvcSiteMapProvider
             return true;
         }
 
-        #endregion
+        #endregion ISiteMapNodeVisibilityProvider Members
     }
 }
-

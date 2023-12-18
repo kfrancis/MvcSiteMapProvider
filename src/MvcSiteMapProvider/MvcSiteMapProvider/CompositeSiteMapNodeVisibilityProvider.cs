@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace MvcSiteMapProvider
 {
     /// <summary>
-    /// Chains together a group of ISiteMapNodeVisibilityProvider instances so that visibility logic 
+    /// Chains together a group of ISiteMapNodeVisibilityProvider instances so that visibility logic
     /// for different purposes can be kept in different providers, but still apply to a single node.
     /// </summary>
     [ExcludeFromAutoRegistration]
@@ -15,13 +15,11 @@ namespace MvcSiteMapProvider
         public CompositeSiteMapNodeVisibilityProvider(string instanceName, params ISiteMapNodeVisibilityProvider[] siteMapNodeVisibilityProviders)
         {
             if (string.IsNullOrEmpty(instanceName))
-                throw new ArgumentNullException("instanceName");
-            if (siteMapNodeVisibilityProviders == null)
-                throw new ArgumentNullException("siteMapNodeVisibilityProviders");
-
+                throw new ArgumentNullException(nameof(instanceName));
             this.instanceName = instanceName;
-            this.siteMapNodeVisibilityProviders = siteMapNodeVisibilityProviders;
+            this.siteMapNodeVisibilityProviders = siteMapNodeVisibilityProviders ?? throw new ArgumentNullException(nameof(siteMapNodeVisibilityProviders));
         }
+
         private readonly string instanceName;
         private readonly ISiteMapNodeVisibilityProvider[] siteMapNodeVisibilityProviders;
 
@@ -31,7 +29,7 @@ namespace MvcSiteMapProvider
         {
             // Result is always true unless the first provider that returns false is encountered.
             bool result = true;
-            foreach (var visibilityProvider in this.siteMapNodeVisibilityProviders)
+            foreach (var visibilityProvider in siteMapNodeVisibilityProviders)
             {
                 result = visibilityProvider.IsVisible(node, sourceMetadata);
                 if (result == false)
@@ -42,9 +40,9 @@ namespace MvcSiteMapProvider
 
         public bool AppliesTo(string providerName)
         {
-            return this.instanceName.Equals(providerName, StringComparison.Ordinal);
+            return instanceName.Equals(providerName, StringComparison.Ordinal);
         }
 
-        #endregion
+        #endregion ISiteMapNodeVisibilityProvider Members
     }
 }

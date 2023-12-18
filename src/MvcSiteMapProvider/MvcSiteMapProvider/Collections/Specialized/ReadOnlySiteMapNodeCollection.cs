@@ -10,54 +10,30 @@ namespace MvcSiteMapProvider.Collections.Specialized
     public class ReadOnlySiteMapNodeCollection
             : ISiteMapNodeCollection
     {
-        public ReadOnlySiteMapNodeCollection(
-            ISiteMapNodeCollection siteMapNodeCollection
-            )
-        {
-            if (siteMapNodeCollection == null)
-                throw new ArgumentNullException("siteMapNodeCollection");
-
-            this.siteMapNodeCollection = siteMapNodeCollection;
-        }
-
         private readonly ISiteMapNodeCollection siteMapNodeCollection;
 
-        #region ISiteMapNodeCollection Members
-
-        public void AddRange(IEnumerable<ISiteMapNode> collection)
+        public ReadOnlySiteMapNodeCollection(
+                    ISiteMapNodeCollection siteMapNodeCollection
+            )
         {
-            throw new NotSupportedException(Resources.Messages.CollectionReadOnly);
+            this.siteMapNodeCollection = siteMapNodeCollection ?? throw new ArgumentNullException(nameof(siteMapNodeCollection));
         }
 
-        public void RemoveRange(int index, int count)
+        public int Count
         {
-            throw new NotSupportedException(Resources.Messages.CollectionReadOnly);
+            get { return siteMapNodeCollection.Count; }
         }
 
-        #endregion
-
-        #region IList<ISiteMapNode> Members
-
-        public int IndexOf(ISiteMapNode item)
+        public bool IsReadOnly
         {
-            return this.siteMapNodeCollection.IndexOf(item);
-        }
-
-        public void Insert(int index, ISiteMapNode item)
-        {
-            throw new NotSupportedException(Resources.Messages.CollectionReadOnly);
-        }
-
-        public void RemoveAt(int index)
-        {
-            throw new NotSupportedException(Resources.Messages.CollectionReadOnly);
+            get { return true; }
         }
 
         public ISiteMapNode this[int index]
         {
             get
             {
-                return this.siteMapNodeCollection[index];
+                return siteMapNodeCollection[index];
             }
             set
             {
@@ -65,11 +41,12 @@ namespace MvcSiteMapProvider.Collections.Specialized
             }
         }
 
-        #endregion
-
-        #region ICollection<ISiteMapNode> Members
-
         public void Add(ISiteMapNode item)
+        {
+            throw new NotSupportedException(Resources.Messages.CollectionReadOnly);
+        }
+
+        public void AddRange(IEnumerable<ISiteMapNode> collection)
         {
             throw new NotSupportedException(Resources.Messages.CollectionReadOnly);
         }
@@ -81,22 +58,32 @@ namespace MvcSiteMapProvider.Collections.Specialized
 
         public bool Contains(ISiteMapNode item)
         {
-            return this.siteMapNodeCollection.Contains(item);
+            return siteMapNodeCollection.Contains(item);
         }
 
         public void CopyTo(ISiteMapNode[] array, int arrayIndex)
         {
-            this.siteMapNodeCollection.CopyTo(array, arrayIndex);
+            siteMapNodeCollection.CopyTo(array, arrayIndex);
         }
 
-        public int Count
+        public IEnumerator<ISiteMapNode> GetEnumerator()
         {
-            get { return this.siteMapNodeCollection.Count; }
+            return siteMapNodeCollection.GetEnumerator();
         }
 
-        public bool IsReadOnly
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            get { return true; }
+            return siteMapNodeCollection.GetEnumerator();
+        }
+
+        public int IndexOf(ISiteMapNode item)
+        {
+            return siteMapNodeCollection.IndexOf(item);
+        }
+
+        public void Insert(int index, ISiteMapNode item)
+        {
+            throw new NotSupportedException(Resources.Messages.CollectionReadOnly);
         }
 
         public bool Remove(ISiteMapNode item)
@@ -104,24 +91,14 @@ namespace MvcSiteMapProvider.Collections.Specialized
             throw new NotSupportedException(Resources.Messages.CollectionReadOnly);
         }
 
-        #endregion
-
-        #region IEnumerable<ISiteMapNode> Members
-
-        public IEnumerator<ISiteMapNode> GetEnumerator()
+        public void RemoveAt(int index)
         {
-            return this.siteMapNodeCollection.GetEnumerator();
+            throw new NotSupportedException(Resources.Messages.CollectionReadOnly);
         }
 
-        #endregion
-
-        #region IEnumerable Members
-
-        IEnumerator IEnumerable.GetEnumerator()
+        public void RemoveRange(int index, int count)
         {
-            return this.siteMapNodeCollection.GetEnumerator();
+            throw new NotSupportedException(Resources.Messages.CollectionReadOnly);
         }
-
-        #endregion
     }
 }

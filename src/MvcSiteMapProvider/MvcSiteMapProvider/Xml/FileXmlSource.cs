@@ -19,7 +19,7 @@ namespace MvcSiteMapProvider.Xml
             )
         {
             if (string.IsNullOrEmpty(fileName))
-                throw new ArgumentNullException("fileName");
+                throw new ArgumentNullException(nameof(fileName));
 
             this.fileName = fileName;
         }
@@ -31,17 +31,17 @@ namespace MvcSiteMapProvider.Xml
         public XDocument GetXml()
         {
             XDocument result = null;
-            if (File.Exists(this.fileName))
+            if (File.Exists(fileName))
             {
-                result = XDocument.Load(this.fileName);
+                result = XDocument.Load(fileName);
             }
             else
             {
-                throw new FileNotFoundException(string.Format(Resources.Messages.XmlFileNotFound, this.fileName), this.fileName);
+                throw new FileNotFoundException(string.Format(Resources.Messages.XmlFileNotFound, fileName), fileName);
             }
             return result;
         }
 
-        #endregion
+        #endregion IXmlSource Members
     }
 }

@@ -6,7 +6,7 @@ namespace MvcSiteMapProvider
     /// <summary>
     /// This class is the static entry point where the presentation layer can request a sitemap by calling Current or passing a siteMapCacheKey.
     /// </summary>
-    public class SiteMaps
+    public static class SiteMaps
     {
         private static ISiteMapLoader loader;
 
@@ -14,11 +14,9 @@ namespace MvcSiteMapProvider
         {
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException("value");
                 if (loader != null)
                     throw new MvcSiteMapException(Resources.Messages.SiteMapLoaderAlreadySet);
-                loader = value;
+                loader = value ?? throw new ArgumentNullException("value");
             }
         }
 

@@ -7,44 +7,43 @@ using System.Xml.Linq;
 namespace MvcSiteMapProvider.Builder
 {
     /// <summary>
-    /// XmlSiteMapNodeProvider class. Builds a <see cref="T:MvcSiteMapProvider.Builder.ISiteMapNodeToParentRelation"/> list based on a 
+    /// XmlSiteMapNodeProvider class. Builds a <see cref="T:MvcSiteMapProvider.Builder.ISiteMapNodeToParentRelation"/> list based on a
     /// <see cref="T:MvcSiteMapProvider.Xml.IXmlSource"/> instance.
     /// </summary>
     public class XmlSiteMapNodeProvider
         : ISiteMapNodeProvider
     {
+        protected const string SourceName = ".sitemap XML File";
+
+        protected readonly bool includeRootNode;
+
+        protected readonly bool useNestedDynamicNodeRecursion;
+
+        protected readonly ISiteMapXmlNameProvider xmlNameProvider;
+
+        protected readonly IXmlSource xmlSource;
+
         public XmlSiteMapNodeProvider(
-            bool includeRootNode,
+                                                    bool includeRootNode,
             bool useNestedDynamicNodeRecursion,
             IXmlSource xmlSource,
             ISiteMapXmlNameProvider xmlNameProvider
             )
         {
-            if (xmlSource == null)
-                throw new ArgumentNullException("xmlSource");
-            if (xmlNameProvider == null)
-                throw new ArgumentNullException("xmlNameProvider");
-
             this.includeRootNode = includeRootNode;
             this.useNestedDynamicNodeRecursion = useNestedDynamicNodeRecursion;
-            this.xmlSource = xmlSource;
-            this.xmlNameProvider = xmlNameProvider;
+            this.xmlSource = xmlSource ?? throw new ArgumentNullException(nameof(xmlSource));
+            this.xmlNameProvider = xmlNameProvider ?? throw new ArgumentNullException(nameof(xmlNameProvider));
         }
-        protected readonly bool includeRootNode;
-        protected readonly bool useNestedDynamicNodeRecursion;
-        protected readonly IXmlSource xmlSource;
-        protected readonly ISiteMapXmlNameProvider xmlNameProvider;
-        protected const string SourceName = ".sitemap XML File";
 
         [Flags]
         protected enum NodesToProcess
         {
+            None = 0,
             StandardNodes = 1,
             DynamicNodes = 2,
             All = StandardNodes | DynamicNodes
         }
-
-        #region ISiteMapNodeProvider Members
 
         public IEnumerable<ISiteMapNodeToParentRelation> GetSiteMapNodes(ISiteMapNodeHelper helper)
         {
@@ -63,34 +62,6 @@ namespace MvcSiteMapProvider.Builder
             return result;
         }
 
-        #endregion
-
-        protected virtual IEnumerable<ISiteMapNodeToParentRelation> LoadSiteMapNodesFromXml(XDocument xml, ISiteMapNodeHelper helper)
-        {
-            var result = new List<ISiteMapNodeToParentRelation>();
-            xmlNameProvider.FixXmlNamespaces(xml);
-
-            // Get the root mvcSiteMapNode element, and map this to an MvcSiteMapNode
-            var rootElement = GetRootElement(xml);
-            if (rootElement == null)
-            {
-                // No root element - inform the user this isn't allowed.
-                throw new MvcSiteMapException(string.Format(Resources.Messages.XmlSiteMapNodeProviderRootNodeNotDefined, helper.SiteMapCacheKey));
-            }
-            // Add the root node
-            var rootNode = GetRootNode(xml, rootElement, helper);
-            if (includeRootNode)
-            {
-                result.Add(rootNode);
-            }
-
-            // Process our XML, passing in the main root sitemap node and xml element.
-            result.AddRange(ProcessXmlNodes(rootNode.Node, rootElement, NodesToProcess.All, helper));
-
-            // Done!
-            return result;
-        }
-
         protected virtual XElement GetRootElement(XDocument xml)
         {
             // Get the root mvcSiteMapNode element, and map this to an MvcSiteMapNode
@@ -100,76 +71,6 @@ namespace MvcSiteMapProvider.Builder
         protected virtual ISiteMapNodeToParentRelation GetRootNode(XDocument xml, XElement rootElement, ISiteMapNodeHelper helper)
         {
             return GetSiteMapNodeFromXmlElement(rootElement, null, helper);
-        }
-
-        /// <summary>
-        /// Recursively processes our XML document, parsing our siteMapNodes and dynamicNode(s).
-        /// </summary>
-        /// <param name="parentNode">The parent node to process.</param>
-        /// <param name="parentElement">The corresponding parent XML element.</param>
-        /// <param name="processFlags">Flags to indicate which nodes to process.</param>
-        /// <param name="helper">The node helper.</param>
-        protected virtual IList<ISiteMapNodeToParentRelation> ProcessXmlNodes(ISiteMapNode parentNode, XElement parentElement, NodesToProcess processFlags, ISiteMapNodeHelper helper)
-        {
-            var result = new List<ISiteMapNodeToParentRelation>();
-            bool processStandardNodes = (processFlags & NodesToProcess.StandardNodes) == NodesToProcess.StandardNodes;
-            bool processDynamicNodes = (processFlags & NodesToProcess.DynamicNodes) == NodesToProcess.DynamicNodes;
-
-            foreach (XElement node in parentElement.Elements())
-            {
-                if (node.Name != xmlNameProvider.NodeName)
-                {
-                    // If the current node is not one of the known node types throw and exception
-                    throw new MvcSiteMapException(string.Format(Resources.Messages.XmlSiteMapNodeProviderInvalidSiteMapElement, helper.SiteMapCacheKey));
-                }
-
-                var child = GetSiteMapNodeFromXmlElement(node, parentNode, helper);
-
-                if (processStandardNodes && !child.Node.HasDynamicNodeProvider)
-                {
-                    result.Add(child);
-
-                    // Continue recursively processing the XML file.
-                    result.AddRange(ProcessXmlNodes(child.Node, node, processFlags, helper));
-                }
-                else if (processDynamicNodes && child.Node.HasDynamicNodeProvider)
-                {
-                    // We pass in the parent node key as the default parent because the dynamic node (child) is never added to the sitemap.
-                    var dynamicNodes = helper.CreateDynamicNodes(child, parentNode.Key);
-
-                    foreach (var dynamicNode in dynamicNodes)
-                    {
-                        result.Add(dynamicNode);
-
-                        if (!this.useNestedDynamicNodeRecursion)
-                        {
-                            // Recursively add non-dynamic children for every dynamic node
-                            result.AddRange(ProcessXmlNodes(dynamicNode.Node, node, NodesToProcess.StandardNodes, helper));
-                        }
-                        else
-                        {
-                            // Recursively process both dynamic nodes and static nodes.
-                            // This is to allow V3 recursion behavior for those who depended on it - it is not a feature.
-                            result.AddRange(ProcessXmlNodes(dynamicNode.Node, node, NodesToProcess.All, helper));
-                        }
-                    }
-
-                    if (!this.useNestedDynamicNodeRecursion)
-                    {
-                        // Process the next nested dynamic node provider. We pass in the parent node as the default 
-                        // parent because the dynamic node definition node (child) is never added to the sitemap.
-                        result.AddRange(ProcessXmlNodes(parentNode, node, NodesToProcess.DynamicNodes, helper));
-                    }
-                    else
-                    {
-                        // Continue recursively processing the XML file.
-                        // Can't figure out why this is here, but this is the way it worked in V3 and if
-                        // anyone depends on the broken recursive behavior, they probably also depend on this.
-                        result.AddRange(ProcessXmlNodes(child.Node, node, processFlags, helper));
-                    }
-                }
-            }
-            return result;
         }
 
         /// <summary>
@@ -184,8 +85,8 @@ namespace MvcSiteMapProvider.Builder
             // Get data required to generate the node instance
 
             // Get area and controller from node declaration or the parent node
-            var area = this.InheritAreaIfNotProvided(node, parentNode);
-            var controller = this.InheritControllerIfNotProvided(node, parentNode);
+            var area = InheritAreaIfNotProvided(node, parentNode);
+            var controller = InheritControllerIfNotProvided(node, parentNode);
             var action = node.GetAttributeValue("action");
             var url = node.GetAttributeValue("url");
             var explicitKey = node.GetAttributeValue("key");
@@ -244,7 +145,7 @@ namespace MvcSiteMapProvider.Builder
             siteMapNode.RouteValues.AddRange(node, false);
             siteMapNode.PreservedRouteParameters.AddRange(node.GetAttributeValue("preservedRouteParameters"), new[] { ',', ';' });
             siteMapNode.UrlResolver = node.GetAttributeValue("urlResolver");
-            
+
             // Area and controller may need inheriting from the parent node, so set (or reset) them explicitly
             siteMapNode.Area = area;
             siteMapNode.Controller = controller;
@@ -297,6 +198,97 @@ namespace MvcSiteMapProvider.Builder
                 result = parentNode.Controller;
             }
 
+            return result;
+        }
+
+        protected virtual IEnumerable<ISiteMapNodeToParentRelation> LoadSiteMapNodesFromXml(XDocument xml, ISiteMapNodeHelper helper)
+        {
+            var result = new List<ISiteMapNodeToParentRelation>();
+            xmlNameProvider.FixXmlNamespaces(xml);
+
+            // Get the root mvcSiteMapNode element, and map this to an MvcSiteMapNode
+            var rootElement = GetRootElement(xml) ?? throw new MvcSiteMapException(string.Format(Resources.Messages.XmlSiteMapNodeProviderRootNodeNotDefined, helper.SiteMapCacheKey));
+            // Add the root node
+            var rootNode = GetRootNode(xml, rootElement, helper);
+            if (includeRootNode)
+            {
+                result.Add(rootNode);
+            }
+
+            // Process our XML, passing in the main root sitemap node and xml element.
+            result.AddRange(ProcessXmlNodes(rootNode.Node, rootElement, NodesToProcess.All, helper));
+
+            // Done!
+            return result;
+        }
+
+        /// <summary>
+        /// Recursively processes our XML document, parsing our siteMapNodes and dynamicNode(s).
+        /// </summary>
+        /// <param name="parentNode">The parent node to process.</param>
+        /// <param name="parentElement">The corresponding parent XML element.</param>
+        /// <param name="processFlags">Flags to indicate which nodes to process.</param>
+        /// <param name="helper">The node helper.</param>
+        protected virtual IList<ISiteMapNodeToParentRelation> ProcessXmlNodes(ISiteMapNode parentNode, XElement parentElement, NodesToProcess processFlags, ISiteMapNodeHelper helper)
+        {
+            var result = new List<ISiteMapNodeToParentRelation>();
+            bool processStandardNodes = (processFlags & NodesToProcess.StandardNodes) == NodesToProcess.StandardNodes;
+            bool processDynamicNodes = (processFlags & NodesToProcess.DynamicNodes) == NodesToProcess.DynamicNodes;
+
+            foreach (XElement node in parentElement.Elements())
+            {
+                if (node.Name != xmlNameProvider.NodeName)
+                {
+                    // If the current node is not one of the known node types throw and exception
+                    throw new MvcSiteMapException(string.Format(Resources.Messages.XmlSiteMapNodeProviderInvalidSiteMapElement, helper.SiteMapCacheKey));
+                }
+
+                var child = GetSiteMapNodeFromXmlElement(node, parentNode, helper);
+
+                if (processStandardNodes && !child.Node.HasDynamicNodeProvider)
+                {
+                    result.Add(child);
+
+                    // Continue recursively processing the XML file.
+                    result.AddRange(ProcessXmlNodes(child.Node, node, processFlags, helper));
+                }
+                else if (processDynamicNodes && child.Node.HasDynamicNodeProvider)
+                {
+                    // We pass in the parent node key as the default parent because the dynamic node (child) is never added to the sitemap.
+                    var dynamicNodes = helper.CreateDynamicNodes(child, parentNode.Key);
+
+                    foreach (var dynamicNode in dynamicNodes)
+                    {
+                        result.Add(dynamicNode);
+
+                        if (!useNestedDynamicNodeRecursion)
+                        {
+                            // Recursively add non-dynamic children for every dynamic node
+                            result.AddRange(ProcessXmlNodes(dynamicNode.Node, node, NodesToProcess.StandardNodes, helper));
+                        }
+                        else
+                        {
+                            // Recursively process both dynamic nodes and static nodes.
+                            // This is to allow V3 recursion behavior for those who depended on it - it is not a feature.
+                            result.AddRange(ProcessXmlNodes(dynamicNode.Node, node, NodesToProcess.All, helper));
+                        }
+                    }
+
+                    if (!useNestedDynamicNodeRecursion)
+                    {
+                        // Process the next nested dynamic node provider. We pass in the parent node as the default
+                        // parent because the dynamic node definition node (child) is never added to the sitemap.
+                        result.AddRange(ProcessXmlNodes(parentNode, node, NodesToProcess.DynamicNodes, helper));
+                    }
+                    else
+                    {
+                        // Continue recursively processing the XML file.
+                        // Can't figure out why this is here, but this is the way it worked in V3 and if
+                        // anyone depends on the broken recursive behavior, they probably also depend on this.
+                        result.AddRange(ProcessXmlNodes(child.Node, node, processFlags, helper));
+                    }
+                }
+            }
             return result;
         }
     }

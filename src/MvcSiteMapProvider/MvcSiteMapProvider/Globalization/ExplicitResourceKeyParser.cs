@@ -5,7 +5,7 @@ using System.Globalization;
 namespace MvcSiteMapProvider.Globalization
 {
     /// <summary>
-    /// AttributeResourceKeyParser class. This class is used to parse resource information from 
+    /// AttributeResourceKeyParser class. This class is used to parse resource information from
     /// attributes in XML files (or other sources). This information can later be used to lookup localized versions of the text
     /// to insert in place of the resource string.
     /// </summary>
@@ -20,7 +20,7 @@ namespace MvcSiteMapProvider.Globalization
             {
                 string resourceString;
                 var trimmedText = value.TrimStart(new[] { ' ' });
-                if (((trimmedText.Length > 10)) && trimmedText.ToLower(CultureInfo.InvariantCulture).StartsWith("$resources:", StringComparison.Ordinal))
+                if ((trimmedText.Length > 10) && trimmedText.ToLower(CultureInfo.InvariantCulture).StartsWith("$resources:", StringComparison.Ordinal))
                 {
                     resourceString = trimmedText.Substring(11);
                     var index = resourceString.IndexOf(',');
@@ -34,7 +34,7 @@ namespace MvcSiteMapProvider.Globalization
                     }
                     else
                     {
-                        // Fixes #339, return string datatype (rather than null) so custom 
+                        // Fixes #339, return string datatype (rather than null) so custom
                         // attributes can still be identified as string vs another datatype.
                         value = string.Empty;
                     }
@@ -48,6 +48,6 @@ namespace MvcSiteMapProvider.Globalization
             }
         }
 
-        #endregion
+        #endregion IExplicitResourceKeyParser Members
     }
 }

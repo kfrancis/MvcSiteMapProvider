@@ -27,5 +27,4 @@ namespace MvcSiteMapProvider.Web.Mvc
         /// <param name="innerException">Inner Exception</param>
         public AmbiguousControllerException(string message, Exception innerException) : base(message, innerException) { }
     }
-
 }

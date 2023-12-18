@@ -14,10 +14,10 @@ namespace MvcSiteMapProvider.Collections
     public class ThreadSafeDictionary<TKey, TValue> : IThreadSafeDictionary<TKey, TValue>
     {
         // This is the internal dictionary that we are wrapping
-        readonly IDictionary<TKey, TValue> dict = new Dictionary<TKey, TValue>();
+        private readonly IDictionary<TKey, TValue> dict = new Dictionary<TKey, TValue>();
 
         [NonSerialized]
-        readonly ReaderWriterLockSlim dictionaryLock = Locks.GetLockInstance(LockRecursionPolicy.NoRecursion); //setup the lock;
+        private readonly ReaderWriterLockSlim dictionaryLock = Locks.GetLockInstance(LockRecursionPolicy.NoRecursion); //setup the lock;
 
         /// <summary>
         /// This is a blind remove. Prevents the need to check for existence first.
@@ -38,7 +38,7 @@ namespace MvcSiteMapProvider.Collections
         }
 
         /// <summary>
-        /// Merge does a blind remove, and then add.  Basically a blind Upsert.  
+        /// Merge does a blind remove, and then add.  Basically a blind Upsert.
         /// </summary>
         /// <param name="key">Key to lookup</param>
         /// <param name="newValue">New Value</param>
@@ -279,7 +279,6 @@ namespace MvcSiteMapProvider.Collections
             throw new NotSupportedException(Resources.Messages.CannotEnumerateThreadSafeDictionary);
         }
 
-
         /// <summary>
         /// Returns an enumerator that iterates through a collection.
         /// </summary>
@@ -391,7 +390,6 @@ namespace MvcSiteMapProvider.Collections
         }
     }
 
-
     /// <summary>
     /// Base lock
     /// </summary>
@@ -416,7 +414,6 @@ namespace MvcSiteMapProvider.Collections
         /// </summary>
         public abstract void Dispose();
     }
-
 
     /// <summary>
     /// Read lock

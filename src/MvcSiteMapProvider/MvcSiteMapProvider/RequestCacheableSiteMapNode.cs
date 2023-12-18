@@ -12,15 +12,17 @@ using System.Web;
 namespace MvcSiteMapProvider
 {
     /// <summary>
-    /// Provides overrides of the <see cref="T:MvcSiteMapProvider.SiteMapNode"/> that track the return values of specific 
-    /// resource-intensive members in case they are accessed more than one time during a single request. Also stores 
+    /// Provides overrides of the <see cref="T:MvcSiteMapProvider.SiteMapNode"/> that track the return values of specific
+    /// resource-intensive members in case they are accessed more than one time during a single request. Also stores
     /// values set from specific read-write properties in the request cache for later retrieval.
     /// </summary>
     public class RequestCacheableSiteMapNode
         : LockableSiteMapNode
     {
+        private readonly IRequestCache requestCache;
+
         public RequestCacheableSiteMapNode(
-            ISiteMap siteMap,
+                    ISiteMap siteMap,
             string key,
             bool isDynamic,
             ISiteMapNodePluginProvider pluginProvider,
@@ -30,8 +32,8 @@ namespace MvcSiteMapProvider
             IUrlPath urlPath
             )
             : base(
-                siteMap, 
-                key, 
+                siteMap,
+                key,
                 isDynamic,
                 pluginProvider,
                 mvcContextFactory,
@@ -41,193 +43,196 @@ namespace MvcSiteMapProvider
             )
         {
             if (mvcContextFactory == null)
-                throw new ArgumentNullException("mvcContextFactory");
+                throw new ArgumentNullException(nameof(mvcContextFactory));
 
-            this.requestCache = mvcContextFactory.GetRequestCache();
-        }
-
-        private readonly IRequestCache requestCache;
-
-        #region ISiteMapNode Members
-
-        public override int Order
-        {
-            get { return (int)this.GetCachedOrMemberValue<int?>(() => base.Order, "Order", false); }
-            set { this.SetCachedOrMemberValue<int>(x => base.Order = x, "Order", value); }
-        }
-
-        public override string Title
-        {
-            get { return this.GetCachedOrMemberValue<string>(() => base.Title, "Title", true); }
-            set { this.SetCachedOrMemberValue<string>(x => base.Title = x, "Title", value); }
-        }
-
-        public override string Description
-        {
-            get { return this.GetCachedOrMemberValue<string>(() => base.Description, "Description", true); }
-            set { this.SetCachedOrMemberValue<string>(x => base.Description = x, "Description", value); }
-        }
-
-        public override string TargetFrame
-        {
-            get { return this.GetCachedOrMemberValue<string>(() => base.TargetFrame, "TargetFrame", false); }
-            set { this.SetCachedOrMemberValue<string>(x => base.TargetFrame = x, "TargetFrame", value); }
-        }
-
-        public override string ImageUrl
-        {
-            get { return this.GetCachedOrMemberValue<string>(() => base.ImageUrl, "ImageUrl", false); }
-            set { this.SetCachedOrMemberValue<string>(x => base.ImageUrl = x, "ImageUrl", value); }
-        }
-
-        public override string ImageUrlProtocol
-        {
-            get { return this.GetCachedOrMemberValue<string>(() => base.ImageUrlProtocol, "ImageUrlProtocol", false); }
-            set { this.SetCachedOrMemberValue<string>(x => base.ImageUrlProtocol = x, "ImageUrlProtocol", value); }
-        }
-
-        public override string ImageUrlHostName
-        {
-            get { return this.GetCachedOrMemberValue<string>(() => base.ImageUrlHostName, "ImageUrlHostName", false); }
-            set { this.SetCachedOrMemberValue<string>(x => base.ImageUrlHostName = x, "ImageUrlHostName", value); }
-        }
-
-        public override string VisibilityProvider
-        {
-            get { return this.GetCachedOrMemberValue<string>(() => base.VisibilityProvider, "VisibilityProvider", false); }
-            set { this.SetCachedOrMemberValue<string>(x => base.VisibilityProvider = x, "VisibilityProvider", value); }
-        }
-
-        public override bool Clickable
-        {
-            get { return (bool)this.GetCachedOrMemberValue<bool?>(() => base.Clickable, "Clickable", false); }
-            set { this.SetCachedOrMemberValue<bool>(x => base.Clickable = x, "Clickable", value); }
-        }
-
-        public override string UrlResolver
-        {
-            get { return this.GetCachedOrMemberValue<string>(() => base.UrlResolver, "UrlResolver", false); }
-            set { this.SetCachedOrMemberValue<string>(x => base.UrlResolver = x, "UrlResolver", value); }
-        }
-
-        public override bool IsVisible(IDictionary<string, object> sourceMetadata)
-        {
-            var key = this.GetCacheKey("IsVisible" + this.GetDictionaryKey(sourceMetadata));
-            var result = this.requestCache.GetValue<bool?>(key);
-            if (result == null)
-            {
-                result = base.IsVisible(sourceMetadata);
-                this.requestCache.SetValue<bool>(key, (bool)result);
-            }
-            return (bool)result;
-        }
-
-        public override string Url
-        {
-            get 
-            {
-                // Fix for #272 - Change the context of the URL cache to ensure
-                // that the AclModule doesn't prevent manually setting route values
-                // from having any effect on the URL.
-                var urlContext = this.requestCache.GetValue<string>(this.SiteMap.GetUrlContextKey());
-                var memberName = "Url" + (string.IsNullOrEmpty(urlContext) ? string.Empty : "_" + urlContext);
-
-                return this.GetCachedOrMemberValue<string>(() => base.Url, memberName, true); 
-            }
-            set { base.Url = value; }
-        }
-
-        public override string Protocol
-        {
-            get { return this.GetCachedOrMemberValue<string>(() => base.Protocol, "Protocol", false); }
-            set { this.SetCachedOrMemberValue<string>(x => base.Protocol = x, "Protocol", value); }
-        }
-
-        public override string HostName
-        {
-            get { return this.GetCachedOrMemberValue<string>(() => base.HostName, "HostName", false); }
-            set { this.SetCachedOrMemberValue<string>(x => base.HostName = x, "HostName", value); }
+            requestCache = mvcContextFactory.GetRequestCache();
         }
 
         public override string CanonicalKey
         {
-            get { return this.GetCachedOrMemberValue<string>(() => base.CanonicalKey, "CanonicalKey", false); }
-            set { this.SetCachedOrMemberValue<string>(x => base.CanonicalKey = x, "CanonicalKey", value); }
+            get { return GetCachedOrMemberValue<string>(() => base.CanonicalKey, "CanonicalKey", false); }
+            set { SetCachedOrMemberValue<string>(x => base.CanonicalKey = x, "CanonicalKey", value); }
         }
 
         public override string CanonicalUrl
         {
-            get { return this.GetCachedOrMemberValue<string>(() => base.CanonicalUrl, "CanonicalUrl", false); }
-            set { this.SetCachedOrMemberValue<string>(x => base.CanonicalUrl = x, "CanonicalUrl", value); }
-        }
-
-        public override string CanonicalUrlProtocol
-        {
-            get { return this.GetCachedOrMemberValue<string>(() => base.CanonicalUrlProtocol, "CanonicalUrlProtocol", false); }
-            set { this.SetCachedOrMemberValue<string>(x => base.CanonicalUrlProtocol = x, "CanonicalUrlProtocol", value); }
+            get { return GetCachedOrMemberValue<string>(() => base.CanonicalUrl, "CanonicalUrl", false); }
+            set { SetCachedOrMemberValue<string>(x => base.CanonicalUrl = x, "CanonicalUrl", value); }
         }
 
         public override string CanonicalUrlHostName
         {
-            get { return this.GetCachedOrMemberValue<string>(() => base.CanonicalUrlHostName, "CanonicalUrlHostName", false); }
-            set { this.SetCachedOrMemberValue<string>(x => base.CanonicalUrlHostName = x, "CanonicalUrlHostName", value); }
+            get { return GetCachedOrMemberValue<string>(() => base.CanonicalUrlHostName, "CanonicalUrlHostName", false); }
+            set { SetCachedOrMemberValue<string>(x => base.CanonicalUrlHostName = x, "CanonicalUrlHostName", value); }
+        }
+
+        public override string CanonicalUrlProtocol
+        {
+            get { return GetCachedOrMemberValue<string>(() => base.CanonicalUrlProtocol, "CanonicalUrlProtocol", false); }
+            set { SetCachedOrMemberValue<string>(x => base.CanonicalUrlProtocol = x, "CanonicalUrlProtocol", value); }
+        }
+
+        public override bool Clickable
+        {
+            get { return (bool)GetCachedOrMemberValue<bool?>(() => base.Clickable, "Clickable", false); }
+            set { SetCachedOrMemberValue<bool>(x => base.Clickable = x, "Clickable", value); }
+        }
+
+        public override string Description
+        {
+            get { return GetCachedOrMemberValue<string>(() => base.Description, "Description", true); }
+            set { SetCachedOrMemberValue<string>(x => base.Description = x, "Description", value); }
+        }
+
+        public override string HostName
+        {
+            get { return GetCachedOrMemberValue<string>(() => base.HostName, "HostName", false); }
+            set { SetCachedOrMemberValue<string>(x => base.HostName = x, "HostName", value); }
+        }
+
+        public override string ImageUrl
+        {
+            get { return GetCachedOrMemberValue<string>(() => base.ImageUrl, "ImageUrl", false); }
+            set { SetCachedOrMemberValue<string>(x => base.ImageUrl = x, "ImageUrl", value); }
+        }
+
+        public override string ImageUrlHostName
+        {
+            get { return GetCachedOrMemberValue<string>(() => base.ImageUrlHostName, "ImageUrlHostName", false); }
+            set { SetCachedOrMemberValue<string>(x => base.ImageUrlHostName = x, "ImageUrlHostName", value); }
+        }
+
+        public override string ImageUrlProtocol
+        {
+            get { return GetCachedOrMemberValue<string>(() => base.ImageUrlProtocol, "ImageUrlProtocol", false); }
+            set { SetCachedOrMemberValue<string>(x => base.ImageUrlProtocol = x, "ImageUrlProtocol", value); }
+        }
+
+        public override int Order
+        {
+            get { return (int)GetCachedOrMemberValue<int?>(() => base.Order, "Order", false); }
+            set { SetCachedOrMemberValue<int>(x => base.Order = x, "Order", value); }
+        }
+
+        public override string Protocol
+        {
+            get { return GetCachedOrMemberValue<string>(() => base.Protocol, "Protocol", false); }
+            set { SetCachedOrMemberValue<string>(x => base.Protocol = x, "Protocol", value); }
         }
 
         public override string Route
         {
-            get { return this.GetCachedOrMemberValue<string>(() => base.Route, "Route", false); }
-            set { this.SetCachedOrMemberValue<string>(x => base.Route = x, "Route", value); }
+            get { return GetCachedOrMemberValue<string>(() => base.Route, "Route", false); }
+            set { SetCachedOrMemberValue<string>(x => base.Route = x, "Route", value); }
+        }
+
+        public override string TargetFrame
+        {
+            get { return GetCachedOrMemberValue<string>(() => base.TargetFrame, "TargetFrame", false); }
+            set { SetCachedOrMemberValue<string>(x => base.TargetFrame = x, "TargetFrame", value); }
+        }
+
+        public override string Title
+        {
+            get { return GetCachedOrMemberValue<string>(() => base.Title, "Title", true); }
+            set { SetCachedOrMemberValue<string>(x => base.Title = x, "Title", value); }
+        }
+
+        public override string Url
+        {
+            get
+            {
+                // Fix for #272 - Change the context of the URL cache to ensure
+                // that the AclModule doesn't prevent manually setting route values
+                // from having any effect on the URL.
+                var urlContext = requestCache.GetValue<string>(SiteMap.GetUrlContextKey());
+                var memberName = "Url" + (string.IsNullOrEmpty(urlContext) ? string.Empty : "_" + urlContext);
+
+                return GetCachedOrMemberValue<string>(() => base.Url, memberName, true);
+            }
+            set { base.Url = value; }
+        }
+
+        public override string UrlResolver
+        {
+            get { return GetCachedOrMemberValue<string>(() => base.UrlResolver, "UrlResolver", false); }
+            set { SetCachedOrMemberValue<string>(x => base.UrlResolver = x, "UrlResolver", value); }
+        }
+
+        public override string VisibilityProvider
+        {
+            get { return GetCachedOrMemberValue<string>(() => base.VisibilityProvider, "VisibilityProvider", false); }
+            set { SetCachedOrMemberValue<string>(x => base.VisibilityProvider = x, "VisibilityProvider", value); }
+        }
+
+        protected override bool AreRouteParametersPreserved
+        {
+            get
+            {
+                var key = GetCacheKey("AreRouteParametersPreserved");
+                var result = requestCache.GetValue<bool?>(key) ?? false;
+                return (bool)result;
+            }
+            set
+            {
+                var key = GetCacheKey("AreRouteParametersPreserved");
+                requestCache.SetValue<bool>(key, value);
+            }
+        }
+
+        public override bool IsVisible(IDictionary<string, object> sourceMetadata)
+        {
+            var key = GetCacheKey("IsVisible" + GetDictionaryKey(sourceMetadata));
+            var result = requestCache.GetValue<bool?>(key);
+            if (result == null)
+            {
+                result = base.IsVisible(sourceMetadata);
+                requestCache.SetValue<bool>(key, (bool)result);
+            }
+            return (bool)result;
+        }
+
+        protected virtual T GetCachedOrMemberValue<T>(Func<T> member, string memberName, bool storeInCache)
+        {
+            var key = GetCacheKey(memberName);
+            var result = requestCache.GetValue<T>(key);
+            if (result == null)
+            {
+                result = member.Invoke();
+                if (storeInCache)
+                {
+                    requestCache.SetValue<T>(key, result);
+                }
+            }
+            return result;
+        }
+
+        protected string GetCacheKey(string memberName)
+        {
+            // NOTE: We must include IsReadOnly in the request cache key because we may have a different
+            // result when the sitemap is being constructed than when it is being read by the presentation layer.
+            return "__MVCSITEMAPNODE_" + SiteMap.CacheKey + "_" + Key + "_" + memberName + "_" + IsReadOnly.ToString() + "_";
         }
 
         protected override NameValueCollection GetCaseCorrectedQueryString(HttpContextBase httpContext)
         {
-            // This method is called twice per node only in the case where there are 
+            // This method is called twice per node only in the case where there are
             // preserved route parameters, so the memory trade-off is only worth it if
             // we have some configured.
-            if (this.PreservedRouteParameters.Any())
+            if (PreservedRouteParameters.Any())
             {
-                var key = this.GetCacheKey("GetCaseCorrectedQueryString_" + httpContext.Request.Url.Query);
-                var result = this.requestCache.GetValue<NameValueCollection>(key);
+                var key = GetCacheKey("GetCaseCorrectedQueryString_" + httpContext.Request.Url.Query);
+                var result = requestCache.GetValue<NameValueCollection>(key);
                 if (result == null)
                 {
                     result = base.GetCaseCorrectedQueryString(httpContext);
-                    this.requestCache.SetValue<NameValueCollection>(key, result);
+                    requestCache.SetValue<NameValueCollection>(key, result);
                 }
 
                 return result;
             }
 
             return base.GetCaseCorrectedQueryString(httpContext);
-        }
-
-        protected override bool AreRouteParametersPreserved
-        {
-            get 
-            {
-                var key = this.GetCacheKey("AreRouteParametersPreserved");
-                var result = this.requestCache.GetValue<bool?>(key);
-                if (result == null)
-                {
-                    result = false;
-                }
-                return (bool)result;
-            }
-            set 
-            {
-                var key = this.GetCacheKey("AreRouteParametersPreserved");
-                this.requestCache.SetValue<bool>(key, value);
-            }
-        }
-
-        #endregion
-
-        #region Protected Members
-
-        protected string GetCacheKey(string memberName)
-        {
-            // NOTE: We must include IsReadOnly in the request cache key because we may have a different 
-            // result when the sitemap is being constructed than when it is being read by the presentation layer.
-            return "__MVCSITEMAPNODE_" + this.SiteMap.CacheKey + "_" + this.Key + "_" + memberName + "_" + this.IsReadOnly.ToString() + "_";
         }
 
         protected virtual string GetDictionaryKey(IDictionary<string, object> dictionary)
@@ -252,34 +257,17 @@ namespace MvcSiteMapProvider
             return value.GetHashCode().ToString();
         }
 
-        protected virtual T GetCachedOrMemberValue<T>(Func<T> member, string memberName, bool storeInCache)
-        {
-            var key = this.GetCacheKey(memberName);
-            var result = this.requestCache.GetValue<T>(key);
-            if (result == null)
-            {
-                result = member.Invoke();
-                if (storeInCache)
-                {
-                    this.requestCache.SetValue<T>(key, result);
-                }
-            }
-            return result;
-        }
-
         protected virtual void SetCachedOrMemberValue<T>(Action<T> member, string memberName, T value)
         {
-            if (this.IsReadOnly)
+            if (IsReadOnly)
             {
-                var key = this.GetCacheKey(memberName);
-                this.requestCache.SetValue<T>(key, value);
+                var key = GetCacheKey(memberName);
+                requestCache.SetValue<T>(key, value);
             }
             else
             {
                 member(value);
             }
         }
-
-        #endregion
     }
 }

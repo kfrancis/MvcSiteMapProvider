@@ -24,23 +24,13 @@ namespace MvcSiteMapProvider.Builder
             ICultureContextFactory cultureContextFactory
             )
         {
-            if (siteMapNodeProvider == null)
-                throw new ArgumentNullException("siteMapNodeProvider");
-            if (siteMapNodeVisitor == null)
-                throw new ArgumentNullException("siteMapNodeVisitor");
-            if (siteMapHierarchyBuilder == null)
-                throw new ArgumentNullException("siteMapHierarchyBuilder");
-            if (siteMapNodeHelperFactory == null)
-                throw new ArgumentNullException("siteMapNodeHelperFactory");
-            if (cultureContextFactory == null)
-                throw new ArgumentNullException("cultureContextFactory");
-
-            this.siteMapNodeProvider = siteMapNodeProvider;
-            this.siteMapHierarchyBuilder = siteMapHierarchyBuilder;
-            this.siteMapNodeHelperFactory = siteMapNodeHelperFactory;
-            this.siteMapNodeVisitor = siteMapNodeVisitor;
-            this.cultureContextFactory = cultureContextFactory;
+            this.siteMapNodeProvider = siteMapNodeProvider ?? throw new ArgumentNullException(nameof(siteMapNodeProvider));
+            this.siteMapHierarchyBuilder = siteMapHierarchyBuilder ?? throw new ArgumentNullException(nameof(siteMapHierarchyBuilder));
+            this.siteMapNodeHelperFactory = siteMapNodeHelperFactory ?? throw new ArgumentNullException(nameof(siteMapNodeHelperFactory));
+            this.siteMapNodeVisitor = siteMapNodeVisitor ?? throw new ArgumentNullException(nameof(siteMapNodeVisitor));
+            this.cultureContextFactory = cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
         }
+
         protected readonly ISiteMapNodeProvider siteMapNodeProvider;
         protected readonly ISiteMapHierarchyBuilder siteMapHierarchyBuilder;
         protected readonly ISiteMapNodeHelperFactory siteMapNodeHelperFactory;
@@ -62,7 +52,7 @@ namespace MvcSiteMapProvider.Builder
                 siteMap.AddNode(root);
             }
 
-            var orphans = this.siteMapHierarchyBuilder.BuildHierarchy(siteMap, sourceNodes);
+            var orphans = siteMapHierarchyBuilder.BuildHierarchy(siteMap, sourceNodes);
 
             if (orphans.Count() > 0)
             {
@@ -73,8 +63,8 @@ namespace MvcSiteMapProvider.Builder
                                          .Contains(parent.ParentKey)
                                  select parent;
 
-                var names = string.Join(Environment.NewLine + Environment.NewLine, mismatched.Select(x => 
-                    string.Format(Resources.Messages.SiteMapNodeFormatWithParentKey, x.ParentKey, x.Node.Controller, 
+                var names = string.Join(Environment.NewLine + Environment.NewLine, mismatched.Select(x =>
+                    string.Format(Resources.Messages.SiteMapNodeFormatWithParentKey, x.ParentKey, x.Node.Controller,
                     x.Node.Action, x.Node.Area, x.Node.Url, x.Node.Key, x.SourceName)).ToArray());
                 throw new MvcSiteMapException(string.Format(Resources.Messages.SiteMapBuilderOrphanedNodes, siteMap.CacheKey, names));
             }
@@ -86,16 +76,16 @@ namespace MvcSiteMapProvider.Builder
             return root;
         }
 
-        #endregion
+        #endregion ISiteMapBuilder Members
 
         protected virtual void LoadSourceNodes(ISiteMap siteMap, List<ISiteMapNodeToParentRelation> sourceNodes)
         {
             // Temporarily override the current thread's culture with the invariant culture
             // while running the ISiteMapNodeProvider instances.
-            using (var cultureContext = this.cultureContextFactory.CreateInvariant())
+            using (var cultureContext = cultureContextFactory.CreateInvariant())
             {
-                var siteMapNodeHelper = this.siteMapNodeHelperFactory.Create(siteMap, cultureContext);
-                sourceNodes.AddRange(this.siteMapNodeProvider.GetSiteMapNodes(siteMapNodeHelper));
+                var siteMapNodeHelper = siteMapNodeHelperFactory.Create(siteMap, cultureContext);
+                sourceNodes.AddRange(siteMapNodeProvider.GetSiteMapNodes(siteMapNodeHelper));
             }
         }
 
@@ -106,8 +96,8 @@ namespace MvcSiteMapProvider.Builder
             // Check if we have more than one root node defined or no root defined
             if (rootNodes.Count() > 1)
             {
-                var names = string.Join(Environment.NewLine + Environment.NewLine, rootNodes.Select(x => 
-                    string.Format(Resources.Messages.SiteMapNodeFormatWithParentKey, x.ParentKey, x.Node.Controller, 
+                var names = string.Join(Environment.NewLine + Environment.NewLine, rootNodes.Select(x =>
+                    string.Format(Resources.Messages.SiteMapNodeFormatWithParentKey, x.ParentKey, x.Node.Controller,
                     x.Node.Action, x.Node.Area, x.Node.Url, x.Node.Key, x.SourceName)).ToArray());
                 throw new MvcSiteMapException(string.Format(Resources.Messages.SiteMapBuilderRootKeyAmbiguous, siteMap.CacheKey, names));
             }
@@ -126,7 +116,7 @@ namespace MvcSiteMapProvider.Builder
 
         protected virtual void VisitNodes(ISiteMapNode node)
         {
-            this.siteMapNodeVisitor.Execute(node);
+            siteMapNodeVisitor.Execute(node);
 
             if (node.HasChildNodes)
             {

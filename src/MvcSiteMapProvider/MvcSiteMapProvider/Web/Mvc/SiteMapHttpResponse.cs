@@ -12,7 +12,7 @@ namespace MvcSiteMapProvider.Web.Mvc
             : base(httpResponse)
         {
         }
-        
+
         public override HttpCachePolicyBase Cache
         {
             get { return new SiteMapHttpResponseCache(); }

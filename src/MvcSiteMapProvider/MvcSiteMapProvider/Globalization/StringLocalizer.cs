@@ -7,20 +7,18 @@ namespace MvcSiteMapProvider.Globalization
     /// <summary>
     /// Contains methods to deal with localization of strings to the current culture.
     /// </summary>
-    public class StringLocalizer 
+    public class StringLocalizer
         : IStringLocalizer
     {
         public StringLocalizer(
             IMvcContextFactory mvcContextFactory
             )
         {
-            if (mvcContextFactory == null)
-                throw new ArgumentNullException("mvcContextFactory");
-            this.mvcContextFactory = mvcContextFactory;
+            this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
         }
 
         protected readonly IMvcContextFactory mvcContextFactory;
-        
+
         /// <summary>
         /// Gets the localized text for the supplied attributeName.
         /// </summary>
@@ -35,12 +33,12 @@ namespace MvcSiteMapProvider.Globalization
         {
             if (enableLocalization)
             {
-                string resourceString = this.GetImplicitResourceString(attributeName, implicitResourceKey, classKey);
+                string resourceString = GetImplicitResourceString(attributeName, implicitResourceKey, classKey);
                 if (resourceString != null)
                 {
                     return resourceString;
                 }
-                resourceString = this.GetExplicitResourceString(attributeName, value, true, explicitResourceKeys);
+                resourceString = GetExplicitResourceString(attributeName, value, true, explicitResourceKeys);
                 if (resourceString != null)
                 {
                     return resourceString;
@@ -57,7 +55,7 @@ namespace MvcSiteMapProvider.Globalization
         {
             if (attributeName == null)
             {
-                throw new ArgumentNullException("attributeName");
+                throw new ArgumentNullException(nameof(attributeName));
             }
             string globalResourceObject = null;
             if (!string.IsNullOrEmpty(implicitResourceKey))
@@ -78,7 +76,7 @@ namespace MvcSiteMapProvider.Globalization
         {
             if (attributeName == null)
             {
-                throw new ArgumentNullException("attributeName");
+                throw new ArgumentNullException(nameof(attributeName));
             }
             string globalResourceObject = null;
             if (explicitResourceKeys != null)

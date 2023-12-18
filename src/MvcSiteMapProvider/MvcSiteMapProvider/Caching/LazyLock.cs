@@ -13,6 +13,7 @@ namespace MvcSiteMapProvider.Caching
     {
         private volatile bool got;
         private object value;
+        private readonly object _lockObject = new object();
 
         public TValue Get<TValue>(Func<TValue> activator)
         {
@@ -20,10 +21,10 @@ namespace MvcSiteMapProvider.Caching
             {
                 if (activator == null)
                 {
-                    return default(TValue);
+                    return default;
                 }
 
-                lock (this)
+                lock (_lockObject)
                 {
                     if (!got)
                     {

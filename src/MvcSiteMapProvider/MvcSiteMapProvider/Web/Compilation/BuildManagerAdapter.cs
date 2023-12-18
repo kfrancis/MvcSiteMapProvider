@@ -9,7 +9,6 @@ namespace MvcSiteMapProvider.Web.Compilation
     public class BuildManagerAdapter
         : IBuildManager
     {
-
         #region IBuildManager Members
 
         public ICollection GetReferencedAssemblies()
@@ -17,6 +16,6 @@ namespace MvcSiteMapProvider.Web.Compilation
             return BuildManager.GetReferencedAssemblies();
         }
 
-        #endregion
+        #endregion IBuildManager Members
     }
 }

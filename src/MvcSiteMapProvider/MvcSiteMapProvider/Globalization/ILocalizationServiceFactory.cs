@@ -1,7 +1,7 @@
 ﻿namespace MvcSiteMapProvider.Globalization
 {
     /// <summary>
-    /// Contract for an abstract factory that creates new instances of <see cref="T:MvcSiteMapProvider.Globalization.ILocalizationService"/> 
+    /// Contract for an abstract factory that creates new instances of <see cref="T:MvcSiteMapProvider.Globalization.ILocalizationService"/>
     /// at runtime.
     /// </summary>
     public interface ILocalizationServiceFactory

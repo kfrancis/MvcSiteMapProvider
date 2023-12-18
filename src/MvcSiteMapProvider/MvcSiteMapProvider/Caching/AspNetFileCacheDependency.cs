@@ -15,7 +15,7 @@ namespace MvcSiteMapProvider.Caching
             )
         {
             if (string.IsNullOrEmpty(fileName))
-                throw new ArgumentNullException("fileName");
+                throw new ArgumentNullException(nameof(fileName));
 
             this.fileName = fileName;
         }
@@ -29,6 +29,6 @@ namespace MvcSiteMapProvider.Caching
             get { return new CacheDependency(fileName); }
         }
 
-        #endregion
+        #endregion ICacheDependency Members
     }
 }

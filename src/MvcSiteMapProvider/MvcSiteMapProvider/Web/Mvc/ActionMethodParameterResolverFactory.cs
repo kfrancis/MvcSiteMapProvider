@@ -15,14 +15,10 @@ namespace MvcSiteMapProvider.Web.Mvc
             IControllerDescriptorFactory controllerDescriptorFactory
             )
         {
-            if (controllerDescriptorFactory == null)
-                throw new ArgumentNullException("controllerDescriptorFactory");
-
-            this.controllerDescriptorFactory = controllerDescriptorFactory;
+            this.controllerDescriptorFactory = controllerDescriptorFactory ?? throw new ArgumentNullException(nameof(controllerDescriptorFactory));
         }
 
         protected readonly IControllerDescriptorFactory controllerDescriptorFactory;
-
 
         #region IActionMethodParameterResolverFactory Members
 
@@ -31,6 +27,6 @@ namespace MvcSiteMapProvider.Web.Mvc
             return new ActionMethodParameterResolver(controllerDescriptorFactory);
         }
 
-        #endregion
+        #endregion IActionMethodParameterResolverFactory Members
     }
 }

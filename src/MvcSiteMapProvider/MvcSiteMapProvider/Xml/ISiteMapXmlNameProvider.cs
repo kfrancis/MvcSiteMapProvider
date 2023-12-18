@@ -9,6 +9,7 @@ namespace MvcSiteMapProvider.Xml
     {
         XName NodeName { get; }
         XName RootName { get; }
+
         void FixXmlNamespaces(XDocument xml);
     }
 }

@@ -33,9 +33,9 @@ namespace MvcSiteMapProvider
             if (string.IsNullOrEmpty(providerName))
                 return false;
 
-            return this.GetType().Equals(Type.GetType(providerName, false));
+            return GetType().Equals(Type.GetType(providerName, false));
         }
 
-        #endregion
+        #endregion ISiteMapNodeVisibilityProvider Members
     }
 }

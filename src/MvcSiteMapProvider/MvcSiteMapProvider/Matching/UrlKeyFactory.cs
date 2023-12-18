@@ -4,7 +4,7 @@ using System;
 namespace MvcSiteMapProvider.Matching
 {
     /// <summary>
-    /// An abstract factory that creates new instances of 
+    /// An abstract factory that creates new instances of
     /// <see cref="T:MvcSiteMapProvider.Matching.IUrlKey"/> at runtime.
     /// </summary>
     public class UrlKeyFactory
@@ -14,21 +14,19 @@ namespace MvcSiteMapProvider.Matching
             IUrlPath urlPath
             )
         {
-            if (urlPath == null)
-                throw new ArgumentNullException("urlPath");
-
-            this.urlPath = urlPath;
+            this.urlPath = urlPath ?? throw new ArgumentNullException(nameof(urlPath));
         }
+
         private readonly IUrlPath urlPath;
 
         public IUrlKey Create(ISiteMapNode node)
         {
-            return new SiteMapNodeUrlKey(node, this.urlPath);
+            return new SiteMapNodeUrlKey(node, urlPath);
         }
 
         public IUrlKey Create(string relativeOrAbsoluteUrl, string hostName)
         {
-            return new RequestUrlKey(relativeOrAbsoluteUrl, hostName, this.urlPath);
+            return new RequestUrlKey(relativeOrAbsoluteUrl, hostName, urlPath);
         }
     }
 }

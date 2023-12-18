@@ -11,7 +11,7 @@ using System.Web.Mvc;
 namespace MvcSiteMapProvider.Builder
 {
     /// <summary>
-    /// ReflectionSiteMapBuilder class (copied from ReflectionSiteMapSource class). 
+    /// ReflectionSiteMapBuilder class (copied from ReflectionSiteMapSource class).
     /// Builds a <see cref="T:MvcSiteMapProvider.ISiteMapNode"/> tree based on a
     /// set of attributes within an assembly.
     /// </summary>
@@ -29,29 +29,15 @@ namespace MvcSiteMapProvider.Builder
             ISiteMapCacheKeyGenerator siteMapCacheKeyGenerator
             )
         {
-            if (includeAssemblies == null)
-                throw new ArgumentNullException("includeAssemblies");
-            if (excludeAssemblies == null)
-                throw new ArgumentNullException("excludeAssemblies");
-            if (reservedAttributeNameProvider == null)
-                throw new ArgumentNullException("reservedAttributeNameProvider");
-            if (nodeKeyGenerator == null)
-                throw new ArgumentNullException("nodeKeyGenerator");
-            if (dynamicNodeBuilder == null)
-                throw new ArgumentNullException("dynamicNodeBuilder");
-            if (siteMapNodeFactory == null)
-                throw new ArgumentNullException("siteMapNodeFactory");
-            if (siteMapCacheKeyGenerator == null)
-                throw new ArgumentNullException("siteMapCacheKeyGenerator");
-
-            this.includeAssemblies = includeAssemblies;
-            this.excludeAssemblies = excludeAssemblies;
-            this.reservedAttributeNameProvider = reservedAttributeNameProvider;
-            this.nodeKeyGenerator = nodeKeyGenerator;
-            this.dynamicNodeBuilder = dynamicNodeBuilder;
-            this.siteMapNodeFactory = siteMapNodeFactory;
-            this.siteMapCacheKeyGenerator = siteMapCacheKeyGenerator;
+            this.includeAssemblies = includeAssemblies ?? throw new ArgumentNullException(nameof(includeAssemblies));
+            this.excludeAssemblies = excludeAssemblies ?? throw new ArgumentNullException(nameof(excludeAssemblies));
+            this.reservedAttributeNameProvider = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
+            this.nodeKeyGenerator = nodeKeyGenerator ?? throw new ArgumentNullException(nameof(nodeKeyGenerator));
+            this.dynamicNodeBuilder = dynamicNodeBuilder ?? throw new ArgumentNullException(nameof(dynamicNodeBuilder));
+            this.siteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
+            this.siteMapCacheKeyGenerator = siteMapCacheKeyGenerator ?? throw new ArgumentNullException(nameof(siteMapCacheKeyGenerator));
         }
+
         protected readonly IEnumerable<string> includeAssemblies;
         protected readonly IEnumerable<string> excludeAssemblies;
         protected readonly ISiteMapXmlReservedAttributeNameProvider reservedAttributeNameProvider;
@@ -61,6 +47,7 @@ namespace MvcSiteMapProvider.Builder
         protected readonly ISiteMapCacheKeyGenerator siteMapCacheKeyGenerator;
 
         protected string siteMapCacheKey;
+
         /// <summary>
         /// Gets the cache key for the current request and caches it, since this class should only be called 1 time per request.
         /// </summary>
@@ -72,14 +59,13 @@ namespace MvcSiteMapProvider.Builder
         {
             get
             {
-                if (string.IsNullOrEmpty(this.siteMapCacheKey))
+                if (string.IsNullOrEmpty(siteMapCacheKey))
                 {
-                    this.siteMapCacheKey = siteMapCacheKeyGenerator.GenerateKey();
+                    siteMapCacheKey = siteMapCacheKeyGenerator.GenerateKey();
                 }
-                return this.siteMapCacheKey;
+                return siteMapCacheKey;
             }
         }
-
 
         /// <summary>
         /// Provides the base data on which the context-aware provider can generate a full tree.
@@ -157,7 +143,6 @@ namespace MvcSiteMapProvider.Builder
                     });
                 }
 
-
                 // Add their methods
                 var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
                     .Where(x => x.GetCustomAttributes(typeof(IMvcSiteMapNodeAttribute), true).Any());
@@ -206,8 +191,7 @@ namespace MvcSiteMapProvider.Builder
 
                     var item = definitions.Where(t => string.IsNullOrEmpty(t.SiteMapNodeAttribute.ParentKey)).Single();
 
-                    var actionNode = item as MvcSiteMapNodeAttributeDefinitionForAction;
-                    if (actionNode != null)
+                    if (item is MvcSiteMapNodeAttributeDefinitionForAction actionNode)
                     {
                         // Create node for action
                         attributedRootNode = GetSiteMapNodeFromMvcSiteMapNodeAttribute(
@@ -215,8 +199,7 @@ namespace MvcSiteMapProvider.Builder
                     }
                     else
                     {
-                        var controllerNode = item as MvcSiteMapNodeAttributeDefinitionForController;
-                        if (controllerNode != null)
+                        if (item is MvcSiteMapNodeAttributeDefinitionForController controllerNode)
                         {
                             // Create node for controller
                             attributedRootNode = GetSiteMapNodeFromMvcSiteMapNodeAttribute(
@@ -245,8 +228,7 @@ namespace MvcSiteMapProvider.Builder
                 ISiteMapNode nodeToAdd = null;
 
                 // Create node
-                var actionNode = assemblyNode as MvcSiteMapNodeAttributeDefinitionForAction;
-                if (actionNode != null)
+                if (assemblyNode is MvcSiteMapNodeAttributeDefinitionForAction actionNode)
                 {
                     // Create node for action
                     nodeToAdd = GetSiteMapNodeFromMvcSiteMapNodeAttribute(
@@ -254,8 +236,7 @@ namespace MvcSiteMapProvider.Builder
                 }
                 else
                 {
-                    var controllerNode = assemblyNode as MvcSiteMapNodeAttributeDefinitionForController;
-                    if (controllerNode != null)
+                    if (assemblyNode is MvcSiteMapNodeAttributeDefinitionForController controllerNode)
                     {
                         // Create node for controller
                         nodeToAdd = GetSiteMapNodeFromMvcSiteMapNodeAttribute(
@@ -353,17 +334,17 @@ namespace MvcSiteMapProvider.Builder
         {
             if (attribute == null)
             {
-                throw new ArgumentNullException("attribute");
+                throw new ArgumentNullException(nameof(attribute));
             }
             if (type == null)
             {
-                throw new ArgumentNullException("type");
+                throw new ArgumentNullException(nameof(type));
             }
 
             if (!string.IsNullOrEmpty(attribute.SiteMapCacheKey))
             {
                 // Return null if the attribute doesn't apply to this cache key
-                if (!this.SiteMapCacheKey.Equals(attribute.SiteMapCacheKey))
+                if (!SiteMapCacheKey.Equals(attribute.SiteMapCacheKey))
                 {
                     return null;
                 }
@@ -409,8 +390,7 @@ namespace MvcSiteMapProvider.Builder
             if (methodInfo != null)
             {
                 // handle ActionNameAttribute
-                var actionNameAttribute = methodInfo.GetCustomAttributes(typeof(ActionNameAttribute), true).FirstOrDefault() as ActionNameAttribute;
-                if (actionNameAttribute != null)
+                if (methodInfo.GetCustomAttributes(typeof(ActionNameAttribute), true).FirstOrDefault() is ActionNameAttribute actionNameAttribute)
                 {
                     action = actionNameAttribute.Name;
                 }
@@ -469,8 +449,8 @@ namespace MvcSiteMapProvider.Builder
             siteMapNode.RouteValues.AddRange(attribute.Attributes, false);
             siteMapNode.PreservedRouteParameters.AddRange(attribute.PreservedRouteParameters, new[] { ',', ';' });
             siteMapNode.UrlResolver = attribute.UrlResolver;
-            
-            // Specified area, controller and action properties will override any 
+
+            // Specified area, controller and action properties will override any
             // provided in the attributes collection.
             if (!string.IsNullOrEmpty(area)) siteMapNode.RouteValues.Add("area", area);
             if (!string.IsNullOrEmpty(controller)) siteMapNode.RouteValues.Add("controller", controller);

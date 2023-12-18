@@ -29,13 +29,13 @@ namespace MvcSiteMapProvider.Xml
             // If no namespace is present (or the wrong one is present), replace it
             foreach (var node in xml.Descendants())
             {
-                if (string.IsNullOrEmpty(node.Name.Namespace.NamespaceName) || node.Name.Namespace != this.xmlSiteMapNamespace)
+                if (string.IsNullOrEmpty(node.Name.Namespace.NamespaceName) || node.Name.Namespace != xmlSiteMapNamespace)
                 {
-                    node.Name = XName.Get(node.Name.LocalName, this.xmlSiteMapNamespace.ToString());
+                    node.Name = XName.Get(node.Name.LocalName, xmlSiteMapNamespace.ToString());
                 }
             }
         }
 
-        #endregion
+        #endregion ISiteMapXmlNameProvider Members
     }
 }

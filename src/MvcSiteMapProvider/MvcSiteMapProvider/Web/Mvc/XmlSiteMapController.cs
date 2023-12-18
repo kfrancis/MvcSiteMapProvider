@@ -10,7 +10,9 @@ namespace MvcSiteMapProvider.Web.Mvc
     /// </summary>
 #if !MVC2
 #if !MVC3
+
     [AllowAnonymous]
+
 #endif
 #endif
     public class XmlSiteMapController
@@ -20,9 +22,7 @@ namespace MvcSiteMapProvider.Web.Mvc
             IXmlSiteMapResultFactory xmlSiteMapResultFactory
             )
         {
-            if (xmlSiteMapResultFactory == null)
-                throw new ArgumentNullException("xmlSiteMapResultFactory");
-            this.xmlSiteMapResultFactory = xmlSiteMapResultFactory;
+            this.xmlSiteMapResultFactory = xmlSiteMapResultFactory ?? throw new ArgumentNullException(nameof(xmlSiteMapResultFactory));
         }
 
         private readonly IXmlSiteMapResultFactory xmlSiteMapResultFactory;

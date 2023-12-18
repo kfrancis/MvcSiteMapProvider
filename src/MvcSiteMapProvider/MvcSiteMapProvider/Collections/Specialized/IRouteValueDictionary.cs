@@ -43,14 +43,14 @@ namespace MvcSiteMapProvider.Collections.Specialized
         /// <summary>
         /// Adds the elements from a JSON string representing the attributes. If the key exists, the value will be overwritten.
         /// </summary>
-        /// <param name="jsonString">A JSON string that represents a dictionary of key-value pairs. Example: @"{ ""key-1"": ""value-1""[, ""key-x"": ""value-x""] }". 
+        /// <param name="jsonString">A JSON string that represents a dictionary of key-value pairs. Example: @"{ ""key-1"": ""value-1""[, ""key-x"": ""value-x""] }".
         /// The value may be a string or primitive type (by leaving off the quotes).</param>
         void AddRange(string jsonString);
 
         /// <summary>
         /// Adds the elements from a JSON string representing the attributes. If the key exists, the value will be overwritten.
         /// </summary>
-        /// <param name="jsonString">A JSON string that represents a dictionary of key-value pairs. Example: @"{ ""key-1"": ""value-1""[, ""key-x"": ""value-x""] }". 
+        /// <param name="jsonString">A JSON string that represents a dictionary of key-value pairs. Example: @"{ ""key-1"": ""value-1""[, ""key-x"": ""value-x""] }".
         /// The value may be a string or primitive type (by leaving off the quotes).</param>
         /// <param name="throwIfReservedKey"><c>true</c> to throw an exception if one of the keys being added is a reserved key name; otherwise, <c>false</c>.</param>
         void AddRange(string jsonString, bool throwIfReservedKey);
@@ -92,9 +92,9 @@ namespace MvcSiteMapProvider.Collections.Specialized
         /// <summary>
         /// Compares whether the current dictionary the same as the passed in dictionary, accounting for empty optional values.
         /// </summary>
-        /// <param name="routeValues">An <see cref="T:System.Collections.Generic.IDictionary{string, object}"/> that represents the routes, 
+        /// <param name="routeValues">An <see cref="T:System.Collections.Generic.IDictionary{string, object}"/> that represents the routes,
         /// typically from the current request context.</param>
-        /// <returns><b>True</b> if the keys and values are an exact match (case insensitive) of of the routeValues that are passed and 
+        /// <returns><b>True</b> if the keys and values are an exact match (case insensitive) of of the routeValues that are passed and
         /// the every member of the action method parameter list is a key in the dictionary; otherwise <b>false</b>.</returns>
         bool MatchesRoute(IDictionary<string, object> routeValues);
 

@@ -7,7 +7,7 @@
     public interface IMvcResolverFactory
     {
         IMvcResolver Create(
-            IControllerTypeResolver controllerTypeResolver, 
+            IControllerTypeResolver controllerTypeResolver,
             IActionMethodParameterResolver actionMethodParameterResolver);
     }
 }

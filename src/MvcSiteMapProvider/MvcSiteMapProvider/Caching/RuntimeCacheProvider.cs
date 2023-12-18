@@ -17,9 +17,7 @@ namespace MvcSiteMapProvider.Caching
             ObjectCache cache
             )
         {
-            if (cache == null)
-                throw new ArgumentNullException("cache");
-            this.cache = cache;
+            this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
         }
         private readonly ObjectCache cache;
 
@@ -39,20 +37,17 @@ namespace MvcSiteMapProvider.Caching
 
         public bool TryGetValue(string key, out LazyLock value)
         {
-            value = this.Get(key);
-            if (value != null)
-            {
-                return true;
-            }
-            return false;
+            value = Get(key);
+            return value != null;
         }
 
         public void Add(string key, LazyLock item, ICacheDetails cacheDetails)
         {
-            var policy = new CacheItemPolicy();
-
-            // Set timeout
-            policy.Priority = CacheItemPriority.NotRemovable;
+            var policy = new CacheItemPolicy
+            {
+                // Set timeout
+                Priority = CacheItemPriority.NotRemovable
+            };
             if (IsTimespanSet(cacheDetails.AbsoluteCacheExpiration))
             {
                 policy.AbsoluteExpiration = DateTimeOffset.Now.Add(cacheDetails.AbsoluteCacheExpiration);
@@ -91,7 +86,7 @@ namespace MvcSiteMapProvider.Caching
 
         private bool IsTimespanSet(TimeSpan timeSpan)
         {
-            return (!timeSpan.Equals(TimeSpan.MinValue));
+            return !timeSpan.Equals(TimeSpan.MinValue);
         }
 
         protected virtual void CacheItemRemoved(CacheEntryRemovedArguments arguments)
@@ -103,7 +98,7 @@ namespace MvcSiteMapProvider.Caching
 
         protected virtual void OnCacheItemRemoved(MicroCacheItemRemovedEventArgs<T> e)
         {
-            if (this.ItemRemoved != null)
+            if (ItemRemoved != null)
             {
                 ItemRemoved(this, e);
             }

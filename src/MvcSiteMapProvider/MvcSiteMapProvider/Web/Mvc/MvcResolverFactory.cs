@@ -10,12 +10,12 @@
         #region IMvcResolverFactory Members
 
         public IMvcResolver Create(
-            IControllerTypeResolver controllerTypeResolver, 
+            IControllerTypeResolver controllerTypeResolver,
             IActionMethodParameterResolver actionMethodParameterResolver)
         {
             return new MvcResolver(controllerTypeResolver, actionMethodParameterResolver);
         }
 
-        #endregion
+        #endregion IMvcResolverFactory Members
     }
 }
