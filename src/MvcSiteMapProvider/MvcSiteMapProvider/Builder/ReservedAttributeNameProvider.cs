@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.DI;
+using MvcSiteMapProvider.DI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,13 +13,13 @@ namespace MvcSiteMapProvider.Builder
     public class ReservedAttributeNameProvider
         : IReservedAttributeNameProvider
     {
-        protected readonly IEnumerable<string> attributesToIgnore;
+        protected readonly IEnumerable<string> AttributesToIgnore;
 
         public ReservedAttributeNameProvider(
                     IEnumerable<string> attributesToIgnore
             )
         {
-            this.attributesToIgnore = attributesToIgnore ?? throw new ArgumentNullException(nameof(attributesToIgnore));
+            this.AttributesToIgnore = attributesToIgnore ?? throw new ArgumentNullException(nameof(attributesToIgnore));
         }
 
         public virtual bool IsRegularAttribute(string attributeName)
@@ -34,7 +34,7 @@ namespace MvcSiteMapProvider.Builder
         {
             return !IsKnownAttribute(attributeName)
                 && attributeName != "visibility"
-                && !attributesToIgnore.Contains(attributeName)
+                && !AttributesToIgnore.Contains(attributeName)
                 && !attributeName.StartsWith("data-");
         }
 

@@ -22,7 +22,7 @@ namespace MvcSiteMapProvider.Reflection
         public static T GetPrivatePropertyValue<T>(this object obj, string propertyName)
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));
-            PropertyInfo pi = obj.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance) ?? throw new ArgumentOutOfRangeException(nameof(propertyName), string.Format(Resources.Messages.ObjectPropertyNotFound, propertyName, obj.GetType().FullName));
+            var pi = obj.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance) ?? throw new ArgumentOutOfRangeException(nameof(propertyName), string.Format(Resources.Messages.ObjectPropertyNotFound, propertyName, obj.GetType().FullName));
             return (T)pi.GetValue(obj, null);
         }
 
@@ -37,7 +37,7 @@ namespace MvcSiteMapProvider.Reflection
         public static T GetPrivateFieldValue<T>(this object obj, string fieldName)
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));
-            Type t = obj.GetType();
+            var t = obj.GetType();
             FieldInfo fi = null;
             while (fi == null && t != null)
             {

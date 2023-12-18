@@ -63,7 +63,7 @@ namespace MvcSiteMapProvider.Web.Mvc
         {
             get
             {
-                bool useRequest = node == null ||
+                var useRequest = node == null ||
                     string.Equals(node.HttpMethod, "*") ||
                     string.Equals(node.HttpMethod, "request", StringComparison.OrdinalIgnoreCase);
                 return !useRequest

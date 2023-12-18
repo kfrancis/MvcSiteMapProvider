@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace MvcSiteMapProvider.Builder
@@ -10,17 +10,17 @@ namespace MvcSiteMapProvider.Builder
     public class CompositeSiteMapBuilder
         : ISiteMapBuilder
     {
-        protected readonly IEnumerable<ISiteMapBuilder> siteMapBuilders;
+        protected readonly IEnumerable<ISiteMapBuilder> SiteMapBuilders;
 
         public CompositeSiteMapBuilder(params ISiteMapBuilder[] siteMapBuilders)
         {
-            this.siteMapBuilders = siteMapBuilders ?? throw new ArgumentNullException(nameof(siteMapBuilders));
+            this.SiteMapBuilders = siteMapBuilders ?? throw new ArgumentNullException(nameof(siteMapBuilders));
         }
 
         public ISiteMapNode BuildSiteMap(ISiteMap siteMap, ISiteMapNode rootNode)
         {
-            ISiteMapNode result = rootNode;
-            foreach (var builder in siteMapBuilders)
+            var result = rootNode;
+            foreach (var builder in SiteMapBuilders)
             {
                 result = builder.BuildSiteMap(siteMap, result);
             }

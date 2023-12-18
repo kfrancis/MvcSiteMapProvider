@@ -22,8 +22,8 @@ namespace MvcSiteMapProvider.Web.Mvc
         {
             if (path.Contains("__MVCSITEMAPPROVIDER") && !path.Contains(".."))
             {
-                string resourceFileName = Path.GetFileName(path);
-                Assembly assembly = typeof(MvcSiteMapProviderViewEngineVirtualFile).Assembly;
+                var resourceFileName = Path.GetFileName(path);
+                var assembly = typeof(MvcSiteMapProviderViewEngineVirtualFile).Assembly;
                 return assembly.GetManifestResourceStream("MvcSiteMapProvider.Web.Html.DisplayTemplates." + resourceFileName) != null;
             }
             return false;

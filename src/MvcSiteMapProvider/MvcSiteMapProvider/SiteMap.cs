@@ -357,7 +357,7 @@ namespace MvcSiteMapProvider
                 return siteMapChildStateFactory.CreateReadOnlySiteMapNodeCollection(collection);
             }
             var secureCollection = siteMapChildStateFactory.CreateSiteMapNodeCollection();
-            foreach (ISiteMapNode secureNode in collection)
+            foreach (var secureNode in collection)
             {
                 if (secureNode.IsAccessibleToUser())
                 {
@@ -553,7 +553,7 @@ namespace MvcSiteMapProvider
                 }
 
                 // Remove the key
-                string key = node.Key;
+                var key = node.Key;
                 if (keyTable.ContainsKey(key))
                 {
                     keyTable.Remove(key);
@@ -589,7 +589,7 @@ namespace MvcSiteMapProvider
             lock (synclock)
             {
                 IUrlKey url = null;
-                bool isMvcUrl = string.IsNullOrEmpty(node.UnresolvedUrl) && node.UsesDefaultUrlResolver();
+                var isMvcUrl = string.IsNullOrEmpty(node.UnresolvedUrl) && node.UsesDefaultUrlResolver();
 
                 // Only store URLs if they are clickable and are configured using the Url
                 // property or provided by a custom URL resolver.
@@ -607,7 +607,7 @@ namespace MvcSiteMapProvider
                 }
 
                 // Add the key
-                string key = node.Key;
+                var key = node.Key;
                 if (keyTable.ContainsKey(key))
                 {
                     throw new InvalidOperationException(string.Format(Resources.Messages.MultipleNodesWithIdenticalKey, key));
@@ -710,7 +710,7 @@ namespace MvcSiteMapProvider
         {
             // Try absolute match with querystring
             var absoluteMatch = siteMapChildStateFactory.CreateUrlKey(relativeUrl, hostName);
-            ISiteMapNode node = FindSiteMapNodeFromUrlMatch(absoluteMatch);
+            var node = FindSiteMapNodeFromUrlMatch(absoluteMatch);
 
             // Try absolute match without querystring
             if (node == null && !string.IsNullOrEmpty(relativePath))
@@ -731,7 +731,7 @@ namespace MvcSiteMapProvider
             {
                 if (handler is Page currentHandler)
                 {
-                    string clientQueryString = currentHandler.ClientQueryString;
+                    var clientQueryString = currentHandler.ClientQueryString;
                     if (clientQueryString.Length > 0)
                     {
                         var aspNetRelativeMatch = siteMapChildStateFactory.CreateUrlKey(relativePath + "?" + clientQueryString, string.Empty);

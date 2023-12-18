@@ -67,7 +67,7 @@ namespace MvcSiteMapProvider
                 var siblingNodes = SiblingNodes;
                 if (siblingNodes != null)
                 {
-                    int index = siblingNodes.IndexOf(this);
+                    var index = siblingNodes.IndexOf(this);
                     if ((index >= 0) && (index < (siblingNodes.Count - 1)))
                     {
                         return siblingNodes[index + 1];
@@ -106,7 +106,7 @@ namespace MvcSiteMapProvider
                 var siblingNodes = SiblingNodes;
                 if (siblingNodes != null)
                 {
-                    int index = siblingNodes.IndexOf(this);
+                    var index = siblingNodes.IndexOf(this);
                     if ((index > 0) && (index <= (siblingNodes.Count - 1)))
                     {
                         return siblingNodes[index - 1];

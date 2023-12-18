@@ -34,8 +34,8 @@ namespace MvcSiteMapProvider.Caching
 
         public void Add(string key, LazyLock item, ICacheDetails cacheDetails)
         {
-            DateTime absolute = System.Web.Caching.Cache.NoAbsoluteExpiration;
-            TimeSpan sliding = System.Web.Caching.Cache.NoSlidingExpiration;
+            var absolute = System.Web.Caching.Cache.NoAbsoluteExpiration;
+            var sliding = System.Web.Caching.Cache.NoSlidingExpiration;
             if (IsTimespanSet(cacheDetails.AbsoluteCacheExpiration))
             {
                 absolute = DateTime.UtcNow.Add(cacheDetails.AbsoluteCacheExpiration);

@@ -14,7 +14,7 @@ namespace MvcSiteMapProvider.Reflection
             var result = new List<IMvcSiteMapNodeAttributeDefinition>();
             var types = GetTypesFromAssemblies(assemblies);
 
-            foreach (Type type in types)
+            foreach (var type in types)
             {
                 result.AddRange(GetAttributeDefinitionsForControllers(type));
                 result.AddRange(GetAttributeDefinitionsForActions(type));

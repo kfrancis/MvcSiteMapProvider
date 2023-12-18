@@ -372,7 +372,7 @@ namespace MvcSiteMapProvider.Web.Html
             if (node.IsAccessibleToUser())
             {
                 // Add node?
-                var nodeToAdd = new SiteMapNodeModel(node, sourceMetadata, Int32.MaxValue, false, startingNodeInChildLevel, visibilityAffectsDescendants);
+                var nodeToAdd = new SiteMapNodeModel(node, sourceMetadata, int.MaxValue, false, startingNodeInChildLevel, visibilityAffectsDescendants);
 
                 // Check visibility
                 if (node.IsVisible(sourceMetadata))

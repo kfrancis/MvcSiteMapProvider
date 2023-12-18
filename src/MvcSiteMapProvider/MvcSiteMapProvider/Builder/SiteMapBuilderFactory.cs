@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Globalization;
+using MvcSiteMapProvider.Globalization;
 using MvcSiteMapProvider.Visitor;
 using System;
 
@@ -19,25 +19,25 @@ namespace MvcSiteMapProvider.Builder
             ICultureContextFactory cultureContextFactory
             )
         {
-            this.siteMapHierarchyBuilder = siteMapHierarchyBuilder ?? throw new ArgumentNullException(nameof(siteMapHierarchyBuilder));
-            this.siteMapNodeHelperFactory = siteMapNodeHelperFactory ?? throw new ArgumentNullException(nameof(siteMapNodeHelperFactory));
-            this.siteMapNodeVisitor = siteMapNodeVisitor ?? throw new ArgumentNullException(nameof(siteMapNodeVisitor));
-            this.cultureContextFactory = cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
+            SiteMapHierarchyBuilder = siteMapHierarchyBuilder ?? throw new ArgumentNullException(nameof(siteMapHierarchyBuilder));
+            SiteMapNodeHelperFactory = siteMapNodeHelperFactory ?? throw new ArgumentNullException(nameof(siteMapNodeHelperFactory));
+            SiteMapNodeVisitor = siteMapNodeVisitor ?? throw new ArgumentNullException(nameof(siteMapNodeVisitor));
+            CultureContextFactory = cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
         }
 
-        protected readonly ISiteMapHierarchyBuilder siteMapHierarchyBuilder;
-        protected readonly ISiteMapNodeHelperFactory siteMapNodeHelperFactory;
-        protected readonly ISiteMapNodeVisitor siteMapNodeVisitor;
-        protected readonly ICultureContextFactory cultureContextFactory;
+        protected readonly ISiteMapHierarchyBuilder SiteMapHierarchyBuilder;
+        protected readonly ISiteMapNodeHelperFactory SiteMapNodeHelperFactory;
+        protected readonly ISiteMapNodeVisitor SiteMapNodeVisitor;
+        protected readonly ICultureContextFactory CultureContextFactory;
 
         public virtual ISiteMapBuilder Create(ISiteMapNodeProvider siteMapNodeProvider)
         {
             return new SiteMapBuilder(
                 siteMapNodeProvider,
-                siteMapNodeVisitor,
-                siteMapHierarchyBuilder,
-                siteMapNodeHelperFactory,
-                cultureContextFactory);
+                SiteMapNodeVisitor,
+                SiteMapHierarchyBuilder,
+                SiteMapNodeHelperFactory,
+                CultureContextFactory);
         }
     }
 }

@@ -160,7 +160,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
         /// <param name="throwIfReservedKey"><c>true</c> to throw an exception if one of the keys being added is a reserved key name; otherwise, <c>false</c>.</param>
         public void AddRange(XElement xmlNode, bool throwIfReservedKey)
         {
-            foreach (XAttribute attribute in xmlNode.Attributes())
+            foreach (var attribute in xmlNode.Attributes())
             {
                 Add(attribute.Name.ToString(), attribute.Value, throwIfReservedKey);
             }

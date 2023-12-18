@@ -22,7 +22,7 @@ namespace MvcSiteMapProvider
         public override bool IsVisible(ISiteMapNode node, IDictionary<string, object> sourceMetadata)
         {
             // Is a visibility attribute specified?
-            string visibility = string.Empty;
+            var visibility = string.Empty;
             if (node.Attributes.ContainsKey("visibility"))
             {
                 visibility = node.Attributes["visibility"].GetType().Equals(typeof(string)) ? node.Attributes["visibility"].ToString() : string.Empty;
@@ -33,8 +33,8 @@ namespace MvcSiteMapProvider
             }
             visibility = visibility.Trim();
 
-            string name = string.Empty;
-            string htmlHelper = string.Empty;
+            var name = string.Empty;
+            var htmlHelper = string.Empty;
             if (sourceMetadata.ContainsKey("name"))
             {
                 name = Convert.ToString(sourceMetadata["name"]);
@@ -59,7 +59,7 @@ namespace MvcSiteMapProvider
                 .Select(k => k.Trim()).ToList();
 
             // All set. Now parse the visibility variable.
-            foreach (string visibilityKeyword in visibilityKeywords)
+            foreach (var visibilityKeyword in visibilityKeywords)
             {
                 if (visibilityKeyword == htmlHelper || visibilityKeyword == name || visibilityKeyword == "*")
                 {

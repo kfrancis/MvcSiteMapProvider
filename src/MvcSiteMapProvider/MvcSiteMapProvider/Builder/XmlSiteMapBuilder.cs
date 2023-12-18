@@ -88,7 +88,7 @@ namespace MvcSiteMapProvider.Builder
             var implicitResourceKey = node.GetAttributeValue("resourceKey");
 
             // Generate key for node
-            string key = nodeKeyGenerator.GenerateKey(
+            var key = nodeKeyGenerator.GenerateKey(
                 parentKey,
                 explicitKey,
                 url,
@@ -100,7 +100,7 @@ namespace MvcSiteMapProvider.Builder
                 clickable);
 
             // Create node
-            ISiteMapNode siteMapNode = siteMapNodeFactory.Create(siteMap, key, implicitResourceKey);
+            var siteMapNode = siteMapNodeFactory.Create(siteMap, key, implicitResourceKey);
 
             // Assign values
             siteMapNode.Title = title;
@@ -220,7 +220,7 @@ namespace MvcSiteMapProvider.Builder
         protected virtual void ProcessXmlNodes(ISiteMap siteMap, ISiteMapNode rootNode, XElement rootElement)
         {
             // Loop through each element below the current root element.
-            foreach (XElement node in rootElement.Elements())
+            foreach (var node in rootElement.Elements())
             {
                 ISiteMapNode childNode;
                 if (node.Name == xmlNameProvider.NodeName)
@@ -228,7 +228,7 @@ namespace MvcSiteMapProvider.Builder
                     // If this is a normal mvcSiteMapNode then map the xml element
                     // to an MvcSiteMapNode, and add the node to the current root.
                     childNode = GetSiteMapNodeFromXmlElement(siteMap, node, rootNode);
-                    ISiteMapNode parentNode = rootNode;
+                    var parentNode = rootNode;
 
                     if (!childNode.HasDynamicNodeProvider)
                     {

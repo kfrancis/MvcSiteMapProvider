@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Reflection;
+using MvcSiteMapProvider.Reflection;
 using MvcSiteMapProvider.Web;
 using MvcSiteMapProvider.Xml;
 using System;
@@ -33,15 +33,15 @@ namespace MvcSiteMapProvider.Builder
     public class AspNetSiteMapBuilder
         : ISiteMapBuilder
     {
-        protected readonly bool reflectAttributes;
+        protected readonly bool ReflectAttributes;
 
-        protected readonly bool reflectRouteValues;
+        protected readonly bool ReflectRouteValues;
 
-        protected readonly ISiteMapXmlReservedAttributeNameProvider reservedAttributeNameProvider;
+        protected readonly ISiteMapXmlReservedAttributeNameProvider ReservedAttributeNameProvider;
 
-        protected readonly ISiteMapNodeFactory siteMapNodeFactory;
+        protected readonly ISiteMapNodeFactory SiteMapNodeFactory;
 
-        protected readonly IAspNetSiteMapProvider siteMapProvider;
+        protected readonly IAspNetSiteMapProvider SiteMapProvider;
 
         public AspNetSiteMapBuilder(
                                                     bool reflectAttributes,
@@ -51,16 +51,16 @@ namespace MvcSiteMapProvider.Builder
             ISiteMapNodeFactory siteMapNodeFactory
             )
         {
-            this.reflectAttributes = reflectAttributes;
-            this.reflectRouteValues = reflectRouteValues;
-            this.reservedAttributeNameProvider = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
-            this.siteMapProvider = siteMapProvider ?? throw new ArgumentNullException(nameof(siteMapProvider));
-            this.siteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
+            this.ReflectAttributes = reflectAttributes;
+            this.ReflectRouteValues = reflectRouteValues;
+            this.ReservedAttributeNameProvider = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
+            this.SiteMapProvider = siteMapProvider ?? throw new ArgumentNullException(nameof(siteMapProvider));
+            this.SiteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
         }
 
         public ISiteMapNode BuildSiteMap(ISiteMap siteMap, ISiteMapNode rootNode)
         {
-            var provider = siteMapProvider.GetProvider();
+            var provider = SiteMapProvider.GetProvider();
 
             rootNode = GetRootNode(siteMap, provider);
             // Fixes #192 root node not added to sitemap
@@ -84,15 +84,15 @@ namespace MvcSiteMapProvider.Builder
         protected virtual ISiteMapNode GetSiteMapNodeFromProviderNode(ISiteMap siteMap, System.Web.SiteMapNode node, ISiteMapNode parentNode)
         {
             // Use the same keys as the underlying provider.
-            string key = node.Key;
+            var key = node.Key;
             var implicitResourceKey = node.ResourceKey;
 
             // Create Node
-            ISiteMapNode siteMapNode = siteMapNodeFactory.Create(siteMap, key, implicitResourceKey);
+            var siteMapNode = SiteMapNodeFactory.Create(siteMap, key, implicitResourceKey);
 
             siteMapNode.Title = node.Title;
             siteMapNode.Description = node.Description;
-            if (reflectAttributes)
+            if (ReflectAttributes)
             {
                 // Unfortunately, the ASP.NET implementation uses a protected member variable to store
                 // the attributes, so there is no way to loop through them without reflection or some
@@ -128,7 +128,7 @@ namespace MvcSiteMapProvider.Builder
 
             // Assign to node
             siteMapNode.Route = node.GetAttributeValue("route");
-            if (reflectRouteValues)
+            if (ReflectRouteValues)
             {
                 // Unfortunately, the ASP.NET implementation uses a protected member variable to store
                 // the attributes, so there is no way to loop through them without reflection or some
@@ -200,7 +200,7 @@ namespace MvcSiteMapProvider.Builder
             foreach (System.Web.SiteMapNode node in providerRootNode.ChildNodes)
             {
                 var childNode = GetSiteMapNodeFromProviderNode(siteMap, node, rootNode);
-                ISiteMapNode parentNode = rootNode;
+                var parentNode = rootNode;
 
                 siteMap.AddNode(childNode, parentNode);
 

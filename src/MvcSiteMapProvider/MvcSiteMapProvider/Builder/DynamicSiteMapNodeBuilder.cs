@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.DI;
+using MvcSiteMapProvider.DI;
 using MvcSiteMapProvider.Globalization;
 using System;
 using System.Collections.Generic;
@@ -12,11 +12,11 @@ namespace MvcSiteMapProvider.Builder
     public class DynamicSiteMapNodeBuilder
         : IDynamicSiteMapNodeBuilder
     {
-        protected readonly ICultureContext cultureContext;
+        protected readonly ICultureContext CultureContext;
 
-        protected readonly ICultureContextFactory cultureContextFactory;
+        protected readonly ICultureContextFactory CultureContextFactory;
 
-        protected readonly ISiteMapNodeCreator siteMapNodeCreator;
+        protected readonly ISiteMapNodeCreator SiteMapNodeCreator;
 
         public DynamicSiteMapNodeBuilder(
                                     ISiteMapNodeCreator siteMapNodeCreator,
@@ -24,9 +24,9 @@ namespace MvcSiteMapProvider.Builder
             ICultureContextFactory cultureContextFactory
             )
         {
-            this.siteMapNodeCreator = siteMapNodeCreator ?? throw new ArgumentNullException(nameof(siteMapNodeCreator));
-            this.cultureContext = cultureContext ?? throw new ArgumentNullException(nameof(cultureContext));
-            this.cultureContextFactory = cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
+            SiteMapNodeCreator = siteMapNodeCreator ?? throw new ArgumentNullException(nameof(siteMapNodeCreator));
+            this.CultureContext = cultureContext ?? throw new ArgumentNullException(nameof(cultureContext));
+            this.CultureContextFactory = cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace MvcSiteMapProvider.Builder
             // be no way to identify the culture of the current request without a reference to the
             // cultureContext object.
             IEnumerable<DynamicNode> dynamicNodes;
-            using (var originalCultureContext = cultureContextFactory.Create(cultureContext.OriginalCulture, cultureContext.OriginalUICulture))
+            using (var originalCultureContext = CultureContextFactory.Create(CultureContext.OriginalCulture, CultureContext.OriginalUICulture))
             {
                 dynamicNodes = node.GetDynamicNodeCollection();
             }
@@ -65,7 +65,7 @@ namespace MvcSiteMapProvider.Builder
 
                 if (string.IsNullOrEmpty(key))
                 {
-                    key = siteMapNodeCreator.GenerateSiteMapNodeKey(
+                    key = SiteMapNodeCreator.GenerateSiteMapNodeKey(
                         parentKey,
                         Guid.NewGuid().ToString(),
                         node.Url,
@@ -78,7 +78,7 @@ namespace MvcSiteMapProvider.Builder
                 }
 
                 // Create a new node
-                var nodeParentMap = siteMapNodeCreator.CreateDynamicSiteMapNode(key, parentKey, node.DynamicNodeProvider, node.ResourceKey);
+                var nodeParentMap = SiteMapNodeCreator.CreateDynamicSiteMapNode(key, parentKey, node.DynamicNodeProvider, node.ResourceKey);
                 var newNode = nodeParentMap.Node;
 
                 // Copy the values from the original node to the new one

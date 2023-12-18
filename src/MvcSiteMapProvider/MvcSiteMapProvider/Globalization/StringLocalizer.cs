@@ -33,7 +33,7 @@ namespace MvcSiteMapProvider.Globalization
         {
             if (enableLocalization)
             {
-                string resourceString = GetImplicitResourceString(attributeName, implicitResourceKey, classKey);
+                var resourceString = GetImplicitResourceString(attributeName, implicitResourceKey, classKey);
                 if (resourceString != null)
                 {
                     return resourceString;
@@ -77,7 +77,7 @@ namespace MvcSiteMapProvider.Globalization
             string globalResourceObject = null;
             if (explicitResourceKeys != null)
             {
-                string[] values = explicitResourceKeys.GetValues(attributeName);
+                var values = explicitResourceKeys.GetValues(attributeName);
                 if ((values == null) || (values.Length <= 1))
                 {
                     return globalResourceObject;

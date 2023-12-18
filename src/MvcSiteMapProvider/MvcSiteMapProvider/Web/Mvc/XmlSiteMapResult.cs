@@ -104,7 +104,7 @@ namespace MvcSiteMapProvider.Web.Mvc
         protected virtual void ExecuteSitemapIndexResult(ControllerContext context, IEnumerable<ISiteMapNode> flattenedHierarchy, long flattenedHierarchyCount)
         {
             // Count the number of pages
-            double numPages = Math.Ceiling((double)flattenedHierarchyCount / MaxNumberOfLinksPerFile);
+            var numPages = Math.Ceiling((double)flattenedHierarchyCount / MaxNumberOfLinksPerFile);
 
             // Output content type
             context.HttpContext.Response.ContentType = "text/xml";
@@ -119,7 +119,7 @@ namespace MvcSiteMapProvider.Web.Mvc
                 sitemapIndex);
 
             // Write XML
-            using (Stream outputStream = RetrieveOutputStream(context))
+            using (var outputStream = RetrieveOutputStream(context))
             {
                 using (var writer = XmlWriter.Create(outputStream))
                 {
@@ -154,7 +154,7 @@ namespace MvcSiteMapProvider.Web.Mvc
                 urlSet);
 
             // Write XML
-            using (Stream outputStream = RetrieveOutputStream(context))
+            using (var outputStream = RetrieveOutputStream(context))
             {
                 using (var writer = XmlWriter.Create(outputStream))
                 {
@@ -221,7 +221,7 @@ namespace MvcSiteMapProvider.Web.Mvc
         protected virtual IEnumerable<XElement> GenerateSiteMapIndexElements(int numPages, string baseUrl, string siteMapUrlTemplate)
         {
             // Generate elements
-            for (int i = 1; i <= numPages; i++)
+            for (var i = 1; i <= numPages; i++)
             {
                 var templateUrl = "~/" + siteMapUrlTemplate.Replace("{page}", i.ToString());
                 var pageUrl = urlPath.MakeUrlAbsolute(baseUrl, templateUrl);
@@ -287,7 +287,7 @@ namespace MvcSiteMapProvider.Web.Mvc
                 if (startingNode.HasChildNodes)
                 {
                     // Make sure all child nodes are accessible prior to rendering them...
-                    foreach (ISiteMapNode node in startingNode.ChildNodes)
+                    foreach (var node in startingNode.ChildNodes)
                     {
                         foreach (var childNode in FlattenHierarchy(node, context, visibilityAffectsDescendants))
                         {
@@ -327,7 +327,7 @@ namespace MvcSiteMapProvider.Web.Mvc
                 return true;
             }
 
-            string absoluteUrl = string.Empty;
+            var absoluteUrl = string.Empty;
 
             if (string.IsNullOrEmpty(node.Protocol) && string.IsNullOrEmpty(node.HostName))
             {
@@ -379,7 +379,7 @@ namespace MvcSiteMapProvider.Web.Mvc
         protected virtual Stream RetrieveOutputStream(ControllerContext context)
         {
             // Output stream
-            Stream outputStream = context.HttpContext.Response.OutputStream;
+            var outputStream = context.HttpContext.Response.OutputStream;
 
             // Check if output can be GZip compressed
             var headers = context.RequestContext.HttpContext.Request.Headers;

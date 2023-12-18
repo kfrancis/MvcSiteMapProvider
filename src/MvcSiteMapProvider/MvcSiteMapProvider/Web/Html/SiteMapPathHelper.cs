@@ -189,7 +189,7 @@ namespace MvcSiteMapProvider.Web.Html
             var node = startingNode;
             while (node != null)
             {
-                bool nodeVisible = node.IsVisible(sourceMetadata);
+                var nodeVisible = node.IsVisible(sourceMetadata);
                 if (nodeVisible && node.IsAccessibleToUser())
                 {
                     var nodeToAdd = new SiteMapNodeModel(node, sourceMetadata);

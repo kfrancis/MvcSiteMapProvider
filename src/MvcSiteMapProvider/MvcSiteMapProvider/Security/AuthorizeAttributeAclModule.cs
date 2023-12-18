@@ -74,7 +74,7 @@ namespace MvcSiteMapProvider.Security
             var controllerFactory = controllerBuilder.GetControllerFactory();
 
             // Create controller context
-            var controllerContext = CreateControllerContext(node, routes, controllerType, controllerFactory, out bool factoryBuiltController);
+            var controllerContext = CreateControllerContext(node, routes, controllerType, controllerFactory, out var factoryBuiltController);
             try
             {
                 return VerifyControllerAttributes(routes, controllerType, controllerContext);
@@ -177,7 +177,7 @@ namespace MvcSiteMapProvider.Security
 
         protected virtual ActionDescriptor GetActionDescriptor(string actionName, ControllerDescriptor controllerDescriptor, ControllerContext controllerContext)
         {
-            var found = TryFindActionDescriptor(actionName, controllerContext, controllerDescriptor, out ActionDescriptor actionDescriptor);
+            var found = TryFindActionDescriptor(actionName, controllerContext, controllerDescriptor, out var actionDescriptor);
             if (!found)
             {
                 actionDescriptor = Array.Find(controllerDescriptor.GetCanonicalActions(), a => a.ActionName == actionName);
@@ -205,10 +205,10 @@ namespace MvcSiteMapProvider.Security
         protected virtual ControllerContext CreateControllerContext(ISiteMapNode node, RouteData routes, Type controllerType, IControllerFactory controllerFactory, out bool factoryBuiltController)
         {
             var requestContext = mvcContextFactory.CreateRequestContext(node, routes);
-            string controllerName = requestContext.RouteData.GetOptionalString("controller");
+            var controllerName = requestContext.RouteData.GetOptionalString("controller");
 
             // Whether controller is built by the ControllerFactory (or otherwise by Activator)
-            factoryBuiltController = TryCreateController(requestContext, controllerName, controllerFactory, out ControllerBase controller);
+            factoryBuiltController = TryCreateController(requestContext, controllerName, controllerFactory, out var controller);
             if (!factoryBuiltController)
             {
                 TryCreateController(controllerType, out controller);

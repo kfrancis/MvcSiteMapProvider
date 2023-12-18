@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Web;
 
 namespace MvcSiteMapProvider.Builder
@@ -11,7 +11,7 @@ namespace MvcSiteMapProvider.Builder
     public class AspNetNamedSiteMapProvider
         : IAspNetSiteMapProvider
     {
-        protected readonly string providerName;
+        protected readonly string ProviderName;
 
         public AspNetNamedSiteMapProvider(
                     string providerName
@@ -19,12 +19,12 @@ namespace MvcSiteMapProvider.Builder
         {
             if (string.IsNullOrEmpty(providerName))
                 throw new ArgumentNullException(providerName);
-            this.providerName = providerName;
+            ProviderName = providerName;
         }
 
         public SiteMapProvider GetProvider()
         {
-            return System.Web.SiteMap.Providers[providerName];
+            return System.Web.SiteMap.Providers[ProviderName];
         }
     }
 }

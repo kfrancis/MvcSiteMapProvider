@@ -61,7 +61,7 @@ namespace MvcSiteMapProvider.Web
             {
                 return false;
             }
-            int length = path.Length;
+            var length = path.Length;
             if (length == 0)
             {
                 return false;
@@ -102,12 +102,12 @@ namespace MvcSiteMapProvider.Web
         /// <remarks>Source: http://stackoverflow.com/questions/372865/path-combine-for-urls/6704287#6704287 </remarks>
         public string CombineUrl(params string[] uriParts)
         {
-            string uri = string.Empty;
+            var uri = string.Empty;
             if (uriParts?.Length > 0)
             {
-                char[] trims = new char[] { '\\', '/' };
+                var trims = new char[] { '\\', '/' };
                 uri = (uriParts[0] ?? string.Empty).TrimEnd(trims);
-                for (int i = 1; i < uriParts.Length; i++)
+                for (var i = 1; i < uriParts.Length; i++)
                 {
                     uri = string.Format("{0}/{1}", uri.TrimEnd(trims), (uriParts[i] ?? string.Empty).TrimStart(trims));
                 }
@@ -137,7 +137,7 @@ namespace MvcSiteMapProvider.Web
             }
             else
             {
-                int num = basepath.LastIndexOf('/');
+                var num = basepath.LastIndexOf('/');
                 if (num < (basepath.Length - 1))
                 {
                     basepath = basepath.Substring(0, num + 1);
@@ -189,7 +189,7 @@ namespace MvcSiteMapProvider.Web
             {
                 throw new HttpException(string.Format(Resources.Messages.PhysicalPathNotAllowed, path));
             }
-            int index = path.IndexOf('?');
+            var index = path.IndexOf('?');
             if (index >= 0)
             {
                 path = path.Substring(0, index);
@@ -202,12 +202,12 @@ namespace MvcSiteMapProvider.Web
 
         private bool HasScheme(string virtualPath)
         {
-            int index = virtualPath.IndexOf(':');
+            var index = virtualPath.IndexOf(':');
             if (index == -1)
             {
                 return false;
             }
-            int num2 = virtualPath.IndexOf('/');
+            var num2 = virtualPath.IndexOf('/');
             return num2 != -1 ? index < num2 : true;
         }
 
@@ -216,7 +216,7 @@ namespace MvcSiteMapProvider.Web
             string str = null;
             if (path != null)
             {
-                int index = path.IndexOf('?');
+                var index = path.IndexOf('?');
                 if (index >= 0)
                 {
                     str = path.Substring(index);
@@ -230,8 +230,8 @@ namespace MvcSiteMapProvider.Web
 
         private string ReduceVirtualPath(string path)
         {
-            int length = path.Length;
-            int startIndex = 0;
+            var length = path.Length;
+            var startIndex = 0;
             while (true)
             {
                 startIndex = path.IndexOf('.', startIndex);
@@ -245,12 +245,12 @@ namespace MvcSiteMapProvider.Web
                 }
                 startIndex++;
             }
-            ArrayList list = new ArrayList();
-            StringBuilder builder = new StringBuilder();
+            var list = new ArrayList();
+            var builder = new StringBuilder();
             startIndex = 0;
             do
             {
-                int num3 = startIndex;
+                var num3 = startIndex;
                 startIndex = path.IndexOf('/', num3 + 1);
                 if (startIndex < 0)
                 {
@@ -279,7 +279,7 @@ namespace MvcSiteMapProvider.Web
                 }
             }
             while (startIndex != length);
-            string str = builder.ToString();
+            var str = builder.ToString();
             if (str.Length != 0)
             {
                 return str;
@@ -292,7 +292,7 @@ namespace MvcSiteMapProvider.Web
             virtualPath = virtualPath.Replace('\\', '/');
             while (true)
             {
-                string str = virtualPath.Replace("//", "/");
+                var str = virtualPath.Replace("//", "/");
                 if (str == virtualPath)
                 {
                     return virtualPath;
@@ -339,7 +339,7 @@ namespace MvcSiteMapProvider.Web
             if (!IsAbsoluteUrl(url))
                 return false;
 
-            if (Uri.TryCreate(url, UriKind.Absolute, out Uri uri))
+            if (Uri.TryCreate(url, UriKind.Absolute, out var uri))
             {
                 var publicFacingUrl = GetPublicFacingUrl(httpContext);
                 var isDifferentHost = !uri.Host.Equals(publicFacingUrl.Host, StringComparison.InvariantCultureIgnoreCase);
@@ -551,16 +551,16 @@ namespace MvcSiteMapProvider.Web
 
                 if (!string.IsNullOrEmpty(protocol) || !string.IsNullOrEmpty(hostName))
                 {
-                    Uri requestUrl = GetPublicFacingUrl(httpContext);
-                    bool isWildcardProtocol = (protocol == "*");
-                    string defaultProtocol = (isWildcardProtocol || !defaultToHttp) ? requestUrl.Scheme : Uri.UriSchemeHttp;
+                    var requestUrl = GetPublicFacingUrl(httpContext);
+                    var isWildcardProtocol = (protocol == "*");
+                    var defaultProtocol = (isWildcardProtocol || !defaultToHttp) ? requestUrl.Scheme : Uri.UriSchemeHttp;
 
                     // Get the protocol and hostName
                     protocol = (!string.IsNullOrEmpty(protocol) && !isWildcardProtocol) ? protocol : defaultProtocol;
                     hostName = !string.IsNullOrEmpty(hostName) ? hostName : requestUrl.Host;
 
                     // Get the port
-                    string port = GetPortString(protocol, hostName, requestUrl);
+                    var port = GetPortString(protocol, hostName, requestUrl);
 
                     url = protocol + Uri.SchemeDelimiter + hostName + port + url;
                 }
@@ -571,10 +571,10 @@ namespace MvcSiteMapProvider.Web
 
         protected virtual string GetPortString(string protocol, string hostName, Uri requestUrl)
         {
-            int port = 80;
-            bool isProtocolMatch = string.Equals(protocol, requestUrl.Scheme, StringComparison.OrdinalIgnoreCase);
-            bool isHostMatch = string.Equals(hostName, requestUrl.Host, StringComparison.OrdinalIgnoreCase);
-            bool isDevelopmentEnvironment = (IsVisualStudioDevelopmentServer && isHostMatch);
+            var port = 80;
+            var isProtocolMatch = string.Equals(protocol, requestUrl.Scheme, StringComparison.OrdinalIgnoreCase);
+            var isHostMatch = string.Equals(hostName, requestUrl.Host, StringComparison.OrdinalIgnoreCase);
+            var isDevelopmentEnvironment = (IsVisualStudioDevelopmentServer && isHostMatch);
 
             if ((isProtocolMatch && isHostMatch) || isDevelopmentEnvironment)
             {
@@ -583,7 +583,7 @@ namespace MvcSiteMapProvider.Web
             else
             {
                 // Attempt to get the port bindings from the binding provider.
-                bool succeeded = false;
+                var succeeded = false;
                 var bindings = bindingProvider.GetBindings();
                 if (bindings != null)
                 {
@@ -642,9 +642,9 @@ namespace MvcSiteMapProvider.Web
             // the public URL:
             if (serverVariables["HTTP_HOST"] != null)
             {
-                string scheme = serverVariables["HTTP_X_FORWARDED_PROTO"] ?? request.Url.Scheme;
-                Uri hostAndPort = new Uri(scheme + Uri.SchemeDelimiter + serverVariables["HTTP_HOST"]);
-                UriBuilder publicRequestUri = new UriBuilder(request.Url)
+                var scheme = serverVariables["HTTP_X_FORWARDED_PROTO"] ?? request.Url.Scheme;
+                var hostAndPort = new Uri(scheme + Uri.SchemeDelimiter + serverVariables["HTTP_HOST"]);
+                var publicRequestUri = new UriBuilder(request.Url)
                 {
                     Scheme = scheme,
                     Host = hostAndPort.Host,
@@ -692,7 +692,7 @@ namespace MvcSiteMapProvider.Web
                 return serverUrl;
 
             // Start by fixing up the Url an Application relative Url
-            string newUrl = ResolveUrl(serverUrl);
+            var newUrl = ResolveUrl(serverUrl);
 
             // Due to URL rewriting, cloud computing (i.e. Azure)
             // and web farms, etc., we have to be VERY careful about what
@@ -706,7 +706,7 @@ namespace MvcSiteMapProvider.Web
 
             if (httpContext.Request.Headers["Host"] != null)
             {
-                string scheme = httpContext.Request.Headers["HTTP_X_FORWARDED_PROTO"]
+                var scheme = httpContext.Request.Headers["HTTP_X_FORWARDED_PROTO"]
                     ?? httpContext.Request.Url.Scheme;
                 originalUri = new Uri(scheme + Uri.SchemeDelimiter + httpContext.Request.Headers["Host"]);
             }

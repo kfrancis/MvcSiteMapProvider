@@ -97,9 +97,9 @@ namespace MvcSiteMapProvider.Web.Routing
 
         private static string GetMvcCodeRoutingRouteContext(Type controllerType, string controllerName)
         {
-            string controllerNamespace = controllerType.Namespace;
+            var controllerNamespace = controllerType.Namespace;
 
-            int controllersIndex = controllerNamespace.LastIndexOf(".Controllers.");
+            var controllersIndex = controllerNamespace.LastIndexOf(".Controllers.");
             if (controllersIndex == -1)
             {
                 // this is a top level controller
@@ -110,12 +110,12 @@ namespace MvcSiteMapProvider.Web.Routing
             // controllerNamespace = "DemoApp.Controllers.Sub1.Sub2.Sub3"
 
             // then selfNamespace is "Sub1.Sub2.Sub3"
-            string selfNamespace = controllerNamespace.Substring(controllersIndex + 13);
+            var selfNamespace = controllerNamespace.Substring(controllersIndex + 13);
 
             // selfNamespace = parentNamespace + "." + selfNamespaceLast
-            int parentIndex = selfNamespace.LastIndexOf('.');
-            string parentNamespace = string.Empty;
-            string selfNamespaceLast = selfNamespace;
+            var parentIndex = selfNamespace.LastIndexOf('.');
+            var parentNamespace = string.Empty;
+            var selfNamespaceLast = selfNamespace;
 
             if (parentIndex != -1)
             {

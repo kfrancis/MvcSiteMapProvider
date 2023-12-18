@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Reflection;
+using MvcSiteMapProvider.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,25 +18,25 @@ namespace MvcSiteMapProvider.Builder
     {
         protected const string SourceName = "MvcSiteMapNodeAttribute";
 
-        protected readonly IAttributeAssemblyProviderFactory attributeAssemblyProviderFactory;
+        protected readonly IAttributeAssemblyProviderFactory AttributeAssemblyProviderFactory;
 
-        protected readonly IMvcSiteMapNodeAttributeDefinitionProvider attributeNodeDefinitionProvider;
+        protected readonly IMvcSiteMapNodeAttributeDefinitionProvider AttributeNodeDefinitionProvider;
 
-        protected readonly IEnumerable<string> excludeAssemblies;
+        protected readonly IEnumerable<string> ExcludeAssemblies;
 
-        protected readonly IEnumerable<string> includeAssemblies;
+        protected readonly IEnumerable<string> IncludeAssemblies;
 
         public ReflectionSiteMapNodeProvider(
-                                                    IEnumerable<String> includeAssemblies,
-            IEnumerable<String> excludeAssemblies,
+                                                    IEnumerable<string> includeAssemblies,
+            IEnumerable<string> excludeAssemblies,
             IAttributeAssemblyProviderFactory attributeAssemblyProviderFactory,
             IMvcSiteMapNodeAttributeDefinitionProvider attributeNodeDefinitionProvider
             )
         {
-            this.includeAssemblies = includeAssemblies ?? throw new ArgumentNullException(nameof(includeAssemblies));
-            this.excludeAssemblies = excludeAssemblies ?? throw new ArgumentNullException(nameof(excludeAssemblies));
-            this.attributeAssemblyProviderFactory = attributeAssemblyProviderFactory ?? throw new ArgumentNullException(nameof(attributeAssemblyProviderFactory));
-            this.attributeNodeDefinitionProvider = attributeNodeDefinitionProvider ?? throw new ArgumentNullException(nameof(attributeNodeDefinitionProvider));
+            IncludeAssemblies = includeAssemblies ?? throw new ArgumentNullException(nameof(includeAssemblies));
+            ExcludeAssemblies = excludeAssemblies ?? throw new ArgumentNullException(nameof(excludeAssemblies));
+            AttributeAssemblyProviderFactory = attributeAssemblyProviderFactory ?? throw new ArgumentNullException(nameof(attributeAssemblyProviderFactory));
+            AttributeNodeDefinitionProvider = attributeNodeDefinitionProvider ?? throw new ArgumentNullException(nameof(attributeNodeDefinitionProvider));
         }
         public IEnumerable<ISiteMapNodeToParentRelation> GetSiteMapNodes(ISiteMapNodeHelper helper)
         {
@@ -104,9 +104,9 @@ namespace MvcSiteMapProvider.Builder
 
         protected virtual IEnumerable<IMvcSiteMapNodeAttributeDefinition> GetMvcSiteMapNodeAttributeDefinitions()
         {
-            var assemblyProvider = attributeAssemblyProviderFactory.Create(includeAssemblies, excludeAssemblies);
+            var assemblyProvider = AttributeAssemblyProviderFactory.Create(IncludeAssemblies, ExcludeAssemblies);
             var assemblies = assemblyProvider.GetAssemblies();
-            var definitions = attributeNodeDefinitionProvider.GetMvcSiteMapNodeAttributeDefinitions(assemblies);
+            var definitions = AttributeNodeDefinitionProvider.GetMvcSiteMapNodeAttributeDefinitions(assemblies);
             return definitions;
         }
 
@@ -142,7 +142,7 @@ namespace MvcSiteMapProvider.Builder
             if (methodInfo == null) // try to find Index action
             {
                 var ms = type.GetMethods(BindingFlags.Instance | BindingFlags.Public).Where(x => x.Name.Equals("Index"));
-                foreach (MethodInfo m in ms)
+                foreach (var m in ms)
                 {
                     var pars = m.GetParameters();
                     if (pars.Length == 0)
@@ -153,7 +153,7 @@ namespace MvcSiteMapProvider.Builder
                 }
             }
 
-            string area = "";
+            var area = "";
 
 #pragma warning disable CS0618 // Type or member is obsolete
             if (!string.IsNullOrEmpty(attribute.AreaName))
@@ -177,8 +177,8 @@ namespace MvcSiteMapProvider.Builder
             }
 
             // Determine controller and (index) action
-            string controller = type.Name.Substring(0, type.Name.IndexOf("Controller"));
-            string action = (methodInfo?.Name) ?? "Index";
+            var controller = type.Name.Substring(0, type.Name.IndexOf("Controller"));
+            var action = (methodInfo?.Name) ?? "Index";
 
             if (methodInfo != null)
             {
@@ -189,7 +189,7 @@ namespace MvcSiteMapProvider.Builder
                 }
             }
 
-            string httpMethod = (string.IsNullOrEmpty(attribute.HttpMethod) ? HttpVerbs.Get.ToString() : attribute.HttpMethod).ToUpper();
+            var httpMethod = (string.IsNullOrEmpty(attribute.HttpMethod) ? HttpVerbs.Get.ToString() : attribute.HttpMethod).ToUpper();
 
             // Handle title
             var title = attribute.Title;
@@ -198,7 +198,7 @@ namespace MvcSiteMapProvider.Builder
             var implicitResourceKey = attribute.ResourceKey;
 
             // Generate key for node
-            string key = helper.CreateNodeKey(
+            var key = helper.CreateNodeKey(
                 attribute.ParentKey,
                 attribute.Key,
                 attribute.Url,

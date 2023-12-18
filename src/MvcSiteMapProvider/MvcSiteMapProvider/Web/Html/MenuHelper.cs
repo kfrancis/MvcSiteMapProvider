@@ -20,7 +20,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper)
         {
-            return Menu(helper, helper.SiteMap.RootNode, true, true, Int32.MaxValue, false);
+            return Menu(helper, helper.SiteMap.RootNode, true, true, int.MaxValue, false);
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, object sourceMetadata)
         {
-            return Menu(helper, helper.SiteMap.RootNode, true, true, Int32.MaxValue, false, sourceMetadata);
+            return Menu(helper, helper.SiteMap.RootNode, true, true, int.MaxValue, false, sourceMetadata);
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, SourceMetadataDictionary sourceMetadata)
         {
-            return Menu(helper, helper.SiteMap.RootNode, true, true, Int32.MaxValue, false, sourceMetadata);
+            return Menu(helper, helper.SiteMap.RootNode, true, true, int.MaxValue, false, sourceMetadata);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, bool showStartingNode)
         {
-            return Menu(helper, helper.SiteMap.RootNode, true, showStartingNode, Int32.MaxValue, false);
+            return Menu(helper, helper.SiteMap.RootNode, true, showStartingNode, int.MaxValue, false);
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, bool showStartingNode, object sourceMetadata)
         {
-            return Menu(helper, helper.SiteMap.RootNode, true, showStartingNode, Int32.MaxValue, false, sourceMetadata);
+            return Menu(helper, helper.SiteMap.RootNode, true, showStartingNode, int.MaxValue, false, sourceMetadata);
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, bool showStartingNode, SourceMetadataDictionary sourceMetadata)
         {
-            return Menu(helper, helper.SiteMap.RootNode, true, showStartingNode, Int32.MaxValue, false, sourceMetadata);
+            return Menu(helper, helper.SiteMap.RootNode, true, showStartingNode, int.MaxValue, false, sourceMetadata);
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, ISiteMapNode startingNode, bool startingNodeInChildLevel, bool showStartingNode)
         {
-            return Menu(helper, startingNode, startingNodeInChildLevel, showStartingNode, Int32.MaxValue, false);
+            return Menu(helper, startingNode, startingNodeInChildLevel, showStartingNode, int.MaxValue, false);
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, ISiteMapNode startingNode, bool startingNodeInChildLevel, bool showStartingNode, object sourceMetadata)
         {
-            return Menu(helper, startingNode, startingNodeInChildLevel, showStartingNode, Int32.MaxValue, false, sourceMetadata);
+            return Menu(helper, startingNode, startingNodeInChildLevel, showStartingNode, int.MaxValue, false, sourceMetadata);
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, ISiteMapNode startingNode, bool startingNodeInChildLevel, bool showStartingNode, SourceMetadataDictionary sourceMetadata)
         {
-            return Menu(helper, startingNode, startingNodeInChildLevel, showStartingNode, Int32.MaxValue, false, sourceMetadata);
+            return Menu(helper, startingNode, startingNodeInChildLevel, showStartingNode, int.MaxValue, false, sourceMetadata);
         }
 
         /// <summary>
@@ -159,8 +159,8 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, bool startFromCurrentNode, bool startingNodeInChildLevel, bool showStartingNode, SourceMetadataDictionary sourceMetadata)
         {
-            ISiteMapNode startingNode = startFromCurrentNode ? GetCurrentNode(helper.SiteMap, true) : helper.SiteMap.RootNode;
-            return Menu(helper, startingNode, startingNodeInChildLevel, showStartingNode, Int32.MaxValue, false, sourceMetadata);
+            var startingNode = startFromCurrentNode ? GetCurrentNode(helper.SiteMap, true) : helper.SiteMap.RootNode;
+            return Menu(helper, startingNode, startingNodeInChildLevel, showStartingNode, int.MaxValue, false, sourceMetadata);
         }
 
         /// <summary>
@@ -204,8 +204,8 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, bool startFromCurrentNode, bool startingNodeInChildLevel, bool showStartingNode, bool visibilityAffectsDescendants, SourceMetadataDictionary sourceMetadata)
         {
-            ISiteMapNode startingNode = startFromCurrentNode ? GetCurrentNode(helper.SiteMap, true) : helper.SiteMap.RootNode;
-            return Menu(helper, null, startingNode, startingNodeInChildLevel, showStartingNode, Int32.MaxValue, false, visibilityAffectsDescendants, sourceMetadata);
+            var startingNode = startFromCurrentNode ? GetCurrentNode(helper.SiteMap, true) : helper.SiteMap.RootNode;
+            return Menu(helper, null, startingNode, startingNodeInChildLevel, showStartingNode, int.MaxValue, false, visibilityAffectsDescendants, sourceMetadata);
         }
 
         /// <summary>
@@ -249,7 +249,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, int startingNodeLevel, int maxDepth, bool allowForwardSearch, bool drillDownToCurrent, SourceMetadataDictionary sourceMetadata)
         {
-            ISiteMapNode startingNode = GetStartingNode(GetCurrentNode(helper.SiteMap, true), startingNodeLevel, allowForwardSearch);
+            var startingNode = GetStartingNode(GetCurrentNode(helper.SiteMap, true), startingNodeLevel, allowForwardSearch);
             return startingNode == null
                 ? MvcHtmlString.Empty
                 : Menu(helper, startingNode, true, false, maxDepth, drillDownToCurrent, sourceMetadata);
@@ -299,7 +299,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, int startingNodeLevel, int maxDepth, bool allowForwardSearch, bool drillDownToCurrent, bool visibilityAffectsDescendants, SourceMetadataDictionary sourceMetadata)
         {
-            ISiteMapNode startingNode = GetStartingNode(GetCurrentNode(helper.SiteMap, true), startingNodeLevel, allowForwardSearch);
+            var startingNode = GetStartingNode(GetCurrentNode(helper.SiteMap, true), startingNodeLevel, allowForwardSearch);
             return startingNode == null
                 ? MvcHtmlString.Empty
                 : Menu(helper, null, startingNode, true, false, maxDepth, drillDownToCurrent, visibilityAffectsDescendants, sourceMetadata);
@@ -431,7 +431,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, int startingNodeLevel, bool startingNodeInChildLevel, bool showStartingNode, int maxDepth, bool allowForwardSearch, bool drillDownToCurrent, SourceMetadataDictionary sourceMetadata)
         {
-            ISiteMapNode startingNode = GetStartingNode(GetCurrentNode(helper.SiteMap, true), startingNodeLevel, allowForwardSearch);
+            var startingNode = GetStartingNode(GetCurrentNode(helper.SiteMap, true), startingNodeLevel, allowForwardSearch);
             return startingNode == null
                 ? MvcHtmlString.Empty
                 : Menu(helper, startingNode, startingNodeInChildLevel, showStartingNode, maxDepth, drillDownToCurrent, sourceMetadata);
@@ -484,7 +484,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, int startingNodeLevel, bool startingNodeInChildLevel, bool showStartingNode, int maxDepth, bool allowForwardSearch, bool drillDownToCurrent, bool visibilityAffectsDescenants, SourceMetadataDictionary sourceMetadata)
         {
-            ISiteMapNode startingNode = GetStartingNode(GetCurrentNode(helper.SiteMap, true), startingNodeLevel, allowForwardSearch);
+            var startingNode = GetStartingNode(GetCurrentNode(helper.SiteMap, true), startingNodeLevel, allowForwardSearch);
             return startingNode == null
                 ? MvcHtmlString.Empty
                 : Menu(helper, null, startingNode, startingNodeInChildLevel, showStartingNode, maxDepth, drillDownToCurrent, visibilityAffectsDescenants, sourceMetadata);
@@ -633,7 +633,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, string templateName)
         {
-            return Menu(helper, templateName, helper.SiteMap.RootNode, true, true, Int32.MaxValue, false);
+            return Menu(helper, templateName, helper.SiteMap.RootNode, true, true, int.MaxValue, false);
         }
 
         /// <summary>
@@ -645,7 +645,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, string templateName, object sourceMetadata)
         {
-            return Menu(helper, templateName, helper.SiteMap.RootNode, true, true, Int32.MaxValue, false, sourceMetadata);
+            return Menu(helper, templateName, helper.SiteMap.RootNode, true, true, int.MaxValue, false, sourceMetadata);
         }
 
         /// <summary>
@@ -657,7 +657,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, string templateName, SourceMetadataDictionary sourceMetadata)
         {
-            return Menu(helper, templateName, helper.SiteMap.RootNode, true, true, Int32.MaxValue, false, sourceMetadata);
+            return Menu(helper, templateName, helper.SiteMap.RootNode, true, true, int.MaxValue, false, sourceMetadata);
         }
 
         /// <summary>
@@ -669,7 +669,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, string templateName, bool showStartingNode)
         {
-            return Menu(helper, templateName, helper.SiteMap.RootNode, true, showStartingNode, Int32.MaxValue, false);
+            return Menu(helper, templateName, helper.SiteMap.RootNode, true, showStartingNode, int.MaxValue, false);
         }
 
         /// <summary>
@@ -682,7 +682,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, string templateName, bool showStartingNode, object sourceMetadata)
         {
-            return Menu(helper, templateName, helper.SiteMap.RootNode, true, showStartingNode, Int32.MaxValue, false, sourceMetadata);
+            return Menu(helper, templateName, helper.SiteMap.RootNode, true, showStartingNode, int.MaxValue, false, sourceMetadata);
         }
 
         /// <summary>
@@ -695,7 +695,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, string templateName, bool showStartingNode, SourceMetadataDictionary sourceMetadata)
         {
-            return Menu(helper, templateName, helper.SiteMap.RootNode, true, showStartingNode, Int32.MaxValue, false, sourceMetadata);
+            return Menu(helper, templateName, helper.SiteMap.RootNode, true, showStartingNode, int.MaxValue, false, sourceMetadata);
         }
 
         /// <summary>
@@ -709,7 +709,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, string templateName, ISiteMapNode startingNode, bool startingNodeInChildLevel, bool showStartingNode)
         {
-            return Menu(helper, templateName, startingNode, startingNodeInChildLevel, showStartingNode, Int32.MaxValue, false);
+            return Menu(helper, templateName, startingNode, startingNodeInChildLevel, showStartingNode, int.MaxValue, false);
         }
 
         /// <summary>
@@ -724,7 +724,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, string templateName, ISiteMapNode startingNode, bool startingNodeInChildLevel, bool showStartingNode, object sourceMetadata)
         {
-            return Menu(helper, templateName, startingNode, startingNodeInChildLevel, showStartingNode, Int32.MaxValue, false, sourceMetadata);
+            return Menu(helper, templateName, startingNode, startingNodeInChildLevel, showStartingNode, int.MaxValue, false, sourceMetadata);
         }
 
         /// <summary>
@@ -739,7 +739,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, string templateName, ISiteMapNode startingNode, bool startingNodeInChildLevel, bool showStartingNode, SourceMetadataDictionary sourceMetadata)
         {
-            return Menu(helper, templateName, startingNode, startingNodeInChildLevel, showStartingNode, Int32.MaxValue, false, sourceMetadata);
+            return Menu(helper, templateName, startingNode, startingNodeInChildLevel, showStartingNode, int.MaxValue, false, sourceMetadata);
         }
 
         /// <summary>
@@ -783,8 +783,8 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, string templateName, bool startFromCurrentNode, bool startingNodeInChildLevel, bool showStartingNode, SourceMetadataDictionary sourceMetadata)
         {
-            ISiteMapNode startingNode = startFromCurrentNode ? GetCurrentNode(helper.SiteMap, true) : helper.SiteMap.RootNode;
-            return Menu(helper, templateName, startingNode, startingNodeInChildLevel, showStartingNode, Int32.MaxValue, false, sourceMetadata);
+            var startingNode = startFromCurrentNode ? GetCurrentNode(helper.SiteMap, true) : helper.SiteMap.RootNode;
+            return Menu(helper, templateName, startingNode, startingNodeInChildLevel, showStartingNode, int.MaxValue, false, sourceMetadata);
         }
 
         /// <summary>
@@ -831,8 +831,8 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, string templateName, bool startFromCurrentNode, bool startingNodeInChildLevel, bool showStartingNode, bool visibilityAffectsDescendants, SourceMetadataDictionary sourceMetadata)
         {
-            ISiteMapNode startingNode = startFromCurrentNode ? GetCurrentNode(helper.SiteMap, true) : helper.SiteMap.RootNode;
-            return Menu(helper, templateName, startingNode, startingNodeInChildLevel, showStartingNode, Int32.MaxValue, false, visibilityAffectsDescendants, sourceMetadata);
+            var startingNode = startFromCurrentNode ? GetCurrentNode(helper.SiteMap, true) : helper.SiteMap.RootNode;
+            return Menu(helper, templateName, startingNode, startingNodeInChildLevel, showStartingNode, int.MaxValue, false, visibilityAffectsDescendants, sourceMetadata);
         }
 
         /// <summary>
@@ -879,7 +879,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, string templateName, int startingNodeLevel, int maxDepth, bool allowForwardSearch, bool drillDownToCurrent, SourceMetadataDictionary sourceMetadata)
         {
-            ISiteMapNode startingNode = GetStartingNode(GetCurrentNode(helper.SiteMap, true), startingNodeLevel, allowForwardSearch);
+            var startingNode = GetStartingNode(GetCurrentNode(helper.SiteMap, true), startingNodeLevel, allowForwardSearch);
             return startingNode == null
                 ? MvcHtmlString.Empty
                 : Menu(helper, templateName, startingNode, true, true, maxDepth, drillDownToCurrent, sourceMetadata);
@@ -976,7 +976,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, string templateName, int startingNodeLevel, bool startingNodeInChildLevel, bool showStartingNode, int maxDepth, bool allowForwardSearch, bool drillDownToCurrent, SourceMetadataDictionary sourceMetadata)
         {
-            ISiteMapNode startingNode = GetStartingNode(GetCurrentNode(helper.SiteMap, true), startingNodeLevel, allowForwardSearch);
+            var startingNode = GetStartingNode(GetCurrentNode(helper.SiteMap, true), startingNodeLevel, allowForwardSearch);
             return startingNode == null
                 ? MvcHtmlString.Empty
                 : Menu(helper, templateName, startingNode, startingNodeInChildLevel, showStartingNode, maxDepth, drillDownToCurrent, sourceMetadata);
@@ -1035,7 +1035,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>Html markup</returns>
         public static MvcHtmlString Menu(this MvcSiteMapHtmlHelper helper, string templateName, int startingNodeLevel, bool startingNodeInChildLevel, bool showStartingNode, int maxDepth, bool allowForwardSearch, bool drillDownToCurrent, bool visibilityAffectsDescendants, SourceMetadataDictionary sourceMetadata)
         {
-            ISiteMapNode startingNode = GetStartingNode(GetCurrentNode(helper.SiteMap, true), startingNodeLevel, allowForwardSearch);
+            var startingNode = GetStartingNode(GetCurrentNode(helper.SiteMap, true), startingNodeLevel, allowForwardSearch);
             return startingNode == null
                 ? MvcHtmlString.Empty
                 : Menu(helper, templateName, startingNode, startingNodeInChildLevel, showStartingNode, maxDepth, drillDownToCurrent, visibilityAffectsDescendants, sourceMetadata);
@@ -1377,7 +1377,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>The starting node.</returns>
         public static ISiteMapNode GetStartingNode(ISiteMapNode currentNode, int startingNodeLevel, bool allowForwardSearch)
         {
-            ISiteMapNode startingNode = GetNodeAtLevel(currentNode, startingNodeLevel, allowForwardSearch);
+            var startingNode = GetNodeAtLevel(currentNode, startingNodeLevel, allowForwardSearch);
             if (startingNode == null)
             {
                 return null;

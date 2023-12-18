@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace MvcSiteMapProvider.Builder
@@ -15,12 +15,12 @@ namespace MvcSiteMapProvider.Builder
             ISiteMapNodeFactory siteMapNodeFactory
             )
         {
-            this.nodeKeyGenerator = nodeKeyGenerator ?? throw new ArgumentNullException(nameof(nodeKeyGenerator));
-            this.siteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
+            _nodeKeyGenerator = nodeKeyGenerator ?? throw new ArgumentNullException(nameof(nodeKeyGenerator));
+            _siteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
         }
 
-        private readonly INodeKeyGenerator nodeKeyGenerator;
-        private readonly ISiteMapNodeFactory siteMapNodeFactory;
+        private readonly INodeKeyGenerator _nodeKeyGenerator;
+        private readonly ISiteMapNodeFactory _siteMapNodeFactory;
 
         /// <summary>
         /// Adds the dynamic nodes for node.
@@ -40,10 +40,10 @@ namespace MvcSiteMapProvider.Builder
             // Build dynamic nodes
             foreach (var dynamicNode in node.GetDynamicNodeCollection())
             {
-                string key = dynamicNode.Key;
+                var key = dynamicNode.Key;
                 if (string.IsNullOrEmpty(key))
                 {
-                    key = nodeKeyGenerator.GenerateKey(
+                    key = _nodeKeyGenerator.GenerateKey(
                         parentNode == null ? "" : parentNode.Key,
                         Guid.NewGuid().ToString(),
                         node.Url,
@@ -56,7 +56,7 @@ namespace MvcSiteMapProvider.Builder
                 }
 
                 // Create a new node
-                var newNode = siteMapNodeFactory.CreateDynamic(siteMap, key, node.ResourceKey);
+                var newNode = _siteMapNodeFactory.CreateDynamic(siteMap, key, node.ResourceKey);
 
                 // Copy the values from the original node to the new one
                 node.CopyTo(newNode);

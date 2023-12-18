@@ -54,7 +54,7 @@ namespace MvcSiteMapProvider.Web.Mvc.Filters
 
                 if (target != null)
                 {
-                    ISiteMap siteMap = SiteMaps.GetSiteMap(SiteMapCacheKey);
+                    var siteMap = SiteMaps.GetSiteMap(SiteMapCacheKey);
                     if (siteMap?.CurrentNode != null)
                     {
                         if (Target == AttributeTarget.ParentNode && siteMap.CurrentNode.ParentNode != null)

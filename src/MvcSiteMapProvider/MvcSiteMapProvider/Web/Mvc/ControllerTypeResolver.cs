@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Collections;
+using MvcSiteMapProvider.Collections;
 using MvcSiteMapProvider.DI;
 using MvcSiteMapProvider.Web.Compilation;
 using System;
@@ -18,15 +18,15 @@ namespace MvcSiteMapProvider.Web.Mvc
     public class ControllerTypeResolver
         : IControllerTypeResolver
     {
-        protected readonly IEnumerable<string> areaNamespacesToIgnore;
+        protected readonly IEnumerable<string> AreaNamespacesToIgnore;
 
-        protected readonly IBuildManager buildManager;
+        protected readonly IBuildManager BuildManager;
 
-        protected readonly IControllerBuilder controllerBuilder;
+        protected readonly IControllerBuilder ControllerBuilder;
 
-        protected readonly RouteCollection routes;
+        protected readonly RouteCollection Routes;
 
-        private readonly object synclock = new object();
+        private readonly object _synclock = new object();
 
         public ControllerTypeResolver(
                                                     IEnumerable<string> areaNamespacesToIgnore,
@@ -35,10 +35,10 @@ namespace MvcSiteMapProvider.Web.Mvc
             IBuildManager buildManager
             )
         {
-            this.areaNamespacesToIgnore = areaNamespacesToIgnore ?? throw new ArgumentNullException(nameof(areaNamespacesToIgnore));
-            this.routes = routes ?? throw new ArgumentNullException(nameof(routes));
-            this.controllerBuilder = controllerBuilder ?? throw new ArgumentNullException(nameof(controllerBuilder));
-            this.buildManager = buildManager ?? throw new ArgumentNullException(nameof(buildManager));
+            AreaNamespacesToIgnore = areaNamespacesToIgnore ?? throw new ArgumentNullException(nameof(areaNamespacesToIgnore));
+            Routes = routes ?? throw new ArgumentNullException(nameof(routes));
+            ControllerBuilder = controllerBuilder ?? throw new ArgumentNullException(nameof(controllerBuilder));
+            BuildManager = buildManager ?? throw new ArgumentNullException(nameof(buildManager));
 
             Cache = new ConcurrentDictionary<string, Type>();
         }
@@ -63,16 +63,16 @@ namespace MvcSiteMapProvider.Web.Mvc
         /// <returns>Controller type</returns>
         public Type ResolveControllerType(string areaName, string controllerName)
         {
-            string cacheKey = areaName + "_" + controllerName;
+            var cacheKey = areaName + "_" + controllerName;
 
             // Try to get the value from the cache first
-            if (Cache.TryGetValue(cacheKey, out Type cachedType))
+            if (Cache.TryGetValue(cacheKey, out var cachedType))
             {
                 return cachedType;
             }
 
             // Compute areaNamespaces only if necessary
-            var areaNamespaces = FindNamespacesForArea(areaName, routes)?.Except(areaNamespacesToIgnore, StringComparer.OrdinalIgnoreCase).ToList();
+            var areaNamespaces = FindNamespacesForArea(areaName, Routes)?.Except(AreaNamespacesToIgnore, StringComparer.OrdinalIgnoreCase).ToList();
             HashSet<string> namespaces = null;
 
             if (areaNamespaces?.Any() == true)
@@ -80,15 +80,15 @@ namespace MvcSiteMapProvider.Web.Mvc
                 namespaces = new HashSet<string>(areaNamespaces, StringComparer.OrdinalIgnoreCase);
                 if (string.IsNullOrEmpty(areaName))
                 {
-                    namespaces.UnionWith(controllerBuilder.DefaultNamespaces);
+                    namespaces.UnionWith(ControllerBuilder.DefaultNamespaces);
                 }
             }
-            else if (controllerBuilder.DefaultNamespaces.Any())
+            else if (ControllerBuilder.DefaultNamespaces.Any())
             {
-                namespaces = new HashSet<string>(controllerBuilder.DefaultNamespaces, StringComparer.OrdinalIgnoreCase);
+                namespaces = new HashSet<string>(ControllerBuilder.DefaultNamespaces, StringComparer.OrdinalIgnoreCase);
             }
 
-            Type controllerType = GetControllerTypeWithinNamespaces(areaName, controllerName, namespaces);
+            var controllerType = GetControllerTypeWithinNamespaces(areaName, controllerName, namespaces);
 
             // Update the cache
             if (controllerType != null)
@@ -149,13 +149,13 @@ namespace MvcSiteMapProvider.Web.Mvc
 
             InitAssemblyCache();
 
-            HashSet<Type> matchingTypes = new HashSet<Type>();
-            if (AssemblyCache.Value.TryGetValue(controller, out ILookup<string, Type> nsLookup))
+            var matchingTypes = new HashSet<Type>();
+            if (AssemblyCache.Value.TryGetValue(controller, out var nsLookup))
             {
                 // this friendly name was located in the cache, now cycle through namespaces
                 if (namespaces != null)
                 {
-                    foreach (string requestedNamespace in namespaces)
+                    foreach (var requestedNamespace in namespaces)
                     {
                         foreach (var targetNamespaceGrouping in nsLookup)
                         {
@@ -182,7 +182,7 @@ namespace MvcSiteMapProvider.Web.Mvc
             }
             else if (matchingTypes.Count > 1)
             {
-                string typeNames = Environment.NewLine + Environment.NewLine;
+                var typeNames = Environment.NewLine + Environment.NewLine;
                 foreach (var matchingType in matchingTypes)
                     typeNames += matchingType.FullName + Environment.NewLine;
                 typeNames += Environment.NewLine;
@@ -199,9 +199,7 @@ namespace MvcSiteMapProvider.Web.Mvc
         protected virtual List<Type> GetListOfControllerTypes()
         {
             var controllerTypes = new HashSet<Type>();
-            var assemblies = this.buildManager.GetReferencedAssemblies();
-
-            foreach (Assembly assembly in assemblies)
+            foreach (Assembly assembly in BuildManager.GetReferencedAssemblies())
             {
                 Type[] typesInAsm;
                 try
@@ -287,7 +285,7 @@ namespace MvcSiteMapProvider.Web.Mvc
         {
             if (AssemblyCache == null)
             {
-                lock (synclock)
+                lock (_synclock)
                 {
                     if (AssemblyCache == null)
                     {

@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Reflection;
+using MvcSiteMapProvider.Reflection;
 using System;
 using System.Collections.Generic;
 
@@ -11,35 +11,35 @@ namespace MvcSiteMapProvider.Builder
     /// </summary>
     public class ReflectionSiteMapNodeProviderFactory
     {
-        protected readonly IAttributeAssemblyProviderFactory attributeAssemblyProviderFactory;
+        protected readonly IAttributeAssemblyProviderFactory AttributeAssemblyProviderFactory;
 
-        protected readonly IMvcSiteMapNodeAttributeDefinitionProvider attributeNodeDefinitionProvider;
+        protected readonly IMvcSiteMapNodeAttributeDefinitionProvider AttributeNodeDefinitionProvider;
 
         public ReflectionSiteMapNodeProviderFactory(
                             IAttributeAssemblyProviderFactory attributeAssemblyProviderFactory,
             IMvcSiteMapNodeAttributeDefinitionProvider attributeNodeDefinitionProvider
             )
         {
-            this.attributeAssemblyProviderFactory = attributeAssemblyProviderFactory ?? throw new ArgumentNullException(nameof(attributeAssemblyProviderFactory));
-            this.attributeNodeDefinitionProvider = attributeNodeDefinitionProvider ?? throw new ArgumentNullException(nameof(attributeNodeDefinitionProvider));
+            AttributeAssemblyProviderFactory = attributeAssemblyProviderFactory ?? throw new ArgumentNullException(nameof(attributeAssemblyProviderFactory));
+            AttributeNodeDefinitionProvider = attributeNodeDefinitionProvider ?? throw new ArgumentNullException(nameof(attributeNodeDefinitionProvider));
         }
 
-        public ReflectionSiteMapNodeProvider Create(IEnumerable<String> includeAssemblies, IEnumerable<String> excludeAssemblies)
+        public ReflectionSiteMapNodeProvider Create(IEnumerable<string> includeAssemblies, IEnumerable<string> excludeAssemblies)
         {
             return new ReflectionSiteMapNodeProvider(
                 includeAssemblies,
                 excludeAssemblies,
-                attributeAssemblyProviderFactory,
-                attributeNodeDefinitionProvider);
+                AttributeAssemblyProviderFactory,
+                AttributeNodeDefinitionProvider);
         }
 
-        public ReflectionSiteMapNodeProvider Create(IEnumerable<String> includeAssemblies)
+        public ReflectionSiteMapNodeProvider Create(IEnumerable<string> includeAssemblies)
         {
             return new ReflectionSiteMapNodeProvider(
                 includeAssemblies,
                 new string[0],
-                attributeAssemblyProviderFactory,
-                attributeNodeDefinitionProvider);
+                AttributeAssemblyProviderFactory,
+                AttributeNodeDefinitionProvider);
         }
     }
 }

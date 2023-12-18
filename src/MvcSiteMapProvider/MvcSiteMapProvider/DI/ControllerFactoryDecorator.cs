@@ -46,7 +46,7 @@ namespace MvcSiteMapProvider.DI
             {
                 throw new ArgumentNullException(nameof(controllerName));
             }
-            Type controllerType = GetControllerType(requestContext, controllerName);
+            var controllerType = GetControllerType(requestContext, controllerName);
 
             // Yield control back to the original controller factory if this isn't an
             // internal controller.

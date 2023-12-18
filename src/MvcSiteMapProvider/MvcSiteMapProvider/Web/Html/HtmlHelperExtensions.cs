@@ -42,7 +42,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// </returns>
         public static MvcSiteMapHtmlHelper MvcSiteMap(this HtmlHelper helper, string siteMapCacheKey)
         {
-            ISiteMap siteMap = SiteMaps.GetSiteMap(siteMapCacheKey) ?? throw new UnknownSiteMapException();
+            var siteMap = SiteMaps.GetSiteMap(siteMapCacheKey) ?? throw new UnknownSiteMapException();
             return MvcSiteMap(helper, siteMap);
         }
     }

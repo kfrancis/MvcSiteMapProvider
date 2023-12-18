@@ -32,7 +32,7 @@ namespace MvcSiteMapProvider
         public bool IsVisible(ISiteMapNode node, IDictionary<string, object> sourceMetadata)
         {
             // Result is always true unless the first provider that returns false is encountered.
-            bool result = true;
+            var result = true;
             foreach (var visibilityProvider in siteMapNodeVisibilityProviders)
             {
                 result = visibilityProvider.IsVisible(node, sourceMetadata);

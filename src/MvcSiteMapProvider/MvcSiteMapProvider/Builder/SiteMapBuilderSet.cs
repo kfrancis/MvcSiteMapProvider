@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Caching;
+using MvcSiteMapProvider.Caching;
 using System;
 
 namespace MvcSiteMapProvider.Builder

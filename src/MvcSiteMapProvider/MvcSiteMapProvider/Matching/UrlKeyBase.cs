@@ -53,7 +53,7 @@ namespace MvcSiteMapProvider.Matching
         {
             unchecked
             {
-                int hashCode = 0;
+                var hashCode = 0;
 
                 // String properties
                 hashCode = (hashCode * 397) ^ (HostName != null ? HostName.GetHashCode() : string.Empty.GetHashCode());

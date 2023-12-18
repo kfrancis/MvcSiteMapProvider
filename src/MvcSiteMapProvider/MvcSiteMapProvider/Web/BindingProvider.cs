@@ -85,12 +85,12 @@ namespace MvcSiteMapProvider.Web
                         var protocol = iisBinding["protocol"] as string;
                         var bindingInfo = iisBinding["bindingInformation"] as string;
 
-                        string[] parts = bindingInfo.Split(':');
+                        var parts = bindingInfo.Split(':');
                         if (parts.Length == 3)
                         {
-                            string ip = parts[0]; // May be "*" or the actual IP
-                            string port = parts[1]; // Always a port number (even if default port)
-                            string hostHeader = parts[2]; // Optional - may be "". We can't rely on this entirely.
+                            var ip = parts[0]; // May be "*" or the actual IP
+                            var port = parts[1]; // Always a port number (even if default port)
+                            var hostHeader = parts[2]; // Optional - may be "". We can't rely on this entirely.
 
                             // Guess what the hostName will be depending on host header/IP address
                             var hostName = string.IsNullOrEmpty(hostHeader) ? ip : hostHeader;

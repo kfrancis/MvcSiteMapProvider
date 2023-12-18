@@ -50,14 +50,14 @@ namespace MvcSiteMapProvider.Web.Mvc
                                                                 string actionMethodName)
         {
             // Is the request cached?
-            string cacheKey = areaName + "_" + controllerName + "_" + actionMethodName;
+            var cacheKey = areaName + "_" + controllerName + "_" + actionMethodName;
             if (Cache.ContainsKey(cacheKey))
             {
                 return Cache[cacheKey];
             }
 
             // Get controller type
-            Type controllerType = controllerTypeResolver.ResolveControllerType(areaName, controllerName);
+            var controllerType = controllerTypeResolver.ResolveControllerType(areaName, controllerName);
 
             // Get action method information
             var actionParameters = new List<string>();
@@ -65,12 +65,12 @@ namespace MvcSiteMapProvider.Web.Mvc
             {
                 var controllerDescriptor = controllerDescriptorFactory.Create(controllerType);
 
-                ActionDescriptor[] actionDescriptors = controllerDescriptor.GetCanonicalActions()
+                var actionDescriptors = controllerDescriptor.GetCanonicalActions()
                     .Where(a => a.ActionName == actionMethodName).ToArray();
 
                 if (actionDescriptors?.Length > 0)
                 {
-                    foreach (ActionDescriptor actionDescriptor in actionDescriptors)
+                    foreach (var actionDescriptor in actionDescriptors)
                     {
                         actionParameters.AddRange(actionDescriptor.GetParameters().Select(p => p.ParameterName));
                     }

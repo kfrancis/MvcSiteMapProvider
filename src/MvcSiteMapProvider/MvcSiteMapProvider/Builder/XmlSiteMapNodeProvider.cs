@@ -97,7 +97,7 @@ namespace MvcSiteMapProvider.Builder
             var implicitResourceKey = node.GetAttributeValue("resourceKey");
 
             // Generate key for node
-            string key = helper.CreateNodeKey(
+            var key = helper.CreateNodeKey(
                 parentKey,
                 explicitKey,
                 url,
@@ -232,10 +232,10 @@ namespace MvcSiteMapProvider.Builder
         protected virtual IList<ISiteMapNodeToParentRelation> ProcessXmlNodes(ISiteMapNode parentNode, XElement parentElement, NodesToProcess processFlags, ISiteMapNodeHelper helper)
         {
             var result = new List<ISiteMapNodeToParentRelation>();
-            bool processStandardNodes = (processFlags & NodesToProcess.StandardNodes) == NodesToProcess.StandardNodes;
-            bool processDynamicNodes = (processFlags & NodesToProcess.DynamicNodes) == NodesToProcess.DynamicNodes;
+            var processStandardNodes = (processFlags & NodesToProcess.StandardNodes) == NodesToProcess.StandardNodes;
+            var processDynamicNodes = (processFlags & NodesToProcess.DynamicNodes) == NodesToProcess.DynamicNodes;
 
-            foreach (XElement node in parentElement.Elements())
+            foreach (var node in parentElement.Elements())
             {
                 if (node.Name != xmlNameProvider.NodeName)
                 {

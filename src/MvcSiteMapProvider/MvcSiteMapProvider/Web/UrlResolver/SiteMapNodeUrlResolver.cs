@@ -74,7 +74,7 @@ namespace MvcSiteMapProvider.Web.UrlResolver
 
         protected virtual string ResolveRouteUrl(ISiteMapNode node, string area, string controller, string action, IDictionary<string, object> routeValues)
         {
-            string result = string.Empty;
+            var result = string.Empty;
             // Create a TextWriter with null stream as a backing stream
             // which doesn't consume resources
             using (var nullWriter = new StreamWriter(Stream.Null))

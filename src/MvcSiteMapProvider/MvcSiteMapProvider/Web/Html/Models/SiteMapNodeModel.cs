@@ -30,7 +30,7 @@ namespace MvcSiteMapProvider.Web.Html.Models
         /// <param name="node">The node.</param>
         /// <param name="sourceMetadata">The source metadata provided by the HtmlHelper.</param>
         public SiteMapNodeModel(ISiteMapNode node, IDictionary<string, object> sourceMetadata)
-            : this(node, sourceMetadata, Int32.MaxValue, true, false, node.SiteMap.VisibilityAffectsDescendants)
+            : this(node, sourceMetadata, int.MaxValue, true, false, node.SiteMap.VisibilityAffectsDescendants)
         {
         }
 
@@ -266,7 +266,7 @@ namespace MvcSiteMapProvider.Web.Html.Models
             {
                 return node.ParentNode == null
                     ? null
-                    : new SiteMapNodeModel(node.ParentNode, SourceMetadata, maxDepth == Int32.MaxValue ? Int32.MaxValue : maxDepth + 1, drillDownToCurrent, startingNodeInChildLevel, VisibilityAffectsDescendants);
+                    : new SiteMapNodeModel(node.ParentNode, SourceMetadata, maxDepth == int.MaxValue ? int.MaxValue : maxDepth + 1, drillDownToCurrent, startingNodeInChildLevel, VisibilityAffectsDescendants);
             }
         }
 
@@ -373,7 +373,7 @@ namespace MvcSiteMapProvider.Web.Html.Models
                 return true;
             if (node.ParentNode?.Equals(node.SiteMap.CurrentNode) == true)
                 return true;
-            foreach (ISiteMapNode sibling in node.ParentNode.ChildNodes)
+            foreach (var sibling in node.ParentNode.ChildNodes)
             {
                 if (sibling.IsInCurrentPath())
                     return true;

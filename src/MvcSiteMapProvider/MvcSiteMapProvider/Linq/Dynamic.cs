@@ -22,7 +22,7 @@ namespace MvcSiteMapProvider.Linq
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-            LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(bool), predicate, values);
+            var lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(bool), predicate, values);
             return source.Provider.CreateQuery(
                 Expression.Call(
                     typeof(Queryable), "Where",
@@ -34,7 +34,7 @@ namespace MvcSiteMapProvider.Linq
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (selector == null) throw new ArgumentNullException(nameof(selector));
-            LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, null, selector, values);
+            var lambda = DynamicExpression.ParseLambda(source.ElementType, null, selector, values);
             return source.Provider.CreateQuery(
                 Expression.Call(
                     typeof(Queryable), "Select",
@@ -51,14 +51,14 @@ namespace MvcSiteMapProvider.Linq
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (ordering == null) throw new ArgumentNullException(nameof(ordering));
-            ParameterExpression[] parameters = new ParameterExpression[] {
+            var parameters = new ParameterExpression[] {
                 Expression.Parameter(source.ElementType, "") };
-            ExpressionParser parser = new ExpressionParser(parameters, ordering, values);
-            IEnumerable<DynamicOrdering> orderings = parser.ParseOrdering();
-            Expression queryExpr = source.Expression;
-            string methodAsc = "OrderBy";
-            string methodDesc = "OrderByDescending";
-            foreach (DynamicOrdering o in orderings)
+            var parser = new ExpressionParser(parameters, ordering, values);
+            var orderings = parser.ParseOrdering();
+            var queryExpr = source.Expression;
+            var methodAsc = "OrderBy";
+            var methodDesc = "OrderByDescending";
+            foreach (var o in orderings)
             {
                 queryExpr = Expression.Call(
                     typeof(Queryable), o.Ascending ? methodAsc : methodDesc,
@@ -97,8 +97,8 @@ namespace MvcSiteMapProvider.Linq
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (keySelector == null) throw new ArgumentNullException(nameof(keySelector));
             if (elementSelector == null) throw new ArgumentNullException(nameof(elementSelector));
-            LambdaExpression keyLambda = DynamicExpression.ParseLambda(source.ElementType, null, keySelector, values);
-            LambdaExpression elementLambda = DynamicExpression.ParseLambda(source.ElementType, null, elementSelector, values);
+            var keyLambda = DynamicExpression.ParseLambda(source.ElementType, null, keySelector, values);
+            var elementLambda = DynamicExpression.ParseLambda(source.ElementType, null, elementSelector, values);
             return source.Provider.CreateQuery(
                 Expression.Call(
                     typeof(Queryable), "GroupBy",
@@ -131,10 +131,10 @@ namespace MvcSiteMapProvider.Linq
     {
         public override string ToString()
         {
-            PropertyInfo[] props = GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
-            StringBuilder sb = new StringBuilder();
+            var props = GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            var sb = new StringBuilder();
             sb.Append("{");
-            for (int i = 0; i < props.Length; i++)
+            for (var i = 0; i < props.Length; i++)
             {
                 if (i > 0) sb.Append(", ");
                 sb.Append(props[i].Name);
@@ -172,7 +172,7 @@ namespace MvcSiteMapProvider.Linq
     {
         public static Expression Parse(Type resultType, string expression, params object[] values)
         {
-            ExpressionParser parser = new ExpressionParser(null, expression, values);
+            var parser = new ExpressionParser(null, expression, values);
             return parser.Parse(resultType);
         }
 
@@ -183,7 +183,7 @@ namespace MvcSiteMapProvider.Linq
 
         public static LambdaExpression ParseLambda(ParameterExpression[] parameters, Type resultType, string expression, params object[] values)
         {
-            ExpressionParser parser = new ExpressionParser(parameters, expression, values);
+            var parser = new ExpressionParser(parameters, expression, values);
             return Expression.Lambda(parser.Parse(resultType), parameters);
         }
 
@@ -218,7 +218,7 @@ namespace MvcSiteMapProvider.Linq
         {
             this.properties = properties.ToArray();
             hashCode = 0;
-            foreach (DynamicProperty p in properties)
+            foreach (var p in properties)
             {
                 hashCode ^= p.Name.GetHashCode() ^ p.Type.GetHashCode();
             }
@@ -237,7 +237,7 @@ namespace MvcSiteMapProvider.Linq
         public bool Equals(Signature other)
         {
             if (properties.Length != other.properties.Length) return false;
-            for (int i = 0; i < properties.Length; i++)
+            for (var i = 0; i < properties.Length; i++)
             {
                 if (properties[i].Name != other.properties[i].Name ||
                     properties[i].Type != other.properties[i].Type) return false;
@@ -261,8 +261,8 @@ namespace MvcSiteMapProvider.Linq
 
         private ClassFactory()
         {
-            AssemblyName name = new AssemblyName("DynamicClasses");
-            AssemblyBuilder assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
+            var name = new AssemblyName("DynamicClasses");
+            var assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
 #if ENABLE_LINQ_PARTIAL_TRUST
             new ReflectionPermission(PermissionState.Unrestricted).Assert();
 #endif
@@ -285,7 +285,7 @@ namespace MvcSiteMapProvider.Linq
             rwLock.AcquireReaderLock(Timeout.Infinite);
             try
             {
-                Signature signature = new Signature(properties);
+                var signature = new Signature(properties);
                 Type type;
                 if (!classes.TryGetValue(signature, out type))
                 {
@@ -302,21 +302,21 @@ namespace MvcSiteMapProvider.Linq
 
         private Type CreateDynamicClass(DynamicProperty[] properties)
         {
-            LockCookie cookie = rwLock.UpgradeToWriterLock(Timeout.Infinite);
+            var cookie = rwLock.UpgradeToWriterLock(Timeout.Infinite);
             try
             {
-                string typeName = "DynamicClass" + (classCount + 1);
+                var typeName = "DynamicClass" + (classCount + 1);
 #if ENABLE_LINQ_PARTIAL_TRUST
                 new ReflectionPermission(PermissionState.Unrestricted).Assert();
 #endif
                 try
                 {
-                    TypeBuilder tb = module.DefineType(typeName, TypeAttributes.Class |
+                    var tb = module.DefineType(typeName, TypeAttributes.Class |
                         TypeAttributes.Public, typeof(DynamicClass));
-                    FieldInfo[] fields = GenerateProperties(tb, properties);
+                    var fields = GenerateProperties(tb, properties);
                     GenerateEquals(tb, fields);
                     GenerateGetHashCode(tb, fields);
-                    Type result = tb.CreateType();
+                    var result = tb.CreateType();
                     classCount++;
                     return result;
                 }
@@ -336,22 +336,22 @@ namespace MvcSiteMapProvider.Linq
         private FieldInfo[] GenerateProperties(TypeBuilder tb, DynamicProperty[] properties)
         {
             FieldInfo[] fields = new FieldBuilder[properties.Length];
-            for (int i = 0; i < properties.Length; i++)
+            for (var i = 0; i < properties.Length; i++)
             {
-                DynamicProperty dp = properties[i];
-                FieldBuilder fb = tb.DefineField("_" + dp.Name, dp.Type, FieldAttributes.Private);
-                PropertyBuilder pb = tb.DefineProperty(dp.Name, PropertyAttributes.HasDefault, dp.Type, null);
-                MethodBuilder mbGet = tb.DefineMethod("get_" + dp.Name,
+                var dp = properties[i];
+                var fb = tb.DefineField("_" + dp.Name, dp.Type, FieldAttributes.Private);
+                var pb = tb.DefineProperty(dp.Name, PropertyAttributes.HasDefault, dp.Type, null);
+                var mbGet = tb.DefineMethod("get_" + dp.Name,
                     MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
                     dp.Type, Type.EmptyTypes);
-                ILGenerator genGet = mbGet.GetILGenerator();
+                var genGet = mbGet.GetILGenerator();
                 genGet.Emit(OpCodes.Ldarg_0);
                 genGet.Emit(OpCodes.Ldfld, fb);
                 genGet.Emit(OpCodes.Ret);
-                MethodBuilder mbSet = tb.DefineMethod("set_" + dp.Name,
+                var mbSet = tb.DefineMethod("set_" + dp.Name,
                     MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
                     null, new Type[] { dp.Type });
-                ILGenerator genSet = mbSet.GetILGenerator();
+                var genSet = mbSet.GetILGenerator();
                 genSet.Emit(OpCodes.Ldarg_0);
                 genSet.Emit(OpCodes.Ldarg_1);
                 genSet.Emit(OpCodes.Stfld, fb);
@@ -365,13 +365,13 @@ namespace MvcSiteMapProvider.Linq
 
         private void GenerateEquals(TypeBuilder tb, FieldInfo[] fields)
         {
-            MethodBuilder mb = tb.DefineMethod("Equals",
+            var mb = tb.DefineMethod("Equals",
                 MethodAttributes.Public | MethodAttributes.ReuseSlot |
                 MethodAttributes.Virtual | MethodAttributes.HideBySig,
                 typeof(bool), new Type[] { typeof(object) });
-            ILGenerator gen = mb.GetILGenerator();
-            LocalBuilder other = gen.DeclareLocal(tb);
-            Label next = gen.DefineLabel();
+            var gen = mb.GetILGenerator();
+            var other = gen.DeclareLocal(tb);
+            var next = gen.DefineLabel();
             gen.Emit(OpCodes.Ldarg_1);
             gen.Emit(OpCodes.Isinst, tb);
             gen.Emit(OpCodes.Stloc, other);
@@ -380,10 +380,10 @@ namespace MvcSiteMapProvider.Linq
             gen.Emit(OpCodes.Ldc_I4_0);
             gen.Emit(OpCodes.Ret);
             gen.MarkLabel(next);
-            foreach (FieldInfo field in fields)
+            foreach (var field in fields)
             {
-                Type ft = field.FieldType;
-                Type ct = typeof(EqualityComparer<>).MakeGenericType(ft);
+                var ft = field.FieldType;
+                var ct = typeof(EqualityComparer<>).MakeGenericType(ft);
                 next = gen.DefineLabel();
                 gen.EmitCall(OpCodes.Call, ct.GetMethod("get_Default"), null);
                 gen.Emit(OpCodes.Ldarg_0);
@@ -402,16 +402,16 @@ namespace MvcSiteMapProvider.Linq
 
         private void GenerateGetHashCode(TypeBuilder tb, FieldInfo[] fields)
         {
-            MethodBuilder mb = tb.DefineMethod("GetHashCode",
+            var mb = tb.DefineMethod("GetHashCode",
                 MethodAttributes.Public | MethodAttributes.ReuseSlot |
                 MethodAttributes.Virtual | MethodAttributes.HideBySig,
                 typeof(int), Type.EmptyTypes);
-            ILGenerator gen = mb.GetILGenerator();
+            var gen = mb.GetILGenerator();
             gen.Emit(OpCodes.Ldc_I4_0);
-            foreach (FieldInfo field in fields)
+            foreach (var field in fields)
             {
-                Type ft = field.FieldType;
-                Type ct = typeof(EqualityComparer<>).MakeGenericType(ft);
+                var ft = field.FieldType;
+                var ct = typeof(EqualityComparer<>).MakeGenericType(ft);
                 gen.EmitCall(OpCodes.Call, ct.GetMethod("get_Default"), null);
                 gen.Emit(OpCodes.Ldarg_0);
                 gen.Emit(OpCodes.Ldfld, field);
@@ -670,21 +670,21 @@ namespace MvcSiteMapProvider.Linq
         }
 
         private static readonly Type[] predefinedTypes = {
-            typeof(Object),
-            typeof(Boolean),
-            typeof(Char),
-            typeof(String),
-            typeof(SByte),
-            typeof(Byte),
-            typeof(Int16),
-            typeof(UInt16),
-            typeof(Int32),
-            typeof(UInt32),
-            typeof(Int64),
-            typeof(UInt64),
-            typeof(Single),
-            typeof(Double),
-            typeof(Decimal),
+            typeof(object),
+            typeof(bool),
+            typeof(char),
+            typeof(string),
+            typeof(sbyte),
+            typeof(byte),
+            typeof(short),
+            typeof(ushort),
+            typeof(int),
+            typeof(uint),
+            typeof(long),
+            typeof(ulong),
+            typeof(float),
+            typeof(double),
+            typeof(decimal),
             typeof(DateTime),
             typeof(TimeSpan),
             typeof(Guid),
@@ -727,7 +727,7 @@ namespace MvcSiteMapProvider.Linq
 
         private void ProcessParameters(ParameterExpression[] parameters)
         {
-            foreach (ParameterExpression pe in parameters)
+            foreach (var pe in parameters)
                 if (!string.IsNullOrEmpty(pe.Name))
                     AddSymbol(pe.Name, pe);
             if (parameters.Length == 1 && string.IsNullOrEmpty(parameters[0].Name))
@@ -736,9 +736,9 @@ namespace MvcSiteMapProvider.Linq
 
         private void ProcessValues(object[] values)
         {
-            for (int i = 0; i < values.Length; i++)
+            for (var i = 0; i < values.Length; i++)
             {
-                object value = values[i];
+                var value = values[i];
                 if (i == values.Length - 1 && value is IDictionary<string, object>)
                 {
                     externals = (IDictionary<string, object>)value;
@@ -759,8 +759,8 @@ namespace MvcSiteMapProvider.Linq
 
         public Expression Parse(Type resultType)
         {
-            int exprPos = token.pos;
-            Expression expr = ParseExpression();
+            var exprPos = token.pos;
+            var expr = ParseExpression();
             if (resultType != null)
                 if ((expr = PromoteExpression(expr, resultType, true)) == null)
                     throw ParseError(exprPos, Res.ExpressionTypeMismatch, GetTypeName(resultType));
@@ -772,11 +772,11 @@ namespace MvcSiteMapProvider.Linq
 
         public IEnumerable<DynamicOrdering> ParseOrdering()
         {
-            List<DynamicOrdering> orderings = new List<DynamicOrdering>();
+            var orderings = new List<DynamicOrdering>();
             while (true)
             {
-                Expression expr = ParseExpression();
-                bool ascending = true;
+                var expr = ParseExpression();
+                var ascending = true;
                 if (TokenIdentifierIs("asc") || TokenIdentifierIs("ascending"))
                 {
                     NextToken();
@@ -799,15 +799,15 @@ namespace MvcSiteMapProvider.Linq
         // ?: operator
         private Expression ParseExpression()
         {
-            int errorPos = token.pos;
-            Expression expr = ParseLogicalOr();
+            var errorPos = token.pos;
+            var expr = ParseLogicalOr();
             if (token.id == TokenId.Question)
             {
                 NextToken();
-                Expression expr1 = ParseExpression();
+                var expr1 = ParseExpression();
                 ValidateToken(TokenId.Colon, Res.ColonExpected);
                 NextToken();
-                Expression expr2 = ParseExpression();
+                var expr2 = ParseExpression();
                 expr = GenerateConditional(expr, expr1, expr2, errorPos);
             }
             return expr;
@@ -816,12 +816,12 @@ namespace MvcSiteMapProvider.Linq
         // ||, or operator
         private Expression ParseLogicalOr()
         {
-            Expression left = ParseLogicalAnd();
+            var left = ParseLogicalAnd();
             while (token.id == TokenId.DoubleBar || TokenIdentifierIs("or"))
             {
-                Token op = token;
+                var op = token;
                 NextToken();
-                Expression right = ParseLogicalAnd();
+                var right = ParseLogicalAnd();
                 CheckAndPromoteOperands(typeof(ILogicalSignatures), op.text, ref left, ref right, op.pos);
                 left = Expression.OrElse(left, right);
             }
@@ -831,12 +831,12 @@ namespace MvcSiteMapProvider.Linq
         // &&, and operator
         private Expression ParseLogicalAnd()
         {
-            Expression left = ParseComparison();
+            var left = ParseComparison();
             while (token.id == TokenId.DoubleAmphersand || TokenIdentifierIs("and"))
             {
-                Token op = token;
+                var op = token;
                 NextToken();
-                Expression right = ParseComparison();
+                var right = ParseComparison();
                 CheckAndPromoteOperands(typeof(ILogicalSignatures), op.text, ref left, ref right, op.pos);
                 left = Expression.AndAlso(left, right);
             }
@@ -846,16 +846,16 @@ namespace MvcSiteMapProvider.Linq
         // =, ==, !=, <>, >, >=, <, <= operators
         private Expression ParseComparison()
         {
-            Expression left = ParseAdditive();
+            var left = ParseAdditive();
             while (token.id == TokenId.Equal || token.id == TokenId.DoubleEqual ||
                 token.id == TokenId.ExclamationEqual || token.id == TokenId.LessGreater ||
                 token.id == TokenId.GreaterThan || token.id == TokenId.GreaterThanEqual ||
                 token.id == TokenId.LessThan || token.id == TokenId.LessThanEqual)
             {
-                Token op = token;
+                var op = token;
                 NextToken();
-                Expression right = ParseAdditive();
-                bool isEquality = op.id == TokenId.Equal || op.id == TokenId.DoubleEqual ||
+                var right = ParseAdditive();
+                var isEquality = op.id == TokenId.Equal || op.id == TokenId.DoubleEqual ||
                     op.id == TokenId.ExclamationEqual || op.id == TokenId.LessGreater;
                 if (isEquality && !left.Type.IsValueType && !right.Type.IsValueType)
                 {
@@ -934,13 +934,13 @@ namespace MvcSiteMapProvider.Linq
         // +, -, & operators
         private Expression ParseAdditive()
         {
-            Expression left = ParseMultiplicative();
+            var left = ParseMultiplicative();
             while (token.id == TokenId.Plus || token.id == TokenId.Minus ||
                 token.id == TokenId.Amphersand)
             {
-                Token op = token;
+                var op = token;
                 NextToken();
-                Expression right = ParseMultiplicative();
+                var right = ParseMultiplicative();
                 switch (op.id)
                 {
                     case TokenId.Plus:
@@ -966,13 +966,13 @@ namespace MvcSiteMapProvider.Linq
         // *, /, %, mod operators
         private Expression ParseMultiplicative()
         {
-            Expression left = ParseUnary();
+            var left = ParseUnary();
             while (token.id == TokenId.Asterisk || token.id == TokenId.Slash ||
                 token.id == TokenId.Percent || TokenIdentifierIs("mod"))
             {
-                Token op = token;
+                var op = token;
                 NextToken();
-                Expression right = ParseUnary();
+                var right = ParseUnary();
                 CheckAndPromoteOperands(typeof(IArithmeticSignatures), op.text, ref left, ref right, op.pos);
                 switch (op.id)
                 {
@@ -999,7 +999,7 @@ namespace MvcSiteMapProvider.Linq
             if (token.id == TokenId.Minus || token.id == TokenId.Exclamation ||
                 TokenIdentifierIs("not"))
             {
-                Token op = token;
+                var op = token;
                 NextToken();
                 if (op.id == TokenId.Minus && (token.id == TokenId.IntegerLiteral ||
                     token.id == TokenId.RealLiteral))
@@ -1008,7 +1008,7 @@ namespace MvcSiteMapProvider.Linq
                     token.pos = op.pos;
                     return ParsePrimary();
                 }
-                Expression expr = ParseUnary();
+                var expr = ParseUnary();
                 if (op.id == TokenId.Minus)
                 {
                     CheckAndPromoteOperand(typeof(INegationSignatures), op.text, ref expr, op.pos);
@@ -1026,7 +1026,7 @@ namespace MvcSiteMapProvider.Linq
 
         private Expression ParsePrimary()
         {
-            Expression expr = ParsePrimaryStart();
+            var expr = ParsePrimaryStart();
             while (true)
             {
                 if (token.id == TokenId.Dot)
@@ -1073,12 +1073,12 @@ namespace MvcSiteMapProvider.Linq
         private Expression ParseStringLiteral()
         {
             ValidateToken(TokenId.StringLiteral);
-            char quote = token.text[0];
-            string s = token.text.Substring(1, token.text.Length - 2);
-            int start = 0;
+            var quote = token.text[0];
+            var s = token.text.Substring(1, token.text.Length - 2);
+            var start = 0;
             while (true)
             {
-                int i = s.IndexOf(quote, start);
+                var i = s.IndexOf(quote, start);
                 if (i < 0) break;
                 s = s.Remove(i, 1);
                 start = i + 1;
@@ -1097,42 +1097,42 @@ namespace MvcSiteMapProvider.Linq
         private Expression ParseIntegerLiteral()
         {
             ValidateToken(TokenId.IntegerLiteral);
-            string tokenText = token.text;
+            var tokenText = token.text;
             if (tokenText[0] != '-')
             {
                 ulong value;
-                if (!UInt64.TryParse(tokenText, out value))
+                if (!ulong.TryParse(tokenText, out value))
                     throw ParseError(Res.InvalidIntegerLiteral, tokenText);
                 NextToken();
-                if (value <= Int32.MaxValue) return CreateLiteral((int)value, tokenText);
-                if (value <= UInt32.MaxValue) return CreateLiteral((uint)value, tokenText);
-                return value <= Int64.MaxValue ? CreateLiteral((long)value, tokenText) : CreateLiteral(value, tokenText);
+                if (value <= int.MaxValue) return CreateLiteral((int)value, tokenText);
+                if (value <= uint.MaxValue) return CreateLiteral((uint)value, tokenText);
+                return value <= long.MaxValue ? CreateLiteral((long)value, tokenText) : CreateLiteral(value, tokenText);
             }
             else
             {
                 long value;
-                if (!Int64.TryParse(tokenText, out value))
+                if (!long.TryParse(tokenText, out value))
                     throw ParseError(Res.InvalidIntegerLiteral, tokenText);
                 NextToken();
-                return value >= Int32.MinValue && value <= Int32.MaxValue ? CreateLiteral((int)value, tokenText) : CreateLiteral(value, tokenText);
+                return value >= int.MinValue && value <= int.MaxValue ? CreateLiteral((int)value, tokenText) : CreateLiteral(value, tokenText);
             }
         }
 
         private Expression ParseRealLiteral()
         {
             ValidateToken(TokenId.RealLiteral);
-            string text = token.text;
+            var text = token.text;
             object value = null;
-            char last = text[text.Length - 1];
+            var last = text[text.Length - 1];
             if (last == 'F' || last == 'f')
             {
                 float f;
-                if (Single.TryParse(text.Substring(0, text.Length - 1), out f)) value = f;
+                if (float.TryParse(text.Substring(0, text.Length - 1), out f)) value = f;
             }
             else
             {
                 double d;
-                if (Double.TryParse(text, out d)) value = d;
+                if (double.TryParse(text, out d)) value = d;
             }
             if (value == null) throw ParseError(Res.InvalidRealLiteral, text);
             NextToken();
@@ -1141,7 +1141,7 @@ namespace MvcSiteMapProvider.Linq
 
         private Expression CreateLiteral(object value, string text)
         {
-            ConstantExpression expr = Expression.Constant(value);
+            var expr = Expression.Constant(value);
             literals.Add(expr, text);
             return expr;
         }
@@ -1150,7 +1150,7 @@ namespace MvcSiteMapProvider.Linq
         {
             ValidateToken(TokenId.OpenParen, Res.OpenParenExpected);
             NextToken();
-            Expression e = ParseExpression();
+            var e = ParseExpression();
             ValidateToken(TokenId.CloseParen, Res.CloseParenOrOperatorExpected);
             NextToken();
             return e;
@@ -1196,9 +1196,9 @@ namespace MvcSiteMapProvider.Linq
 
         private Expression ParseIif()
         {
-            int errorPos = token.pos;
+            var errorPos = token.pos;
             NextToken();
-            Expression[] args = ParseArgumentList();
+            var args = ParseArgumentList();
             return args.Length != 3
                 ? throw ParseError(errorPos, Res.IifRequiresThreeArgs)
                 : GenerateConditional(args[0], args[1], args[2], errorPos);
@@ -1210,8 +1210,8 @@ namespace MvcSiteMapProvider.Linq
                 throw ParseError(errorPos, Res.FirstExprMustBeBool);
             if (expr1.Type != expr2.Type)
             {
-                Expression expr1as2 = expr2 != nullLiteral ? PromoteExpression(expr1, expr2.Type, true) : null;
-                Expression expr2as1 = expr1 != nullLiteral ? PromoteExpression(expr2, expr1.Type, true) : null;
+                var expr1as2 = expr2 != nullLiteral ? PromoteExpression(expr1, expr2.Type, true) : null;
+                var expr2as1 = expr1 != nullLiteral ? PromoteExpression(expr2, expr1.Type, true) : null;
                 if (expr1as2 != null && expr2as1 == null)
                 {
                     expr1 = expr1as2;
@@ -1222,8 +1222,8 @@ namespace MvcSiteMapProvider.Linq
                 }
                 else
                 {
-                    string type1 = expr1 != nullLiteral ? expr1.Type.Name : "null";
-                    string type2 = expr2 != nullLiteral ? expr2.Type.Name : "null";
+                    var type1 = expr1 != nullLiteral ? expr1.Type.Name : "null";
+                    var type2 = expr2 != nullLiteral ? expr2.Type.Name : "null";
                     if (expr1as2 != null && expr2as1 != null)
                         throw ParseError(errorPos, Res.BothTypesConvertToOther, type1, type2);
                     throw ParseError(errorPos, Res.NeitherTypeConvertsToOther, type1, type2);
@@ -1237,12 +1237,12 @@ namespace MvcSiteMapProvider.Linq
             NextToken();
             ValidateToken(TokenId.OpenParen, Res.OpenParenExpected);
             NextToken();
-            List<DynamicProperty> properties = new List<DynamicProperty>();
-            List<Expression> expressions = new List<Expression>();
+            var properties = new List<DynamicProperty>();
+            var expressions = new List<Expression>();
             while (true)
             {
-                int exprPos = token.pos;
-                Expression expr = ParseExpression();
+                var exprPos = token.pos;
+                var expr = ParseExpression();
                 string propName;
                 if (TokenIdentifierIs("as"))
                 {
@@ -1252,7 +1252,7 @@ namespace MvcSiteMapProvider.Linq
                 }
                 else
                 {
-                    MemberExpression me = expr as MemberExpression ?? throw ParseError(exprPos, Res.MissingAsClause);
+                    var me = expr as MemberExpression ?? throw ParseError(exprPos, Res.MissingAsClause);
                     propName = me.Member.Name;
                 }
                 expressions.Add(expr);
@@ -1262,18 +1262,18 @@ namespace MvcSiteMapProvider.Linq
             }
             ValidateToken(TokenId.CloseParen, Res.CloseParenOrCommaExpected);
             NextToken();
-            Type type = DynamicExpression.CreateClass(properties);
-            MemberBinding[] bindings = new MemberBinding[properties.Count];
-            for (int i = 0; i < bindings.Length; i++)
+            var type = DynamicExpression.CreateClass(properties);
+            var bindings = new MemberBinding[properties.Count];
+            for (var i = 0; i < bindings.Length; i++)
                 bindings[i] = Expression.Bind(type.GetProperty(properties[i].Name), expressions[i]);
             return Expression.MemberInit(Expression.New(type), bindings);
         }
 
         private Expression ParseLambdaInvocation(LambdaExpression lambda)
         {
-            int errorPos = token.pos;
+            var errorPos = token.pos;
             NextToken();
-            Expression[] args = ParseArgumentList();
+            var args = ParseArgumentList();
             MethodBase method;
             return FindMethod(lambda.Type, "Invoke", false, args, out method) != 1
                 ? throw ParseError(errorPos, Res.ArgsIncompatibleWithLambda)
@@ -1282,7 +1282,7 @@ namespace MvcSiteMapProvider.Linq
 
         private Expression ParseTypeAccess(Type type)
         {
-            int errorPos = token.pos;
+            var errorPos = token.pos;
             NextToken();
             if (token.id == TokenId.Question)
             {
@@ -1293,7 +1293,7 @@ namespace MvcSiteMapProvider.Linq
             }
             if (token.id == TokenId.OpenParen)
             {
-                Expression[] args = ParseArgumentList();
+                var args = ParseArgumentList();
                 MethodBase method;
                 switch (FindBestMethod(type.GetConstructors(), args, out method))
                 {
@@ -1315,7 +1315,7 @@ namespace MvcSiteMapProvider.Linq
 
         private Expression GenerateConversion(Expression expr, Type type, int errorPos)
         {
-            Type exprType = expr.Type;
+            var exprType = expr.Type;
             if (exprType == type) return expr;
             if (exprType.IsValueType && type.IsValueType)
             {
@@ -1336,21 +1336,21 @@ namespace MvcSiteMapProvider.Linq
         private Expression ParseMemberAccess(Type type, Expression instance)
         {
             if (instance != null) type = instance.Type;
-            int errorPos = token.pos;
-            string id = GetIdentifier();
+            var errorPos = token.pos;
+            var id = GetIdentifier();
             NextToken();
             if (token.id == TokenId.OpenParen)
             {
                 if (instance != null && type != typeof(string))
                 {
-                    Type enumerableType = FindGenericType(typeof(IEnumerable<>), type);
+                    var enumerableType = FindGenericType(typeof(IEnumerable<>), type);
                     if (enumerableType != null)
                     {
-                        Type elementType = enumerableType.GetGenericArguments()[0];
+                        var elementType = enumerableType.GetGenericArguments()[0];
                         return ParseAggregate(instance, elementType, id, errorPos);
                     }
                 }
-                Expression[] args = ParseArgumentList();
+                var args = ParseArgumentList();
                 MethodBase mb;
                 switch (FindMethod(type, id, instance == null, args, out mb))
                 {
@@ -1358,7 +1358,7 @@ namespace MvcSiteMapProvider.Linq
                         throw ParseError(errorPos, Res.NoApplicableMethod,
                             id, GetTypeName(type));
                     case 1:
-                        MethodInfo method = (MethodInfo)mb;
+                        var method = (MethodInfo)mb;
                         if (!IsPredefinedType(method.DeclaringType))
                             throw ParseError(errorPos, Res.MethodsAreInaccessible, GetTypeName(method.DeclaringType));
                         if (method.ReturnType == typeof(void))
@@ -1373,7 +1373,7 @@ namespace MvcSiteMapProvider.Linq
             }
             else
             {
-                MemberInfo member = FindPropertyOrField(type, id, instance == null) ?? throw ParseError(errorPos, Res.UnknownPropertyOrField,
+                var member = FindPropertyOrField(type, id, instance == null) ?? throw ParseError(errorPos, Res.UnknownPropertyOrField,
                         id, GetTypeName(type));
                 return member is PropertyInfo ?
                     Expression.Property(instance, (PropertyInfo)member) :
@@ -1388,9 +1388,9 @@ namespace MvcSiteMapProvider.Linq
                 if (type.IsGenericType && type.GetGenericTypeDefinition() == generic) return type;
                 if (generic.IsInterface)
                 {
-                    foreach (Type intfType in type.GetInterfaces())
+                    foreach (var intfType in type.GetInterfaces())
                     {
-                        Type found = FindGenericType(generic, intfType);
+                        var found = FindGenericType(generic, intfType);
                         if (found != null) return found;
                     }
                 }
@@ -1401,10 +1401,10 @@ namespace MvcSiteMapProvider.Linq
 
         private Expression ParseAggregate(Expression instance, Type elementType, string methodName, int errorPos)
         {
-            ParameterExpression outerIt = it;
-            ParameterExpression innerIt = Expression.Parameter(elementType, "");
+            var outerIt = it;
+            var innerIt = Expression.Parameter(elementType, "");
             it = innerIt;
-            Expression[] args = ParseArgumentList();
+            var args = ParseArgumentList();
             it = outerIt;
             MethodBase signature;
             if (FindMethod(typeof(IEnumerableSignatures), methodName, false, args, out signature) != 1)
@@ -1433,7 +1433,7 @@ namespace MvcSiteMapProvider.Linq
         {
             ValidateToken(TokenId.OpenParen, Res.OpenParenExpected);
             NextToken();
-            Expression[] args = token.id != TokenId.CloseParen ? ParseArguments() : new Expression[0];
+            var args = token.id != TokenId.CloseParen ? ParseArguments() : new Expression[0];
             ValidateToken(TokenId.CloseParen, Res.CloseParenOrCommaExpected);
             NextToken();
             return args;
@@ -1441,7 +1441,7 @@ namespace MvcSiteMapProvider.Linq
 
         private Expression[] ParseArguments()
         {
-            List<Expression> argList = new List<Expression>();
+            var argList = new List<Expression>();
             while (true)
             {
                 argList.Add(ParseExpression());
@@ -1453,17 +1453,17 @@ namespace MvcSiteMapProvider.Linq
 
         private Expression ParseElementAccess(Expression expr)
         {
-            int errorPos = token.pos;
+            var errorPos = token.pos;
             ValidateToken(TokenId.OpenBracket, Res.OpenParenExpected);
             NextToken();
-            Expression[] args = ParseArguments();
+            var args = ParseArguments();
             ValidateToken(TokenId.CloseBracket, Res.CloseBracketOrCommaExpected);
             NextToken();
             if (expr.Type.IsArray)
             {
                 if (expr.Type.GetArrayRank() != 1 || args.Length != 1)
                     throw ParseError(errorPos, Res.CannotIndexMultiDimArray);
-                Expression index = PromoteExpression(args[0], typeof(int), true) ?? throw ParseError(errorPos, Res.InvalidIndex);
+                var index = PromoteExpression(args[0], typeof(int), true) ?? throw ParseError(errorPos, Res.InvalidIndex);
                 return Expression.ArrayIndex(expr, index);
             }
             else
@@ -1486,7 +1486,7 @@ namespace MvcSiteMapProvider.Linq
 
         private static bool IsPredefinedType(Type type)
         {
-            foreach (Type t in predefinedTypes) if (t == type) return true;
+            foreach (var t in predefinedTypes) if (t == type) return true;
             return false;
         }
 
@@ -1502,8 +1502,8 @@ namespace MvcSiteMapProvider.Linq
 
         private static string GetTypeName(Type type)
         {
-            Type baseType = GetNonNullableType(type);
-            string s = baseType.Name;
+            var baseType = GetNonNullableType(type);
+            var s = baseType.Name;
             if (type != baseType) s += '?';
             return s;
         }
@@ -1559,7 +1559,7 @@ namespace MvcSiteMapProvider.Linq
 
         private void CheckAndPromoteOperand(Type signatures, string opName, ref Expression expr, int errorPos)
         {
-            Expression[] args = new Expression[] { expr };
+            var args = new Expression[] { expr };
             MethodBase method;
             if (FindMethod(signatures, "F", false, args, out method) != 1)
                 throw ParseError(errorPos, Res.IncompatibleOperand,
@@ -1569,7 +1569,7 @@ namespace MvcSiteMapProvider.Linq
 
         private void CheckAndPromoteOperands(Type signatures, string opName, ref Expression left, ref Expression right, int errorPos)
         {
-            Expression[] args = new Expression[] { left, right };
+            var args = new Expression[] { left, right };
             MethodBase method;
             if (FindMethod(signatures, "F", false, args, out method) != 1)
                 throw IncompatibleOperandsError(opName, left, right, errorPos);
@@ -1585,11 +1585,11 @@ namespace MvcSiteMapProvider.Linq
 
         private MemberInfo FindPropertyOrField(Type type, string memberName, bool staticAccess)
         {
-            BindingFlags flags = BindingFlags.Public | BindingFlags.DeclaredOnly |
+            var flags = BindingFlags.Public | BindingFlags.DeclaredOnly |
                 (staticAccess ? BindingFlags.Static : BindingFlags.Instance);
-            foreach (Type t in SelfAndBaseTypes(type))
+            foreach (var t in SelfAndBaseTypes(type))
             {
-                MemberInfo[] members = t.FindMembers(MemberTypes.Property | MemberTypes.Field,
+                var members = t.FindMembers(MemberTypes.Property | MemberTypes.Field,
                     flags, Type.FilterNameIgnoreCase, memberName);
                 if (members.Length != 0) return members[0];
             }
@@ -1598,13 +1598,13 @@ namespace MvcSiteMapProvider.Linq
 
         private int FindMethod(Type type, string methodName, bool staticAccess, Expression[] args, out MethodBase method)
         {
-            BindingFlags flags = BindingFlags.Public | BindingFlags.DeclaredOnly |
+            var flags = BindingFlags.Public | BindingFlags.DeclaredOnly |
                 (staticAccess ? BindingFlags.Static : BindingFlags.Instance);
-            foreach (Type t in SelfAndBaseTypes(type))
+            foreach (var t in SelfAndBaseTypes(type))
             {
-                MemberInfo[] members = t.FindMembers(MemberTypes.Method,
+                var members = t.FindMembers(MemberTypes.Method,
                     flags, Type.FilterNameIgnoreCase, methodName);
-                int count = FindBestMethod(members.Cast<MethodBase>(), args, out method);
+                var count = FindBestMethod(members.Cast<MethodBase>(), args, out method);
                 if (count != 0) return count;
             }
             method = null;
@@ -1613,16 +1613,16 @@ namespace MvcSiteMapProvider.Linq
 
         private int FindIndexer(Type type, Expression[] args, out MethodBase method)
         {
-            foreach (Type t in SelfAndBaseTypes(type))
+            foreach (var t in SelfAndBaseTypes(type))
             {
-                MemberInfo[] members = t.GetDefaultMembers();
+                var members = t.GetDefaultMembers();
                 if (members.Length != 0)
                 {
-                    IEnumerable<MethodBase> methods = members.
+                    var methods = members.
                         OfType<PropertyInfo>().
                         Select(p => (MethodBase)p.GetGetMethod()).
                         Where(m => m != null);
-                    int count = FindBestMethod(methods, args, out method);
+                    var count = FindBestMethod(methods, args, out method);
                     if (count != 0) return count;
                 }
             }
@@ -1634,7 +1634,7 @@ namespace MvcSiteMapProvider.Linq
         {
             if (type.IsInterface)
             {
-                List<Type> types = new List<Type>();
+                var types = new List<Type>();
                 AddInterface(types, type);
                 return types;
             }
@@ -1655,7 +1655,7 @@ namespace MvcSiteMapProvider.Linq
             if (!types.Contains(type))
             {
                 types.Add(type);
-                foreach (Type t in type.GetInterfaces()) AddInterface(types, t);
+                foreach (var t in type.GetInterfaces()) AddInterface(types, t);
             }
         }
 
@@ -1668,7 +1668,7 @@ namespace MvcSiteMapProvider.Linq
 
         private int FindBestMethod(IEnumerable<MethodBase> methods, Expression[] args, out MethodBase method)
         {
-            MethodData[] applicable = methods.
+            var applicable = methods.
                 Select(m => new MethodData { MethodBase = m, Parameters = m.GetParameters() }).
                 Where(m => IsApplicable(m, args)).
                 ToArray();
@@ -1680,8 +1680,8 @@ namespace MvcSiteMapProvider.Linq
             }
             if (applicable.Length == 1)
             {
-                MethodData md = applicable[0];
-                for (int i = 0; i < args.Length; i++) args[i] = md.Args[i];
+                var md = applicable[0];
+                for (var i = 0; i < args.Length; i++) args[i] = md.Args[i];
                 method = md.MethodBase;
             }
             else
@@ -1694,12 +1694,12 @@ namespace MvcSiteMapProvider.Linq
         private bool IsApplicable(MethodData method, Expression[] args)
         {
             if (method.Parameters.Length != args.Length) return false;
-            Expression[] promotedArgs = new Expression[args.Length];
-            for (int i = 0; i < args.Length; i++)
+            var promotedArgs = new Expression[args.Length];
+            for (var i = 0; i < args.Length; i++)
             {
-                ParameterInfo pi = method.Parameters[i];
+                var pi = method.Parameters[i];
                 if (pi.IsOut) return false;
-                Expression promoted = PromoteExpression(args[i], pi.ParameterType, false);
+                var promoted = PromoteExpression(args[i], pi.ParameterType, false);
                 if (promoted == null) return false;
                 promotedArgs[i] = promoted;
             }
@@ -1712,7 +1712,7 @@ namespace MvcSiteMapProvider.Linq
             if (expr.Type == type) return expr;
             if (expr is ConstantExpression)
             {
-                ConstantExpression ce = (ConstantExpression)expr;
+                var ce = (ConstantExpression)expr;
                 if (ce == nullLiteral)
                 {
                     if (!type.IsValueType || IsNullableType(type))
@@ -1723,8 +1723,8 @@ namespace MvcSiteMapProvider.Linq
                     string text;
                     if (literals.TryGetValue(ce, out text))
                     {
-                        Type target = GetNonNullableType(type);
-                        Object value = null;
+                        var target = GetNonNullableType(type);
+                        object value = null;
                         switch (Type.GetTypeCode(ce.Type))
                         {
                             case TypeCode.Int32:
@@ -1820,7 +1820,7 @@ namespace MvcSiteMapProvider.Linq
         {
             if (type.IsEnum)
             {
-                MemberInfo[] memberInfos = type.FindMembers(MemberTypes.Field,
+                var memberInfos = type.FindMembers(MemberTypes.Field,
                     BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Static,
                     Type.FilterNameIgnoreCase, name);
                 if (memberInfos.Length != 0) return ((FieldInfo)memberInfos[0]).GetValue(null);
@@ -1832,11 +1832,11 @@ namespace MvcSiteMapProvider.Linq
         {
             if (source == target) return true;
             if (!target.IsValueType) return target.IsAssignableFrom(source);
-            Type st = GetNonNullableType(source);
-            Type tt = GetNonNullableType(target);
+            var st = GetNonNullableType(source);
+            var tt = GetNonNullableType(target);
             if (st != source && tt == target) return false;
-            TypeCode sc = st.IsEnum ? TypeCode.Object : Type.GetTypeCode(st);
-            TypeCode tc = tt.IsEnum ? TypeCode.Object : Type.GetTypeCode(tt);
+            var sc = st.IsEnum ? TypeCode.Object : Type.GetTypeCode(st);
+            var tc = tt.IsEnum ? TypeCode.Object : Type.GetTypeCode(tt);
             switch (sc)
             {
                 case TypeCode.SByte:
@@ -1963,10 +1963,10 @@ namespace MvcSiteMapProvider.Linq
 
         private static bool IsBetterThan(Expression[] args, MethodData m1, MethodData m2)
         {
-            bool better = false;
-            for (int i = 0; i < args.Length; i++)
+            var better = false;
+            for (var i = 0; i < args.Length; i++)
             {
-                int c = CompareConversions(args[i].Type,
+                var c = CompareConversions(args[i].Type,
                     m1.Parameters[i].ParameterType,
                     m2.Parameters[i].ParameterType);
                 if (c < 0) return false;
@@ -1983,8 +1983,8 @@ namespace MvcSiteMapProvider.Linq
             if (t1 == t2) return 0;
             if (s == t1) return 1;
             if (s == t2) return -1;
-            bool t1t2 = IsCompatibleWith(t1, t2);
-            bool t2t1 = IsCompatibleWith(t2, t1);
+            var t1t2 = IsCompatibleWith(t1, t2);
+            var t2t1 = IsCompatibleWith(t2, t1);
             if (t1t2 && !t2t1) return 1;
             if (t2t1 && !t1t2) return -1;
             if (IsSignedIntegralType(t1) && IsUnsignedIntegralType(t2)) return 1;
@@ -2085,9 +2085,9 @@ namespace MvcSiteMapProvider.Linq
 
         private void NextToken()
         {
-            while (Char.IsWhiteSpace(ch)) NextChar();
+            while (char.IsWhiteSpace(ch)) NextChar();
             TokenId t;
-            int tokenPos = textPos;
+            var tokenPos = textPos;
             switch (ch)
             {
                 case '!':
@@ -2240,7 +2240,7 @@ namespace MvcSiteMapProvider.Linq
 
                 case '"':
                 case '\'':
-                    char quote = ch;
+                    var quote = ch;
                     do
                     {
                         NextChar();
@@ -2253,22 +2253,22 @@ namespace MvcSiteMapProvider.Linq
                     break;
 
                 default:
-                    if (Char.IsLetter(ch) || ch == '@' || ch == '_')
+                    if (char.IsLetter(ch) || ch == '@' || ch == '_')
                     {
                         do
                         {
                             NextChar();
-                        } while (Char.IsLetterOrDigit(ch) || ch == '_');
+                        } while (char.IsLetterOrDigit(ch) || ch == '_');
                         t = TokenId.Identifier;
                         break;
                     }
-                    if (Char.IsDigit(ch))
+                    if (char.IsDigit(ch))
                     {
                         t = TokenId.IntegerLiteral;
                         do
                         {
                             NextChar();
-                        } while (Char.IsDigit(ch));
+                        } while (char.IsDigit(ch));
                         if (ch == '.')
                         {
                             t = TokenId.RealLiteral;
@@ -2277,7 +2277,7 @@ namespace MvcSiteMapProvider.Linq
                             do
                             {
                                 NextChar();
-                            } while (Char.IsDigit(ch));
+                            } while (char.IsDigit(ch));
                         }
                         if (ch == 'E' || ch == 'e')
                         {
@@ -2288,7 +2288,7 @@ namespace MvcSiteMapProvider.Linq
                             do
                             {
                                 NextChar();
-                            } while (Char.IsDigit(ch));
+                            } while (char.IsDigit(ch));
                         }
                         if (ch == 'F' || ch == 'f') NextChar();
                         break;
@@ -2313,14 +2313,14 @@ namespace MvcSiteMapProvider.Linq
         private string GetIdentifier()
         {
             ValidateToken(TokenId.Identifier, Res.IdentifierExpected);
-            string id = token.text;
+            var id = token.text;
             if (id.Length > 1 && id[0] == '@') id = id.Substring(1);
             return id;
         }
 
         private void ValidateDigit()
         {
-            if (!Char.IsDigit(ch)) throw ParseError(textPos, Res.DigitExpected);
+            if (!char.IsDigit(ch)) throw ParseError(textPos, Res.DigitExpected);
         }
 
         private void ValidateToken(TokenId t, string errorMessage)
@@ -2345,14 +2345,14 @@ namespace MvcSiteMapProvider.Linq
 
         private static Dictionary<string, object> CreateKeywords()
         {
-            Dictionary<string, object> d = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            var d = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             d.Add("true", trueLiteral);
             d.Add("false", falseLiteral);
             d.Add("null", nullLiteral);
             d.Add(keywordIt, keywordIt);
             d.Add(keywordIif, keywordIif);
             d.Add(keywordNew, keywordNew);
-            foreach (Type type in predefinedTypes) d.Add(type.Name, type);
+            foreach (var type in predefinedTypes) d.Add(type.Name, type);
             return d;
         }
     }

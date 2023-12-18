@@ -19,7 +19,7 @@ namespace MvcSiteMapProvider.Web.Mvc
 
             try
             {
-                MvcSiteMapProviderViewEngineVirtualPathProvider pathProvider = new MvcSiteMapProviderViewEngineVirtualPathProvider();
+                var pathProvider = new MvcSiteMapProviderViewEngineVirtualPathProvider();
                 HostingEnvironment.RegisterVirtualPathProvider(pathProvider);
             }
             catch (SecurityException)

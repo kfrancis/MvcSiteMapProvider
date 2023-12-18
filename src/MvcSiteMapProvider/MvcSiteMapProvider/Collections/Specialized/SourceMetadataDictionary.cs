@@ -41,7 +41,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
             {
                 foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(values))
                 {
-                    object value = descriptor.GetValue(values);
+                    var value = descriptor.GetValue(values);
                     Add(descriptor.Name, value);
                 }
             }

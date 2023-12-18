@@ -165,8 +165,8 @@ namespace MvcSiteMapProvider.Collections.Specialized
         public virtual string GetMetaRobotsContentString()
         {
             if (HasDefaultValue) return string.Empty;
-            string result = string.Empty;
-            bool first = true;
+            var result = string.Empty;
+            var first = true;
             foreach (var item in this)
             {
                 if (first)

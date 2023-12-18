@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Caching;
+using MvcSiteMapProvider.Caching;
 using MvcSiteMapProvider.Xml;
 using System;
 using System.Collections.Generic;
@@ -20,8 +20,8 @@ namespace MvcSiteMapProvider.Builder
         : ISiteMapBuilder
     {
         public ReflectionSiteMapBuilder(
-            IEnumerable<String> includeAssemblies,
-            IEnumerable<String> excludeAssemblies,
+            IEnumerable<string> includeAssemblies,
+            IEnumerable<string> excludeAssemblies,
             ISiteMapXmlReservedAttributeNameProvider reservedAttributeNameProvider,
             INodeKeyGenerator nodeKeyGenerator,
             IDynamicNodeBuilder dynamicNodeBuilder,
@@ -29,24 +29,24 @@ namespace MvcSiteMapProvider.Builder
             ISiteMapCacheKeyGenerator siteMapCacheKeyGenerator
             )
         {
-            this.includeAssemblies = includeAssemblies ?? throw new ArgumentNullException(nameof(includeAssemblies));
-            this.excludeAssemblies = excludeAssemblies ?? throw new ArgumentNullException(nameof(excludeAssemblies));
-            this.reservedAttributeNameProvider = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
-            this.nodeKeyGenerator = nodeKeyGenerator ?? throw new ArgumentNullException(nameof(nodeKeyGenerator));
-            this.dynamicNodeBuilder = dynamicNodeBuilder ?? throw new ArgumentNullException(nameof(dynamicNodeBuilder));
-            this.siteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
-            this.siteMapCacheKeyGenerator = siteMapCacheKeyGenerator ?? throw new ArgumentNullException(nameof(siteMapCacheKeyGenerator));
+            IncludeAssemblies = includeAssemblies ?? throw new ArgumentNullException(nameof(includeAssemblies));
+            ExcludeAssemblies = excludeAssemblies ?? throw new ArgumentNullException(nameof(excludeAssemblies));
+            ReservedAttributeNameProvider = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
+            NodeKeyGenerator = nodeKeyGenerator ?? throw new ArgumentNullException(nameof(nodeKeyGenerator));
+            DynamicNodeBuilder = dynamicNodeBuilder ?? throw new ArgumentNullException(nameof(dynamicNodeBuilder));
+            SiteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
+            SiteMapCacheKeyGenerator = siteMapCacheKeyGenerator ?? throw new ArgumentNullException(nameof(siteMapCacheKeyGenerator));
         }
 
-        protected readonly IEnumerable<string> includeAssemblies;
-        protected readonly IEnumerable<string> excludeAssemblies;
-        protected readonly ISiteMapXmlReservedAttributeNameProvider reservedAttributeNameProvider;
-        protected readonly INodeKeyGenerator nodeKeyGenerator;
-        protected readonly IDynamicNodeBuilder dynamicNodeBuilder;
-        protected readonly ISiteMapNodeFactory siteMapNodeFactory;
-        protected readonly ISiteMapCacheKeyGenerator siteMapCacheKeyGenerator;
+        protected readonly IEnumerable<string> IncludeAssemblies;
+        protected readonly IEnumerable<string> ExcludeAssemblies;
+        protected readonly ISiteMapXmlReservedAttributeNameProvider ReservedAttributeNameProvider;
+        protected readonly INodeKeyGenerator NodeKeyGenerator;
+        protected readonly IDynamicNodeBuilder DynamicNodeBuilder;
+        protected readonly ISiteMapNodeFactory SiteMapNodeFactory;
+        protected readonly ISiteMapCacheKeyGenerator SiteMapCacheKeyGenerator;
 
-        protected string siteMapCacheKey;
+        protected string _siteMapCacheKey;
 
         /// <summary>
         /// Gets the cache key for the current request and caches it, since this class should only be called 1 time per request.
@@ -59,11 +59,11 @@ namespace MvcSiteMapProvider.Builder
         {
             get
             {
-                if (string.IsNullOrEmpty(siteMapCacheKey))
+                if (string.IsNullOrEmpty(_siteMapCacheKey))
                 {
-                    siteMapCacheKey = siteMapCacheKeyGenerator.GenerateKey();
+                    _siteMapCacheKey = SiteMapCacheKeyGenerator.GenerateKey();
                 }
-                return siteMapCacheKey;
+                return _siteMapCacheKey;
             }
         }
 
@@ -76,11 +76,11 @@ namespace MvcSiteMapProvider.Builder
         {
             // List of assemblies
             IEnumerable<Assembly> assemblies;
-            if (includeAssemblies.Any())
+            if (IncludeAssemblies.Any())
             {
                 // An include list is given
                 assemblies = AppDomain.CurrentDomain.GetAssemblies()
-                    .Where(a => includeAssemblies.Contains(new AssemblyName(a.FullName).Name));
+                    .Where(a => IncludeAssemblies.Contains(new AssemblyName(a.FullName).Name));
             }
             else
             {
@@ -93,10 +93,10 @@ namespace MvcSiteMapProvider.Builder
                                 && !a.FullName.StartsWith("SMDiagnostics")
                                 && !a.FullName.StartsWith("Anonymously")
                                 && !a.FullName.StartsWith("App_")
-                                && !excludeAssemblies.Contains(new AssemblyName(a.FullName).Name));
+                                && !ExcludeAssemblies.Contains(new AssemblyName(a.FullName).Name));
             }
 
-            foreach (Assembly assembly in assemblies)
+            foreach (var assembly in assemblies)
             {
                 // http://stackoverflow.com/questions/1423733/how-to-tell-if-a-net-assembly-is-dynamic
                 if (!(assembly.ManifestModule is System.Reflection.Emit.ModuleBuilder)
@@ -131,7 +131,7 @@ namespace MvcSiteMapProvider.Builder
             }
 
             // Add all types
-            foreach (Type type in types)
+            foreach (var type in types)
             {
                 var attributes = type.GetCustomAttributes(typeof(IMvcSiteMapNodeAttribute), true) as IMvcSiteMapNodeAttribute[];
                 foreach (var attribute in attributes)
@@ -174,7 +174,7 @@ namespace MvcSiteMapProvider.Builder
         {
             // A dictionary of nodes to process later (node, parentKey)
             var nodesToProcessLater = new Dictionary<ISiteMapNode, string>();
-            var emptyParentKeyCount = definitions.Where(t => string.IsNullOrEmpty(t.SiteMapNodeAttribute.ParentKey)).Count();
+            var emptyParentKeyCount = definitions.Count(t => string.IsNullOrEmpty(t.SiteMapNodeAttribute.ParentKey));
 
             // Throw a sensible exception if the configuration has more than 1 empty parent key (#179).
             if (emptyParentKeyCount > 1)
@@ -189,7 +189,7 @@ namespace MvcSiteMapProvider.Builder
                 {
                     ISiteMapNode attributedRootNode = null;
 
-                    var item = definitions.Where(t => string.IsNullOrEmpty(t.SiteMapNodeAttribute.ParentKey)).Single();
+                    var item = definitions.Single(t => string.IsNullOrEmpty(t.SiteMapNodeAttribute.ParentKey));
 
                     if (item is MvcSiteMapNodeAttributeDefinitionForAction actionNode)
                     {
@@ -258,7 +258,7 @@ namespace MvcSiteMapProvider.Builder
                     {
                         if (nodeToAdd.HasDynamicNodeProvider)
                         {
-                            var dynamicNodesForChildNode = dynamicNodeBuilder.BuildDynamicNodesFor(siteMap, nodeToAdd, parentForNode);
+                            var dynamicNodesForChildNode = DynamicNodeBuilder.BuildDynamicNodesFor(siteMap, nodeToAdd, parentForNode);
                             foreach (var dynamicNode in dynamicNodesForChildNode)
                             {
                                 // Verify parent/child relation
@@ -290,7 +290,7 @@ namespace MvcSiteMapProvider.Builder
                     var parentForNode = siteMap.FindSiteMapNodeFromKey(nodeToAdd.Value);
                     if (parentForNode == null)
                     {
-                        var temp = nodesToProcessLater.Keys.Where(t => t.Key == nodeToAdd.Value).FirstOrDefault();
+                        var temp = nodesToProcessLater.Keys.FirstOrDefault(t => t.Key == nodeToAdd.Value);
                         if (temp != null)
                         {
                             parentNode = temp;
@@ -300,7 +300,7 @@ namespace MvcSiteMapProvider.Builder
                     {
                         if (nodeToAdd.Key.HasDynamicNodeProvider)
                         {
-                            var dynamicNodesForChildNode = dynamicNodeBuilder.BuildDynamicNodesFor(siteMap, nodeToAdd.Key, parentForNode);
+                            var dynamicNodesForChildNode = DynamicNodeBuilder.BuildDynamicNodesFor(siteMap, nodeToAdd.Key, parentForNode);
                             foreach (var dynamicNode in dynamicNodesForChildNode)
                             {
                                 // Verify parent/child relation
@@ -353,8 +353,8 @@ namespace MvcSiteMapProvider.Builder
             if (methodInfo == null) // try to find Index action
             {
                 var ms = type.FindMembers(MemberTypes.Method, BindingFlags.Instance | BindingFlags.Public,
-                                          (mi, o) => mi != null && string.Equals(mi.Name, "Index"), null);
-                foreach (MethodInfo m in ms.OfType<MethodInfo>())
+                                          (mi, _) => mi != null && string.Equals(mi.Name, "Index"), null);
+                foreach (var m in ms.OfType<MethodInfo>())
                 {
                     var pars = m.GetParameters();
                     if (pars.Length == 0)
@@ -365,7 +365,7 @@ namespace MvcSiteMapProvider.Builder
                 }
             }
 
-            string area = "";
+            var area = "";
             if (!string.IsNullOrEmpty(attribute.AreaName))
             {
                 area = attribute.AreaName;
@@ -385,8 +385,8 @@ namespace MvcSiteMapProvider.Builder
             }
 
             // Determine controller and (index) action
-            string controller = type.Name.Substring(0, type.Name.IndexOf("Controller"));
-            string action = (methodInfo != null ? methodInfo.Name : null) ?? "Index";
+            var controller = type.Name.Substring(0, type.Name.IndexOf("Controller"));
+            var action = (methodInfo?.Name) ?? "Index";
             if (methodInfo != null)
             {
                 // handle ActionNameAttribute
@@ -396,7 +396,7 @@ namespace MvcSiteMapProvider.Builder
                 }
             }
 
-            string httpMethod = string.IsNullOrEmpty(attribute.HttpMethod) ? HttpVerbs.Get.ToString().ToUpperInvariant() : attribute.HttpMethod.ToUpperInvariant();
+            var httpMethod = string.IsNullOrEmpty(attribute.HttpMethod) ? HttpVerbs.Get.ToString().ToUpperInvariant() : attribute.HttpMethod.ToUpperInvariant();
 
             // Handle title
             var title = attribute.Title;
@@ -405,7 +405,7 @@ namespace MvcSiteMapProvider.Builder
             var implicitResourceKey = attribute.ResourceKey;
 
             // Generate key for node
-            string key = nodeKeyGenerator.GenerateKey(
+            var key = NodeKeyGenerator.GenerateKey(
                 null,
                 attribute.Key,
                 "",
@@ -414,7 +414,7 @@ namespace MvcSiteMapProvider.Builder
                 controller, action, httpMethod,
                 attribute.Clickable);
 
-            var siteMapNode = siteMapNodeFactory.Create(siteMap, key, implicitResourceKey);
+            var siteMapNode = SiteMapNodeFactory.Create(siteMap, key, implicitResourceKey);
 
             // Assign defaults
             siteMapNode.Title = title;

@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Reflection;
+using MvcSiteMapProvider.Reflection;
 using MvcSiteMapProvider.Web;
 using System;
 using System.Collections.Generic;
@@ -38,13 +38,13 @@ namespace MvcSiteMapProvider.Builder
     {
         protected const string SourceName = "ASP.NET SiteMap Provider";
 
-        protected readonly bool includeRootNode;
+        protected readonly bool IncludeRootNode;
 
-        protected readonly bool reflectAttributes;
+        protected readonly bool ReflectAttributes;
 
-        protected readonly bool reflectRouteValues;
+        protected readonly bool ReflectRouteValues;
 
-        protected readonly IAspNetSiteMapProvider siteMapProvider;
+        protected readonly IAspNetSiteMapProvider SiteMapProvider;
 
         public AspNetSiteMapNodeProvider(
                                                     bool includeRootNode,
@@ -53,19 +53,19 @@ namespace MvcSiteMapProvider.Builder
             IAspNetSiteMapProvider siteMapProvider
             )
         {
-            this.includeRootNode = includeRootNode;
-            this.reflectAttributes = reflectAttributes;
-            this.reflectRouteValues = reflectRouteValues;
-            this.siteMapProvider = siteMapProvider ?? throw new ArgumentNullException(nameof(siteMapProvider));
+            this.IncludeRootNode = includeRootNode;
+            this.ReflectAttributes = reflectAttributes;
+            this.ReflectRouteValues = reflectRouteValues;
+            this.SiteMapProvider = siteMapProvider ?? throw new ArgumentNullException(nameof(siteMapProvider));
         }
 
         public IEnumerable<ISiteMapNodeToParentRelation> GetSiteMapNodes(ISiteMapNodeHelper helper)
         {
             var result = new List<ISiteMapNodeToParentRelation>();
-            var provider = siteMapProvider.GetProvider();
+            var provider = SiteMapProvider.GetProvider();
 
             var rootNode = GetRootNode(provider, helper);
-            if (includeRootNode)
+            if (IncludeRootNode)
             {
                 result.Add(rootNode);
             }
@@ -84,7 +84,7 @@ namespace MvcSiteMapProvider.Builder
         protected virtual ISiteMapNodeToParentRelation GetSiteMapNodeFromProviderNode(System.Web.SiteMapNode node, ISiteMapNode parentNode, ISiteMapNodeHelper helper)
         {
             // Use the same keys as the underlying provider.
-            string key = node.Key;
+            var key = node.Key;
             var implicitResourceKey = node.ResourceKey;
 
             // Create Node
@@ -93,7 +93,7 @@ namespace MvcSiteMapProvider.Builder
 
             siteMapNode.Title = node.Title;
             siteMapNode.Description = node.Description;
-            if (reflectAttributes)
+            if (ReflectAttributes)
             {
                 // Unfortunately, the ASP.NET implementation uses a protected member variable to store
                 // the attributes, so there is no way to loop through them without reflection or some
@@ -129,7 +129,7 @@ namespace MvcSiteMapProvider.Builder
 
             // Assign to node
             siteMapNode.Route = node.GetAttributeValue("route");
-            if (reflectRouteValues)
+            if (ReflectRouteValues)
             {
                 // Unfortunately, the ASP.NET implementation uses a protected member variable to store
                 // the attributes, so there is no way to loop through them without reflection or some
