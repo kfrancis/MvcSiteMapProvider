@@ -13,8 +13,14 @@ namespace MvcSiteMapProvider.Collections.Specialized
     public class AttributeDictionaryFactory
         : IAttributeDictionaryFactory
     {
+        protected readonly IJsonToDictionaryDeserializer jsonToDictionaryDeserializer;
+
+        protected readonly IRequestCache requestCache;
+
+        protected readonly IReservedAttributeNameProvider reservedAttributeNameProvider;
+
         public AttributeDictionaryFactory(
-            IRequestCache requestCache,
+                                    IRequestCache requestCache,
             IReservedAttributeNameProvider reservedAttributeNameProvider,
             IJsonToDictionaryDeserializer jsonToDictionaryDeserializer
             )
@@ -24,17 +30,9 @@ namespace MvcSiteMapProvider.Collections.Specialized
             this.jsonToDictionaryDeserializer = jsonToDictionaryDeserializer ?? throw new ArgumentNullException(nameof(jsonToDictionaryDeserializer));
         }
 
-        protected readonly IRequestCache requestCache;
-        protected readonly IReservedAttributeNameProvider reservedAttributeNameProvider;
-        protected readonly IJsonToDictionaryDeserializer jsonToDictionaryDeserializer;
-
-        #region IAttributeDictionaryFactory Members
-
         public virtual IAttributeDictionary Create(string siteMapNodeKey, string memberName, ISiteMap siteMap, ILocalizationService localizationService)
         {
             return new AttributeDictionary(siteMapNodeKey, memberName, siteMap, localizationService, reservedAttributeNameProvider, jsonToDictionaryDeserializer, requestCache);
         }
-
-        #endregion IAttributeDictionaryFactory Members
     }
 }

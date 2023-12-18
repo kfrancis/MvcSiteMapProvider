@@ -13,21 +13,13 @@ namespace MvcSiteMapProvider.Builder
     public class SiteMapBuilderSetStrategy
         : ISiteMapBuilderSetStrategy
     {
+        protected readonly ISiteMapBuilderSet[] siteMapBuilderSets;
+
         public SiteMapBuilderSetStrategy(
-            ISiteMapBuilderSet[] siteMapBuilderSets
+                    ISiteMapBuilderSet[] siteMapBuilderSets
             )
         {
             this.siteMapBuilderSets = siteMapBuilderSets ?? throw new ArgumentNullException(nameof(siteMapBuilderSets));
-        }
-
-        protected readonly ISiteMapBuilderSet[] siteMapBuilderSets;
-
-        #region ISiteMapBuilderSetStrategy Members
-
-        public virtual ISiteMapBuilderSet GetBuilderSet(string builderSetName)
-        {
-            var builderSet = siteMapBuilderSets.FirstOrDefault(x => x.AppliesTo(builderSetName)) ?? throw new MvcSiteMapException(string.Format(Resources.Messages.NamedBuilderSetNotFound, builderSetName));
-            return builderSet;
         }
 
         public virtual ISiteMapBuilder GetBuilder(string builderSetName)
@@ -36,12 +28,16 @@ namespace MvcSiteMapProvider.Builder
             return builderSet.Builder;
         }
 
+        public virtual ISiteMapBuilderSet GetBuilderSet(string builderSetName)
+        {
+            var builderSet = siteMapBuilderSets.FirstOrDefault(x => x.AppliesTo(builderSetName)) ?? throw new MvcSiteMapException(string.Format(Resources.Messages.NamedBuilderSetNotFound, builderSetName));
+            return builderSet;
+        }
+
         public virtual ICacheDetails GetCacheDetails(string builderSetName)
         {
             var builderSet = GetBuilderSet(builderSetName);
             return builderSet.CacheDetails;
         }
-
-        #endregion ISiteMapBuilderSetStrategy Members
     }
 }

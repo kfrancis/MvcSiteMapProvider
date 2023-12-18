@@ -9,8 +9,12 @@ namespace MvcSiteMapProvider.Globalization
     public class LocalizationServiceFactory
         : ILocalizationServiceFactory
     {
+        protected readonly IExplicitResourceKeyParser explicitResourceKeyParser;
+
+        protected readonly IStringLocalizer stringLocalizer;
+
         public LocalizationServiceFactory(
-            IExplicitResourceKeyParser explicitResourceKeyParser,
+                            IExplicitResourceKeyParser explicitResourceKeyParser,
             IStringLocalizer stringLocalizer
             )
         {
@@ -18,16 +22,9 @@ namespace MvcSiteMapProvider.Globalization
             this.stringLocalizer = stringLocalizer ?? throw new ArgumentNullException(nameof(stringLocalizer));
         }
 
-        protected readonly IExplicitResourceKeyParser explicitResourceKeyParser;
-        protected readonly IStringLocalizer stringLocalizer;
-
-        #region ILocalizationServiceFactory Members
-
         public ILocalizationService Create(string implicitResourceKey)
         {
             return new LocalizationService(implicitResourceKey, explicitResourceKeyParser, stringLocalizer);
         }
-
-        #endregion ILocalizationServiceFactory Members
     }
 }

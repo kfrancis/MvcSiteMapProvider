@@ -29,11 +29,7 @@ namespace MvcSiteMapProvider.Caching
 
         public virtual T GetValue<T>(string key)
         {
-            if (Context.Items.Contains(key))
-            {
-                return (T)Context.Items[key];
-            }
-            return default;
+            return Context.Items.Contains(key) ? (T)Context.Items[key] : default;
         }
 
         public virtual void SetValue<T>(string key, T value)

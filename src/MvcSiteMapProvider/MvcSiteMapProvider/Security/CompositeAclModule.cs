@@ -9,16 +9,14 @@ namespace MvcSiteMapProvider.Security
     public class CompositeAclModule
         : IAclModule
     {
+        protected readonly IAclModule[] aclModules;
+
         public CompositeAclModule(
-            params IAclModule[] aclModules
+                    params IAclModule[] aclModules
             )
         {
             this.aclModules = aclModules ?? throw new ArgumentNullException(nameof(aclModules));
         }
-
-        protected readonly IAclModule[] aclModules;
-
-        #region IAclModule Members
 
         /// <summary>
         /// Determines whether node is accessible to user.
@@ -33,13 +31,11 @@ namespace MvcSiteMapProvider.Security
             foreach (var module in aclModules)
             {
                 var authorized = module.IsAccessibleToUser(siteMap, node);
-                if (authorized == false)
+                if (!authorized)
                     return false;
             }
             // Convention throughout the provider: if the IAclModule can not authenticate a user, true is returned.
             return true;
         }
-
-        #endregion IAclModule Members
     }
 }

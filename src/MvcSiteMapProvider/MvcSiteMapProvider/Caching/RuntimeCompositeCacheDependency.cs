@@ -13,22 +13,20 @@ namespace MvcSiteMapProvider.Caching
     public class RuntimeCompositeCacheDependency
         : ICacheDependency
     {
+        protected readonly ICacheDependency[] cacheDependencies;
+
         public RuntimeCompositeCacheDependency(
-            params ICacheDependency[] cacheDependencies
+                    params ICacheDependency[] cacheDependencies
             )
         {
             this.cacheDependencies = cacheDependencies ?? throw new ArgumentNullException(nameof(cacheDependencies));
         }
 
-        protected readonly ICacheDependency[] cacheDependencies;
-
-        #region ICacheDependency Members
-
         public object Dependency
         {
             get
             {
-                if (cacheDependencies.Count() > 0)
+                if (cacheDependencies.Length > 0)
                 {
                     var list = new List<ChangeMonitor>();
                     foreach (var item in cacheDependencies)
@@ -36,10 +34,7 @@ namespace MvcSiteMapProvider.Caching
                         var changeMonitorList = (IList<ChangeMonitor>)item.Dependency;
                         if (changeMonitorList != null)
                         {
-                            foreach (var changeMonitor in changeMonitorList)
-                            {
-                                list.Add(changeMonitor);
-                            }
+                            list.AddRange(changeMonitorList);
                         }
                     }
                     return list;
@@ -47,8 +42,6 @@ namespace MvcSiteMapProvider.Caching
                 return null;
             }
         }
-
-        #endregion
     }
 }
 #endif

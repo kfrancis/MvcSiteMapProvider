@@ -9,8 +9,22 @@ namespace MvcSiteMapProvider.Builder
     public class SiteMapBuilderSet
         : ISiteMapBuilderSet
     {
+        protected readonly ICacheDetails cacheDetails;
+
+        protected readonly bool enableLocalization;
+
+        protected readonly string instanceName;
+
+        protected readonly bool securityTrimmingEnabled;
+
+        protected readonly ISiteMapBuilder siteMapBuilder;
+
+        protected readonly bool useTitleIfDescriptionNotProvided;
+
+        protected readonly bool visibilityAffectsDescendants;
+
         public SiteMapBuilderSet(
-           string instanceName,
+                                                                   string instanceName,
            bool securityTrimmingEnabled,
            bool enableLocalization,
            bool visibilityAffectsDescendants,
@@ -55,16 +69,6 @@ namespace MvcSiteMapProvider.Builder
         {
         }
 
-        protected readonly string instanceName;
-        protected readonly bool securityTrimmingEnabled;
-        protected readonly bool enableLocalization;
-        protected readonly bool visibilityAffectsDescendants;
-        protected readonly bool useTitleIfDescriptionNotProvided;
-        protected readonly ISiteMapBuilder siteMapBuilder;
-        protected readonly ICacheDetails cacheDetails;
-
-        #region ISiteMapBuilderSet Members
-
         public virtual ISiteMapBuilder Builder
         {
             get { return siteMapBuilder; }
@@ -75,16 +79,21 @@ namespace MvcSiteMapProvider.Builder
             get { return cacheDetails; }
         }
 
-        public virtual string SiteMapCacheKey { get; set; }
+        public virtual bool EnableLocalization
+        {
+            get { return enableLocalization; }
+        }
 
         public virtual bool SecurityTrimmingEnabled
         {
             get { return securityTrimmingEnabled; }
         }
 
-        public virtual bool EnableLocalization
+        public virtual string SiteMapCacheKey { get; set; }
+
+        public virtual bool UseTitleIfDescriptionNotProvided
         {
-            get { return enableLocalization; }
+            get { return useTitleIfDescriptionNotProvided; }
         }
 
         public virtual bool VisibilityAffectsDescendants
@@ -92,16 +101,9 @@ namespace MvcSiteMapProvider.Builder
             get { return visibilityAffectsDescendants; }
         }
 
-        public virtual bool UseTitleIfDescriptionNotProvided
-        {
-            get { return useTitleIfDescriptionNotProvided; }
-        }
-
         public virtual bool AppliesTo(string builderSetName)
         {
             return instanceName.Equals(builderSetName, StringComparison.Ordinal);
         }
-
-        #endregion ISiteMapBuilderSet Members
     }
 }

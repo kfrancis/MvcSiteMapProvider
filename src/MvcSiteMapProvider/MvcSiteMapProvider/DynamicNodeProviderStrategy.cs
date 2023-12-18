@@ -11,24 +11,11 @@ namespace MvcSiteMapProvider
     public class DynamicNodeProviderStrategy
         : IDynamicNodeProviderStrategy
     {
+        private readonly IDynamicNodeProvider[] dynamicNodeProviders;
+
         public DynamicNodeProviderStrategy(IDynamicNodeProvider[] dynamicNodeProviders)
         {
             this.dynamicNodeProviders = dynamicNodeProviders ?? throw new ArgumentNullException(nameof(dynamicNodeProviders));
-        }
-
-        private readonly IDynamicNodeProvider[] dynamicNodeProviders;
-
-        #region IDynamicNodeProviderStrategy Members
-
-        public IDynamicNodeProvider GetProvider(string providerName)
-        {
-            var provider = dynamicNodeProviders.FirstOrDefault(x => x.AppliesTo(providerName));
-            if (provider == null && !string.IsNullOrEmpty(providerName))
-            {
-                throw new MvcSiteMapException(string.Format(Resources.Messages.NamedDynamicNodeProviderNotFound, providerName));
-            }
-
-            return provider;
         }
 
         public IEnumerable<DynamicNode> GetDynamicNodeCollection(string providerName, ISiteMapNode node)
@@ -38,6 +25,12 @@ namespace MvcSiteMapProvider
             return provider.GetDynamicNodeCollection(node);
         }
 
-        #endregion IDynamicNodeProviderStrategy Members
+        public IDynamicNodeProvider GetProvider(string providerName)
+        {
+            var provider = Array.Find(dynamicNodeProviders, x => x.AppliesTo(providerName));
+            return provider == null && !string.IsNullOrEmpty(providerName)
+                ? throw new MvcSiteMapException(string.Format(Resources.Messages.NamedDynamicNodeProviderNotFound, providerName))
+                : provider;
+        }
     }
 }

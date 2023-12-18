@@ -13,8 +13,14 @@ namespace MvcSiteMapProvider
     public class SiteMapPluginProvider
         : ISiteMapPluginProvider
     {
+        protected readonly IAclModule aclModule;
+
+        protected readonly IMvcResolver mvcResolver;
+
+        protected readonly ISiteMapBuilder siteMapBuilder;
+
         public SiteMapPluginProvider(
-            IMvcResolver mvcResolver,
+                                    IMvcResolver mvcResolver,
             ISiteMapBuilder siteMapBuilder,
             IAclModule aclModule
             )
@@ -24,15 +30,9 @@ namespace MvcSiteMapProvider
             this.aclModule = aclModule ?? throw new ArgumentNullException(nameof(aclModule));
         }
 
-        protected readonly ISiteMapBuilder siteMapBuilder;
-        protected readonly IMvcResolver mvcResolver;
-        protected readonly IAclModule aclModule;
-
-        #region ISiteMapPluginProvider Members
-
-        public virtual ISiteMapBuilder SiteMapBuilder
+        public virtual IAclModule AclModule
         {
-            get { return siteMapBuilder; }
+            get { return aclModule; }
         }
 
         public virtual IMvcResolver MvcResolver
@@ -40,11 +40,9 @@ namespace MvcSiteMapProvider
             get { return mvcResolver; }
         }
 
-        public virtual IAclModule AclModule
+        public virtual ISiteMapBuilder SiteMapBuilder
         {
-            get { return aclModule; }
+            get { return siteMapBuilder; }
         }
-
-        #endregion ISiteMapPluginProvider Members
     }
 }

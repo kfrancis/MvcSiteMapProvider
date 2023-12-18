@@ -10,8 +10,14 @@ namespace MvcSiteMapProvider.Loader
     public class SiteMapCreator
         : ISiteMapCreator
     {
+        protected readonly ISiteMapBuilderSetStrategy siteMapBuilderSetStrategy;
+
+        protected readonly ISiteMapCacheKeyToBuilderSetMapper siteMapCacheKeyToBuilderSetMapper;
+
+        protected readonly ISiteMapFactory siteMapFactory;
+
         public SiteMapCreator(
-            ISiteMapCacheKeyToBuilderSetMapper siteMapCacheKeyToBuilderSetMapper,
+                                    ISiteMapCacheKeyToBuilderSetMapper siteMapCacheKeyToBuilderSetMapper,
             ISiteMapBuilderSetStrategy siteMapBuilderSetStrategy,
             ISiteMapFactory siteMapFactory
             )
@@ -20,12 +26,6 @@ namespace MvcSiteMapProvider.Loader
             this.siteMapBuilderSetStrategy = siteMapBuilderSetStrategy ?? throw new ArgumentNullException(nameof(siteMapBuilderSetStrategy));
             this.siteMapFactory = siteMapFactory ?? throw new ArgumentNullException(nameof(siteMapFactory));
         }
-
-        protected readonly ISiteMapCacheKeyToBuilderSetMapper siteMapCacheKeyToBuilderSetMapper;
-        protected readonly ISiteMapBuilderSetStrategy siteMapBuilderSetStrategy;
-        protected readonly ISiteMapFactory siteMapFactory;
-
-        #region ISiteMapCreator Members
 
         public virtual ISiteMap CreateSiteMap(string siteMapCacheKey)
         {
@@ -46,8 +46,6 @@ namespace MvcSiteMapProvider.Loader
             var builderSet = GetBuilderSet(siteMapCacheKey);
             return builderSet.CacheDetails;
         }
-
-        #endregion ISiteMapCreator Members
 
         protected virtual ISiteMapBuilderSet GetBuilderSet(string siteMapCacheKey)
         {

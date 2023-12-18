@@ -10,6 +10,8 @@ namespace MvcSiteMapProvider.Xml
     public class FileXmlSource
         : IXmlSource
     {
+        protected readonly string fileName;
+
         /// <summary>
         /// Creates a new instance of FileXmlSource.
         /// </summary>
@@ -24,24 +26,16 @@ namespace MvcSiteMapProvider.Xml
             this.fileName = fileName;
         }
 
-        protected readonly string fileName;
-
-        #region IXmlSource Members
-
         public XDocument GetXml()
         {
-            XDocument result = null;
             if (File.Exists(fileName))
             {
-                result = XDocument.Load(fileName);
+                return XDocument.Load(fileName);
             }
             else
             {
                 throw new FileNotFoundException(string.Format(Resources.Messages.XmlFileNotFound, fileName), fileName);
             }
-            return result;
         }
-
-        #endregion IXmlSource Members
     }
 }

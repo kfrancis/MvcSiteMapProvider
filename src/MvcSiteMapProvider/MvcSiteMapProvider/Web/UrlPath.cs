@@ -50,17 +50,9 @@ namespace MvcSiteMapProvider.Web
             }
             if ((virtualPath.Length >= 2) && (virtualPath[0] == '~') && ((virtualPath[1] == '/') || (virtualPath[1] == '\\')))
             {
-                if (applicationPath.Length > 1)
-                {
-                    return applicationPath + virtualPath.Substring(2);
-                }
-                return "/" + virtualPath.Substring(2);
+                return applicationPath.Length > 1 ? applicationPath + virtualPath.Substring(2) : "/" + virtualPath.Substring(2);
             }
-            if (!IsRooted(virtualPath))
-            {
-                throw new ArgumentOutOfRangeException(nameof(virtualPath));
-            }
-            return virtualPath;
+            return !IsRooted(virtualPath) ? throw new ArgumentOutOfRangeException(nameof(virtualPath)) : virtualPath;
         }
 
         public bool IsAppRelativePath(string path)
@@ -78,38 +70,22 @@ namespace MvcSiteMapProvider.Web
             {
                 return false;
             }
-            if ((length != 1) && (path[1] != '\\'))
-            {
-                return path[1] == '/';
-            }
-            return true;
+            return (length != 1) && (path[1] != '\\') ? path[1] == '/' : true;
         }
 
         public bool IsRooted(string basepath)
         {
-            if (!string.IsNullOrEmpty(basepath) && (basepath[0] != '/'))
-            {
-                return basepath[0] == '\\';
-            }
-            return true;
+            return !string.IsNullOrEmpty(basepath) && (basepath[0] != '/') ? basepath[0] == '\\' : true;
         }
 
         public bool IsAbsolutePhysicalPath(string path)
         {
-            if ((path == null) || (path.Length < 3))
-            {
-                return false;
-            }
-            return ((path[1] == ':') && IsDirectorySeparatorChar(path[2])) || IsUncSharePath(path);
+            return (path == null) || (path.Length < 3) ? false : ((path[1] == ':') && IsDirectorySeparatorChar(path[2])) || IsUncSharePath(path);
         }
 
         private bool IsDirectorySeparatorChar(char ch)
         {
-            if (ch != '\\')
-            {
-                return ch == '/';
-            }
-            return true;
+            return ch != '\\' ? ch == '/' : true;
         }
 
         private bool IsUncSharePath(string path)
@@ -199,11 +175,7 @@ namespace MvcSiteMapProvider.Web
 
         private string SimpleCombine(string basepath, string relative)
         {
-            if (HasTrailingSlash(basepath))
-            {
-                return basepath + relative;
-            }
-            return basepath + "/" + relative;
+            return HasTrailingSlash(basepath) ? basepath + relative : basepath + "/" + relative;
         }
 
         private bool HasTrailingSlash(string virtualPath)
@@ -236,11 +208,7 @@ namespace MvcSiteMapProvider.Web
                 return false;
             }
             int num2 = virtualPath.IndexOf('/');
-            if (num2 != -1)
-            {
-                return index < num2;
-            }
-            return true;
+            return num2 != -1 ? index < num2 : true;
         }
 
         private string Reduce(string path)
@@ -257,11 +225,7 @@ namespace MvcSiteMapProvider.Web
             }
             path = FixVirtualPathSlashes(path);
             path = ReduceVirtualPath(path);
-            if (str == null)
-            {
-                return path;
-            }
-            return path + str;
+            return str == null ? path : path + str;
         }
 
         private string ReduceVirtualPath(string path)
@@ -320,11 +284,7 @@ namespace MvcSiteMapProvider.Web
             {
                 return str;
             }
-            if ((length > 0) && (path[0] == '/'))
-            {
-                return "/";
-            }
-            return ".";
+            return (length > 0) && (path[0] == '/') ? "/" : ".";
         }
 
         private string FixVirtualPathSlashes(string virtualPath)
@@ -413,10 +373,7 @@ namespace MvcSiteMapProvider.Web
         /// <returns>The absolute URL.</returns>
         public string MakeUrlAbsolute(string url)
         {
-            if (IsAbsoluteUrl(url))
-                return url;
-
-            return ResolveUrl(url, Uri.UriSchemeHttp);
+            return IsAbsoluteUrl(url) ? url : ResolveUrl(url, Uri.UriSchemeHttp);
         }
 
         /// <summary>
@@ -431,10 +388,7 @@ namespace MvcSiteMapProvider.Web
         /// <returns>The absolute URL.</returns>
         public string MakeUrlAbsolute(string baseUrl, string url)
         {
-            if (IsAbsoluteUrl(url))
-                return url;
-
-            return CombineUrl(baseUrl, ResolveUrl(url));
+            return IsAbsoluteUrl(url) ? url : CombineUrl(baseUrl, ResolveUrl(url));
         }
 
         /// <summary>
@@ -445,10 +399,7 @@ namespace MvcSiteMapProvider.Web
         /// <returns>The resolved URL.</returns>
         public string ResolveVirtualApplicationToRootRelativeUrl(string url)
         {
-            if (IsAbsoluteUrl(url) || IsAbsolutePhysicalPath(url))
-                return url;
-
-            return MakeVirtualPathAppAbsolute(Combine(AppDomainAppVirtualPath, url));
+            return IsAbsoluteUrl(url) || IsAbsolutePhysicalPath(url) ? url : MakeVirtualPathAppAbsolute(Combine(AppDomainAppVirtualPath, url));
         }
 
         /// <summary>

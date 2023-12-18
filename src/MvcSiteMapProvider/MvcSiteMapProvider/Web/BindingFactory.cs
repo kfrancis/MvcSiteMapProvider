@@ -6,13 +6,9 @@
     public class BindingFactory
         : IBindingFactory
     {
-        #region IBindingFactory Members
-
         public IBinding Create(string hostName, string protocol, int port)
         {
             return new Binding(hostName, protocol, port);
         }
-
-        #endregion IBindingFactory Members
     }
 }

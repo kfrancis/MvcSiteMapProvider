@@ -11,16 +11,14 @@ namespace MvcSiteMapProvider.Web.Mvc
     public class ControllerBuilderAdaptor
         : IControllerBuilder
     {
+        protected readonly ControllerBuilder controllerBuilder;
+
         public ControllerBuilderAdaptor(
-            ControllerBuilder controllerBuilder
+                    ControllerBuilder controllerBuilder
             )
         {
             this.controllerBuilder = controllerBuilder ?? throw new ArgumentNullException(nameof(controllerBuilder));
         }
-
-        protected readonly ControllerBuilder controllerBuilder;
-
-        #region IControllerBuilder Members
 
         public HashSet<string> DefaultNamespaces
         {
@@ -41,7 +39,5 @@ namespace MvcSiteMapProvider.Web.Mvc
         {
             controllerBuilder.SetControllerFactory(controllerFactory);
         }
-
-        #endregion IControllerBuilder Members
     }
 }

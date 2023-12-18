@@ -14,8 +14,14 @@ namespace MvcSiteMapProvider.Web.Mvc
     public class ControllerTypeResolverFactory
         : IControllerTypeResolverFactory
     {
+        protected readonly IEnumerable<string> areaNamespacesToIgnore;
+
+        protected readonly IBuildManager buildManager;
+
+        protected readonly IControllerBuilder controllerBuilder;
+
         public ControllerTypeResolverFactory(
-            IEnumerable<string> areaNamespacesToIgnore,
+                                    IEnumerable<string> areaNamespacesToIgnore,
             IControllerBuilder controllerBuilder,
             IBuildManager buildManager
             )
@@ -25,17 +31,9 @@ namespace MvcSiteMapProvider.Web.Mvc
             this.buildManager = buildManager ?? throw new ArgumentNullException(nameof(buildManager));
         }
 
-        protected readonly IEnumerable<string> areaNamespacesToIgnore;
-        protected readonly IControllerBuilder controllerBuilder;
-        protected readonly IBuildManager buildManager;
-
-        #region IControllerTypeResolverFactory Members
-
         public IControllerTypeResolver Create(RouteCollection routes)
         {
             return new ControllerTypeResolver(areaNamespacesToIgnore, routes, controllerBuilder, buildManager);
         }
-
-        #endregion IControllerTypeResolverFactory Members
     }
 }

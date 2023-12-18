@@ -13,8 +13,14 @@ namespace MvcSiteMapProvider.Web.Mvc
     public class XmlSiteMapResultFactory
         : IXmlSiteMapResultFactory
     {
+        protected readonly ICultureContextFactory cultureContextFactory;
+
+        protected readonly ISiteMapLoader siteMapLoader;
+
+        protected readonly IUrlPath urlPath;
+
         public XmlSiteMapResultFactory(
-            ISiteMapLoader siteMapLoader,
+                                    ISiteMapLoader siteMapLoader,
             IUrlPath urlPath,
             ICultureContextFactory cultureContextFactory
             )
@@ -24,11 +30,30 @@ namespace MvcSiteMapProvider.Web.Mvc
             this.cultureContextFactory = cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
         }
 
-        protected readonly ISiteMapLoader siteMapLoader;
-        protected readonly IUrlPath urlPath;
-        protected readonly ICultureContextFactory cultureContextFactory;
+        protected virtual string DefaultBaseUrl
+        {
+            get { return urlPath.ResolveUrl("/", Uri.UriSchemeHttp); }
+        }
 
-        #region IXmlSiteMapResultFactory Members
+        protected virtual int DefaultPage
+        {
+            get { return 0; }
+        }
+
+        protected virtual ISiteMapNode DefaultRootNode
+        {
+            get { return siteMapLoader.GetSiteMap().RootNode; }
+        }
+
+        protected virtual IEnumerable<string> DefaultSiteMapCacheKeys
+        {
+            get { return new List<string>(); }
+        }
+
+        protected virtual string DefaultSiteMapUrlTemplate
+        {
+            get { return "sitemap-{page}.xml"; }
+        }
 
         public virtual ActionResult Create(int page)
         {
@@ -202,33 +227,6 @@ namespace MvcSiteMapProvider.Web.Mvc
                 siteMapLoader,
                 urlPath,
                 cultureContextFactory);
-        }
-
-        #endregion IXmlSiteMapResultFactory Members
-
-        protected virtual int DefaultPage
-        {
-            get { return 0; }
-        }
-
-        protected virtual ISiteMapNode DefaultRootNode
-        {
-            get { return siteMapLoader.GetSiteMap().RootNode; }
-        }
-
-        protected virtual string DefaultSiteMapUrlTemplate
-        {
-            get { return "sitemap-{page}.xml"; }
-        }
-
-        protected virtual string DefaultBaseUrl
-        {
-            get { return urlPath.ResolveUrl("/", Uri.UriSchemeHttp); }
-        }
-
-        protected virtual IEnumerable<string> DefaultSiteMapCacheKeys
-        {
-            get { return new List<string>(); }
         }
     }
 }

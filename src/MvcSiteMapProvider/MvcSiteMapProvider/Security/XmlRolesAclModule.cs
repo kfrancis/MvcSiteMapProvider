@@ -10,16 +10,14 @@ namespace MvcSiteMapProvider.Security
     public class XmlRolesAclModule
         : IAclModule
     {
+        protected readonly IMvcContextFactory mvcContextFactory;
+
         public XmlRolesAclModule(
-            IMvcContextFactory mvcContextFactory
+                    IMvcContextFactory mvcContextFactory
             )
         {
             this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
         }
-
-        protected readonly IMvcContextFactory mvcContextFactory;
-
-        #region IAclModule Members
 
         /// <summary>
         /// Determines whether node is accessible to user.
@@ -61,7 +59,5 @@ namespace MvcSiteMapProvider.Security
             // Everything seems OK...
             return true;
         }
-
-        #endregion IAclModule Members
     }
 }

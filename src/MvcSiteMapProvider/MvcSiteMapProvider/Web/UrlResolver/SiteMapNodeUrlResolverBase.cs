@@ -18,10 +18,7 @@ namespace MvcSiteMapProvider.Web.UrlResolver
         /// </returns>
         public virtual bool AppliesTo(string providerName)
         {
-            if (string.IsNullOrEmpty(providerName))
-                return false;
-
-            return GetType().Equals(Type.GetType(providerName, false));
+            return string.IsNullOrEmpty(providerName) ? false : GetType().Equals(Type.GetType(providerName, false));
         }
 
         /// <summary>

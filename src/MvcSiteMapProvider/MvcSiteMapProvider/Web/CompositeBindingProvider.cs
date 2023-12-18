@@ -10,14 +10,12 @@ namespace MvcSiteMapProvider.Web
     public class CompositeBindingProvider
         : IBindingProvider
     {
+        protected readonly IEnumerable<IBindingProvider> bindingProviders;
+
         public CompositeBindingProvider(params IBindingProvider[] bindingProviders)
         {
             this.bindingProviders = bindingProviders ?? throw new ArgumentNullException(nameof(bindingProviders));
         }
-
-        protected readonly IEnumerable<IBindingProvider> bindingProviders;
-
-        #region IBindingProvider Members
 
         public IEnumerable<IBinding> GetBindings()
         {
@@ -28,7 +26,5 @@ namespace MvcSiteMapProvider.Web
             }
             return result;
         }
-
-        #endregion IBindingProvider Members
     }
 }

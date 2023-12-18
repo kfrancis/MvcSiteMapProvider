@@ -12,6 +12,10 @@ namespace MvcSiteMapProvider
     public class CompositeSiteMapNodeVisibilityProvider
         : ISiteMapNodeVisibilityProvider
     {
+        private readonly string instanceName;
+
+        private readonly ISiteMapNodeVisibilityProvider[] siteMapNodeVisibilityProviders;
+
         public CompositeSiteMapNodeVisibilityProvider(string instanceName, params ISiteMapNodeVisibilityProvider[] siteMapNodeVisibilityProviders)
         {
             if (string.IsNullOrEmpty(instanceName))
@@ -20,10 +24,10 @@ namespace MvcSiteMapProvider
             this.siteMapNodeVisibilityProviders = siteMapNodeVisibilityProviders ?? throw new ArgumentNullException(nameof(siteMapNodeVisibilityProviders));
         }
 
-        private readonly string instanceName;
-        private readonly ISiteMapNodeVisibilityProvider[] siteMapNodeVisibilityProviders;
-
-        #region ISiteMapNodeVisibilityProvider Members
+        public bool AppliesTo(string providerName)
+        {
+            return instanceName.Equals(providerName, StringComparison.Ordinal);
+        }
 
         public bool IsVisible(ISiteMapNode node, IDictionary<string, object> sourceMetadata)
         {
@@ -32,17 +36,10 @@ namespace MvcSiteMapProvider
             foreach (var visibilityProvider in siteMapNodeVisibilityProviders)
             {
                 result = visibilityProvider.IsVisible(node, sourceMetadata);
-                if (result == false)
+                if (!result)
                     return false;
             }
             return result;
         }
-
-        public bool AppliesTo(string providerName)
-        {
-            return instanceName.Equals(providerName, StringComparison.Ordinal);
-        }
-
-        #endregion ISiteMapNodeVisibilityProvider Members
     }
 }

@@ -84,11 +84,7 @@ namespace MvcSiteMapProvider.Matching
             {
                 return false;
             }
-            if (!string.Equals(HostName, objB.HostName, StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-            return true;
+            return string.Equals(HostName, objB.HostName, StringComparison.OrdinalIgnoreCase);
         }
 
         public override string ToString()

@@ -10,14 +10,12 @@ namespace MvcSiteMapProvider.Builder
     public class CompositeSiteMapBuilder
         : ISiteMapBuilder
     {
+        protected readonly IEnumerable<ISiteMapBuilder> siteMapBuilders;
+
         public CompositeSiteMapBuilder(params ISiteMapBuilder[] siteMapBuilders)
         {
             this.siteMapBuilders = siteMapBuilders ?? throw new ArgumentNullException(nameof(siteMapBuilders));
         }
-
-        protected readonly IEnumerable<ISiteMapBuilder> siteMapBuilders;
-
-        #region ISiteMapBuilder Members
 
         public ISiteMapNode BuildSiteMap(ISiteMap siteMap, ISiteMapNode rootNode)
         {
@@ -28,7 +26,5 @@ namespace MvcSiteMapProvider.Builder
             }
             return result;
         }
-
-        #endregion ISiteMapBuilder Members
     }
 }

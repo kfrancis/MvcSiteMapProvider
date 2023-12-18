@@ -7,13 +7,9 @@
     public class NullCacheDependency
         : ICacheDependency
     {
-        #region ICacheDependency Members
-
         public object Dependency
         {
             get { return null; }
         }
-
-        #endregion ICacheDependency Members
     }
 }

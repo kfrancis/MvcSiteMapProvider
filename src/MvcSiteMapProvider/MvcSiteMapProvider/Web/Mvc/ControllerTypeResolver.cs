@@ -2,7 +2,6 @@
 using MvcSiteMapProvider.DI;
 using MvcSiteMapProvider.Web.Compilation;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -18,8 +17,18 @@ namespace MvcSiteMapProvider.Web.Mvc
     public class ControllerTypeResolver
         : IControllerTypeResolver
     {
+        protected readonly IEnumerable<string> areaNamespacesToIgnore;
+
+        protected readonly IBuildManager buildManager;
+
+        protected readonly IControllerBuilder controllerBuilder;
+
+        protected readonly RouteCollection routes;
+
+        private readonly object synclock = new object();
+
         public ControllerTypeResolver(
-            IEnumerable<string> areaNamespacesToIgnore,
+                                                    IEnumerable<string> areaNamespacesToIgnore,
             RouteCollection routes,
             IControllerBuilder controllerBuilder,
             IBuildManager buildManager
@@ -33,26 +42,17 @@ namespace MvcSiteMapProvider.Web.Mvc
             Cache = new ThreadSafeDictionary<string, Type>();
         }
 
-        protected readonly IEnumerable<string> areaNamespacesToIgnore;
-        protected readonly RouteCollection routes;
-        protected readonly IControllerBuilder controllerBuilder;
-        protected readonly IBuildManager buildManager;
-
-        private readonly object synclock = new object();
-
-        /// <summary>
-        /// Gets or sets the cache.
-        /// </summary>
-        /// <value>The cache.</value>
-        protected ThreadSafeDictionary<string, Type> Cache { get; }
-
         /// <summary>
         /// Gets or sets the assembly cache.
         /// </summary>
         /// <value>The assembly cache.</value>
         protected Dictionary<string, ILookup<string, Type>> AssemblyCache { get; private set; }
 
-        #region IControllerTypeResolver Members
+        /// <summary>
+        /// Gets or sets the cache.
+        /// </summary>
+        /// <value>The cache.</value>
+        protected ThreadSafeDictionary<string, Type> Cache { get; }
 
         /// <summary>
         /// Resolves the type of the controller.
@@ -106,8 +106,6 @@ namespace MvcSiteMapProvider.Web.Mvc
             return controllerType;
         }
 
-        #endregion IControllerTypeResolver Members
-
         /// <summary>
         /// Finds the namespaces for area.
         /// </summary>
@@ -143,27 +141,62 @@ namespace MvcSiteMapProvider.Web.Mvc
         }
 
         /// <summary>
-        /// Inits the assembly cache.
+        /// Gets the controller type within namespaces.
         /// </summary>
-        private void InitAssemblyCache()
+        /// <param name="area">The area.</param>
+        /// <param name="controller">The controller.</param>
+        /// <param name="namespaces">The namespaces.</param>
+        /// <returns>
+        /// A controller type within namespaces represented as a <see cref="Type"/> instance
+        /// </returns>
+        protected virtual Type GetControllerTypeWithinNamespaces(string area, string controller, HashSet<string> namespaces)
         {
-            if (AssemblyCache == null)
+            if (string.IsNullOrEmpty(controller) || controller?.Length == 0)
+                return null;
+
+            InitAssemblyCache();
+
+            HashSet<Type> matchingTypes = new HashSet<Type>();
+            if (AssemblyCache.TryGetValue(controller, out ILookup<string, Type> nsLookup))
             {
-                lock (synclock)
+                // this friendly name was located in the cache, now cycle through namespaces
+                if (namespaces != null)
                 {
-                    if (AssemblyCache == null)
+                    foreach (string requestedNamespace in namespaces)
                     {
-                        List<Type> controllerTypes = GetListOfControllerTypes();
-                        var groupedByName = controllerTypes.GroupBy(
-                            t => t.Name.Substring(0, t.Name.IndexOf("Controller")),
-                            StringComparer.OrdinalIgnoreCase);
-                        AssemblyCache = groupedByName.ToDictionary(
-                            g => g.Key,
-                            g => g.ToLookup(t => t.Namespace ?? string.Empty, StringComparer.OrdinalIgnoreCase),
-                            StringComparer.OrdinalIgnoreCase);
+                        foreach (var targetNamespaceGrouping in nsLookup)
+                        {
+                            if (IsNamespaceMatch(requestedNamespace, targetNamespaceGrouping.Key))
+                            {
+                                matchingTypes.UnionWith(targetNamespaceGrouping);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // if the namespaces parameter is null, search *every* namespace
+                    foreach (var nsGroup in nsLookup)
+                    {
+                        matchingTypes.UnionWith(nsGroup);
                     }
                 }
             }
+
+            if (matchingTypes.Count == 1)
+            {
+                return matchingTypes.First();
+            }
+            else if (matchingTypes.Count > 1)
+            {
+                string typeNames = Environment.NewLine + Environment.NewLine;
+                foreach (var matchingType in matchingTypes)
+                    typeNames += matchingType.FullName + Environment.NewLine;
+                typeNames += Environment.NewLine;
+
+                throw new AmbiguousControllerException(string.Format(Resources.Messages.AmbiguousControllerFoundMultipleControllers, controller, typeNames));
+            }
+            return null;
         }
 
         /// <summary>
@@ -255,62 +288,27 @@ namespace MvcSiteMapProvider.Web.Mvc
         }
 
         /// <summary>
-        /// Gets the controller type within namespaces.
+        /// Inits the assembly cache.
         /// </summary>
-        /// <param name="area">The area.</param>
-        /// <param name="controller">The controller.</param>
-        /// <param name="namespaces">The namespaces.</param>
-        /// <returns>
-        /// A controller type within namespaces represented as a <see cref="Type"/> instance
-        /// </returns>
-        protected virtual Type GetControllerTypeWithinNamespaces(string area, string controller, HashSet<string> namespaces)
+        private void InitAssemblyCache()
         {
-            if (string.IsNullOrEmpty(controller) || controller?.Length == 0)
-                return null;
-
-            InitAssemblyCache();
-
-            HashSet<Type> matchingTypes = new HashSet<Type>();
-            if (AssemblyCache.TryGetValue(controller, out ILookup<string, Type> nsLookup))
+            if (AssemblyCache == null)
             {
-                // this friendly name was located in the cache, now cycle through namespaces
-                if (namespaces != null)
+                lock (synclock)
                 {
-                    foreach (string requestedNamespace in namespaces)
+                    if (AssemblyCache == null)
                     {
-                        foreach (var targetNamespaceGrouping in nsLookup)
-                        {
-                            if (IsNamespaceMatch(requestedNamespace, targetNamespaceGrouping.Key))
-                            {
-                                matchingTypes.UnionWith(targetNamespaceGrouping);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    // if the namespaces parameter is null, search *every* namespace
-                    foreach (var nsGroup in nsLookup)
-                    {
-                        matchingTypes.UnionWith(nsGroup);
+                        List<Type> controllerTypes = GetListOfControllerTypes();
+                        var groupedByName = controllerTypes.GroupBy(
+                            t => t.Name.Substring(0, t.Name.IndexOf("Controller")),
+                            StringComparer.OrdinalIgnoreCase);
+                        AssemblyCache = groupedByName.ToDictionary(
+                            g => g.Key,
+                            g => g.ToLookup(t => t.Namespace ?? string.Empty, StringComparer.OrdinalIgnoreCase),
+                            StringComparer.OrdinalIgnoreCase);
                     }
                 }
             }
-
-            if (matchingTypes.Count == 1)
-            {
-                return matchingTypes.First();
-            }
-            else if (matchingTypes.Count > 1)
-            {
-                string typeNames = Environment.NewLine + Environment.NewLine;
-                foreach (var matchingType in matchingTypes)
-                    typeNames += matchingType.FullName + Environment.NewLine;
-                typeNames += Environment.NewLine;
-
-                throw new AmbiguousControllerException(string.Format(Resources.Messages.AmbiguousControllerFoundMultipleControllers, controller, typeNames));
-            }
-            return null;
         }
     }
 }

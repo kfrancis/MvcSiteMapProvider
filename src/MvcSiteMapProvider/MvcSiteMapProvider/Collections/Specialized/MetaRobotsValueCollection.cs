@@ -184,9 +184,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
             {
                 if (Contains("none"))
                     return true;
-                if (Contains("noindex") && Contains("nofollow"))
-                    return true;
-                return false;
+                return Contains("noindex") && Contains("nofollow");
             }
         }
 

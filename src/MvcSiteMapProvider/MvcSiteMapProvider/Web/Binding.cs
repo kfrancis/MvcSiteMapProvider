@@ -28,14 +28,9 @@ namespace MvcSiteMapProvider.Web
             Port = port;
         }
 
-        #region IBinding Members
+        public string HostName { get; }
 
-        public string HostName { get; private set; }
-
-        public string Protocol { get; private set; }
-
-        public int Port { get; private set; }
-
-        #endregion IBinding Members
+        public int Port { get; }
+        public string Protocol { get; }
     }
 }

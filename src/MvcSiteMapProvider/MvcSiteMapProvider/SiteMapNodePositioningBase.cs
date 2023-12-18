@@ -9,17 +9,15 @@ namespace MvcSiteMapProvider
     public abstract class SiteMapNodePositioningBase
         : SiteMapNodeSecurityBase
     {
-        #region Node Map Positioning
-
         /// <summary>
-        /// Gets the parent node.
+        /// Gets the ancestor nodes.
         /// </summary>
         /// <value>
-        /// The parent node.
+        /// The ancestor nodes.
         /// </value>
-        public override ISiteMapNode ParentNode
+        public override ISiteMapNodeCollection Ancestors
         {
-            get { return SiteMap.GetParentNode(this); }
+            get { return SiteMap.GetAncestors(this); }
         }
 
         /// <summary>
@@ -45,31 +43,15 @@ namespace MvcSiteMapProvider
         }
 
         /// <summary>
-        /// Gets the ancestor nodes.
+        /// Gets a value indicating whether the current SiteMapNode has any child nodes.
         /// </summary>
-        /// <value>
-        /// The ancestor nodes.
-        /// </value>
-        public override ISiteMapNodeCollection Ancestors
+        public override bool HasChildNodes
         {
-            get { return SiteMap.GetAncestors(this); }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the current site map node is a child or a direct descendant of the specified node.
-        /// </summary>
-        /// <param name="node">The <see cref="T:MvcSiteMapProvider.ISiteMapNode"/> to check if the current node is a child or descendant of.</param>
-        /// <returns>true if the current node is a child or descendant of the specified node; otherwise, false.</returns>
-        public override bool IsDescendantOf(ISiteMapNode node)
-        {
-            for (var parent = ParentNode; parent != null; parent = parent.ParentNode)
+            get
             {
-                if (parent.Equals(node))
-                {
-                    return true;
-                }
+                var childNodes = ChildNodes;
+                return childNodes?.Count > 0;
             }
-            return false;
         }
 
         /// <summary>
@@ -93,6 +75,22 @@ namespace MvcSiteMapProvider
                 }
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Gets or sets the display sort order for the node relative to its sibling nodes.
+        /// </summary>
+        public override int Order { get; set; }
+
+        /// <summary>
+        /// Gets the parent node.
+        /// </summary>
+        /// <value>
+        /// The parent node.
+        /// </value>
+        public override ISiteMapNode ParentNode
+        {
+            get { return SiteMap.GetParentNode(this); }
         }
 
         /// <summary>
@@ -140,35 +138,7 @@ namespace MvcSiteMapProvider
             get
             {
                 var parentNode = ParentNode;
-                if (parentNode != null)
-                {
-                    return parentNode.ChildNodes;
-                }
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Determines whether the specified node is in current path.
-        /// </summary>
-        /// <returns>
-        /// 	<c>true</c> if the specified node is in current path; otherwise, <c>false</c>.
-        /// </returns>
-        public override bool IsInCurrentPath()
-        {
-            ISiteMapNode node = this;
-            return SiteMap.CurrentNode != null && (SiteMap.CurrentNode.Equals(node) || SiteMap.CurrentNode.IsDescendantOf(node));
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the current SiteMapNode has any child nodes.
-        /// </summary>
-        public override bool HasChildNodes
-        {
-            get
-            {
-                var childNodes = ChildNodes;
-                return (childNodes?.Count > 0);
+                return parentNode?.ChildNodes;
             }
         }
 
@@ -193,10 +163,32 @@ namespace MvcSiteMapProvider
         }
 
         /// <summary>
-        /// Gets or sets the display sort order for the node relative to its sibling nodes.
+        /// Gets a value indicating whether the current site map node is a child or a direct descendant of the specified node.
         /// </summary>
-        public override int Order { get; set; }
+        /// <param name="node">The <see cref="T:MvcSiteMapProvider.ISiteMapNode"/> to check if the current node is a child or descendant of.</param>
+        /// <returns>true if the current node is a child or descendant of the specified node; otherwise, false.</returns>
+        public override bool IsDescendantOf(ISiteMapNode node)
+        {
+            for (var parent = ParentNode; parent != null; parent = parent.ParentNode)
+            {
+                if (parent.Equals(node))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
-        #endregion Node Map Positioning
+        /// <summary>
+        /// Determines whether the specified node is in current path.
+        /// </summary>
+        /// <returns>
+        /// 	<c>true</c> if the specified node is in current path; otherwise, <c>false</c>.
+        /// </returns>
+        public override bool IsInCurrentPath()
+        {
+            ISiteMapNode node = this;
+            return SiteMap.CurrentNode != null && (SiteMap.CurrentNode.Equals(node) || SiteMap.CurrentNode.IsDescendantOf(node));
+        }
     }
 }

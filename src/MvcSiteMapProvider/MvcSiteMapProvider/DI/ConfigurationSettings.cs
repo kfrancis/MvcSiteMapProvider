@@ -58,11 +58,7 @@ namespace MvcSiteMapProvider.DI
         private string GetConfigurationValueOrFallback(string name, string defaultValue)
         {
             var value = ConfigurationManager.AppSettings[name];
-            if (!string.IsNullOrEmpty(value))
-            {
-                return value;
-            }
-            return defaultValue;
+            return !string.IsNullOrEmpty(value) ? value : defaultValue;
         }
     }
 }

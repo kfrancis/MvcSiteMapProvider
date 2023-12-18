@@ -13,8 +13,20 @@ namespace MvcSiteMapProvider.Builder
     public class XmlSiteMapBuilder
         : ISiteMapBuilder
     {
+        protected readonly IDynamicNodeBuilder dynamicNodeBuilder;
+
+        protected readonly INodeKeyGenerator nodeKeyGenerator;
+
+        protected readonly ISiteMapXmlReservedAttributeNameProvider reservedAttributeNameProvider;
+
+        protected readonly ISiteMapNodeFactory siteMapNodeFactory;
+
+        protected readonly ISiteMapXmlNameProvider xmlNameProvider;
+
+        protected readonly IXmlSource xmlSource;
+
         public XmlSiteMapBuilder(
-            IXmlSource xmlSource,
+                                                            IXmlSource xmlSource,
             ISiteMapXmlReservedAttributeNameProvider reservedAttributeNameProvider,
             INodeKeyGenerator nodeKeyGenerator,
             IDynamicNodeBuilder dynamicNodeBuilder,
@@ -30,15 +42,6 @@ namespace MvcSiteMapProvider.Builder
             this.xmlNameProvider = xmlNameProvider ?? throw new ArgumentNullException(nameof(xmlNameProvider));
         }
 
-        protected readonly IXmlSource xmlSource;
-        protected readonly ISiteMapXmlReservedAttributeNameProvider reservedAttributeNameProvider;
-        protected readonly INodeKeyGenerator nodeKeyGenerator;
-        protected readonly IDynamicNodeBuilder dynamicNodeBuilder;
-        protected readonly ISiteMapNodeFactory siteMapNodeFactory;
-        protected readonly ISiteMapXmlNameProvider xmlNameProvider;
-
-        #region ISiteMapBuilder Members
-
         public virtual ISiteMapNode BuildSiteMap(ISiteMap siteMap, ISiteMapNode rootNode)
         {
             var xml = xmlSource.GetXml();
@@ -49,30 +52,6 @@ namespace MvcSiteMapProvider.Builder
 
             // Done!
             return rootNode;
-        }
-
-        #endregion ISiteMapBuilder Members
-
-        protected virtual ISiteMapNode LoadSiteMapFromXml(ISiteMap siteMap, XDocument xml)
-        {
-            xmlNameProvider.FixXmlNamespaces(xml);
-
-            // Get the root mvcSiteMapNode element, and map this to an MvcSiteMapNode
-            var rootElement = GetRootElement(xml);
-            var root = GetRootNode(siteMap, xml, rootElement);
-
-            // Fixes #192 root node not added to sitemap
-            if (siteMap.FindSiteMapNodeFromKey(root.Key) == null)
-            {
-                // Add the root node to the sitemap
-                siteMap.AddNode(root);
-            }
-
-            // Process our XML, passing in the main root sitemap node and XML element.
-            ProcessXmlNodes(siteMap, root, rootElement);
-
-            // Done!
-            return root;
         }
 
         protected virtual XElement GetRootElement(XDocument xml)
@@ -209,6 +188,28 @@ namespace MvcSiteMapProvider.Builder
             }
 
             return result;
+        }
+
+        protected virtual ISiteMapNode LoadSiteMapFromXml(ISiteMap siteMap, XDocument xml)
+        {
+            xmlNameProvider.FixXmlNamespaces(xml);
+
+            // Get the root mvcSiteMapNode element, and map this to an MvcSiteMapNode
+            var rootElement = GetRootElement(xml);
+            var root = GetRootNode(siteMap, xml, rootElement);
+
+            // Fixes #192 root node not added to sitemap
+            if (siteMap.FindSiteMapNodeFromKey(root.Key) == null)
+            {
+                // Add the root node to the sitemap
+                siteMap.AddNode(root);
+            }
+
+            // Process our XML, passing in the main root sitemap node and XML element.
+            ProcessXmlNodes(siteMap, root, rootElement);
+
+            // Done!
+            return root;
         }
 
         /// <summary>

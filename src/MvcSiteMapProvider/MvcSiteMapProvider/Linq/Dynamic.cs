@@ -72,8 +72,9 @@ namespace MvcSiteMapProvider.Linq
 
         public static IQueryable Take(this IQueryable source, int count)
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            return source.Provider.CreateQuery(
+            return source == null
+                ? throw new ArgumentNullException(nameof(source))
+                : source.Provider.CreateQuery(
                 Expression.Call(
                     typeof(Queryable), "Take",
                     new Type[] { source.ElementType },
@@ -82,8 +83,9 @@ namespace MvcSiteMapProvider.Linq
 
         public static IQueryable Skip(this IQueryable source, int count)
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            return source.Provider.CreateQuery(
+            return source == null
+                ? throw new ArgumentNullException(nameof(source))
+                : source.Provider.CreateQuery(
                 Expression.Call(
                     typeof(Queryable), "Skip",
                     new Type[] { source.ElementType },
@@ -106,8 +108,9 @@ namespace MvcSiteMapProvider.Linq
 
         public static bool Any(this IQueryable source)
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            return (bool)source.Provider.Execute(
+            return source == null
+                ? throw new ArgumentNullException(nameof(source))
+                : (bool)source.Provider.Execute(
                 Expression.Call(
                     typeof(Queryable), "Any",
                     new Type[] { source.ElementType }, source.Expression));
@@ -115,8 +118,9 @@ namespace MvcSiteMapProvider.Linq
 
         public static int Count(this IQueryable source)
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            return (int)source.Provider.Execute(
+            return source == null
+                ? throw new ArgumentNullException(nameof(source))
+                : (int)source.Provider.Execute(
                 Expression.Call(
                     typeof(Queryable), "Count",
                     new Type[] { source.ElementType }, source.Expression));
@@ -1102,8 +1106,7 @@ namespace MvcSiteMapProvider.Linq
                 NextToken();
                 if (value <= Int32.MaxValue) return CreateLiteral((int)value, tokenText);
                 if (value <= UInt32.MaxValue) return CreateLiteral((uint)value, tokenText);
-                if (value <= Int64.MaxValue) return CreateLiteral((long)value, tokenText);
-                return CreateLiteral(value, tokenText);
+                return value <= Int64.MaxValue ? CreateLiteral((long)value, tokenText) : CreateLiteral(value, tokenText);
             }
             else
             {
@@ -1111,9 +1114,7 @@ namespace MvcSiteMapProvider.Linq
                 if (!Int64.TryParse(tokenText, out value))
                     throw ParseError(Res.InvalidIntegerLiteral, tokenText);
                 NextToken();
-                if (value >= Int32.MinValue && value <= Int32.MaxValue)
-                    return CreateLiteral((int)value, tokenText);
-                return CreateLiteral(value, tokenText);
+                return value >= Int32.MinValue && value <= Int32.MaxValue ? CreateLiteral((int)value, tokenText) : CreateLiteral(value, tokenText);
             }
         }
 
@@ -1182,8 +1183,7 @@ namespace MvcSiteMapProvider.Linq
                 NextToken();
                 return expr;
             }
-            if (it != null) return ParseMemberAccess(null, it);
-            throw ParseError(Res.UnknownIdentifier, token.text);
+            return it != null ? ParseMemberAccess(null, it) : throw ParseError(Res.UnknownIdentifier, token.text);
         }
 
         private Expression ParseIt()
@@ -1199,9 +1199,9 @@ namespace MvcSiteMapProvider.Linq
             int errorPos = token.pos;
             NextToken();
             Expression[] args = ParseArgumentList();
-            if (args.Length != 3)
-                throw ParseError(errorPos, Res.IifRequiresThreeArgs);
-            return GenerateConditional(args[0], args[1], args[2], errorPos);
+            return args.Length != 3
+                ? throw ParseError(errorPos, Res.IifRequiresThreeArgs)
+                : GenerateConditional(args[0], args[1], args[2], errorPos);
         }
 
         private Expression GenerateConditional(Expression test, Expression expr1, Expression expr2, int errorPos)
@@ -1275,9 +1275,9 @@ namespace MvcSiteMapProvider.Linq
             NextToken();
             Expression[] args = ParseArgumentList();
             MethodBase method;
-            if (FindMethod(lambda.Type, "Invoke", false, args, out method) != 1)
-                throw ParseError(errorPos, Res.ArgsIncompatibleWithLambda);
-            return Expression.Invoke(lambda, args);
+            return FindMethod(lambda.Type, "Invoke", false, args, out method) != 1
+                ? throw ParseError(errorPos, Res.ArgsIncompatibleWithLambda)
+                : (Expression)Expression.Invoke(lambda, args);
         }
 
         private Expression ParseTypeAccess(Type type)
@@ -1326,10 +1326,10 @@ namespace MvcSiteMapProvider.Linq
                     (IsNumericType(type)) || IsEnumType(type))
                     return Expression.ConvertChecked(expr, type);
             }
-            if (exprType.IsAssignableFrom(type) || type.IsAssignableFrom(exprType) ||
-                exprType.IsInterface || type.IsInterface)
-                return Expression.Convert(expr, type);
-            throw ParseError(errorPos, Res.CannotConvertValue,
+            return exprType.IsAssignableFrom(type) || type.IsAssignableFrom(exprType) ||
+                exprType.IsInterface || type.IsInterface
+                ? (Expression)Expression.Convert(expr, type)
+                : throw ParseError(errorPos, Res.CannotConvertValue,
                 GetTypeName(exprType), GetTypeName(type));
         }
 
@@ -1749,8 +1749,7 @@ namespace MvcSiteMapProvider.Linq
             }
             if (IsCompatibleWith(expr.Type, type))
             {
-                if (type.IsValueType || exact) return Expression.Convert(expr, type);
-                return expr;
+                return type.IsValueType || exact ? Expression.Convert(expr, type) : expr;
             }
             return null;
         }
@@ -1989,8 +1988,7 @@ namespace MvcSiteMapProvider.Linq
             if (t1t2 && !t2t1) return 1;
             if (t2t1 && !t1t2) return -1;
             if (IsSignedIntegralType(t1) && IsUnsignedIntegralType(t2)) return 1;
-            if (IsSignedIntegralType(t2) && IsUnsignedIntegralType(t1)) return -1;
-            return 0;
+            return IsSignedIntegralType(t2) && IsUnsignedIntegralType(t1) ? -1 : 0;
         }
 
         private Expression GenerateEqual(Expression left, Expression right)
@@ -2005,59 +2003,49 @@ namespace MvcSiteMapProvider.Linq
 
         private Expression GenerateGreaterThan(Expression left, Expression right)
         {
-            if (left.Type == typeof(string))
-            {
-                return Expression.GreaterThan(
+            return left.Type == typeof(string)
+                ? Expression.GreaterThan(
                     GenerateStaticMethodCall("Compare", left, right),
                     Expression.Constant(0)
-                );
-            }
-            return Expression.GreaterThan(left, right);
+                )
+                : (Expression)Expression.GreaterThan(left, right);
         }
 
         private Expression GenerateGreaterThanEqual(Expression left, Expression right)
         {
-            if (left.Type == typeof(string))
-            {
-                return Expression.GreaterThanOrEqual(
+            return left.Type == typeof(string)
+                ? Expression.GreaterThanOrEqual(
                     GenerateStaticMethodCall("Compare", left, right),
                     Expression.Constant(0)
-                );
-            }
-            return Expression.GreaterThanOrEqual(left, right);
+                )
+                : (Expression)Expression.GreaterThanOrEqual(left, right);
         }
 
         private Expression GenerateLessThan(Expression left, Expression right)
         {
-            if (left.Type == typeof(string))
-            {
-                return Expression.LessThan(
+            return left.Type == typeof(string)
+                ? Expression.LessThan(
                     GenerateStaticMethodCall("Compare", left, right),
                     Expression.Constant(0)
-                );
-            }
-            return Expression.LessThan(left, right);
+                )
+                : (Expression)Expression.LessThan(left, right);
         }
 
         private Expression GenerateLessThanEqual(Expression left, Expression right)
         {
-            if (left.Type == typeof(string))
-            {
-                return Expression.LessThanOrEqual(
+            return left.Type == typeof(string)
+                ? Expression.LessThanOrEqual(
                     GenerateStaticMethodCall("Compare", left, right),
                     Expression.Constant(0)
-                );
-            }
-            return Expression.LessThanOrEqual(left, right);
+                )
+                : (Expression)Expression.LessThanOrEqual(left, right);
         }
 
         private Expression GenerateAdd(Expression left, Expression right)
         {
-            if (left.Type == typeof(string) && right.Type == typeof(string))
-            {
-                return GenerateStaticMethodCall("Concat", left, right);
-            }
-            return Expression.Add(left, right);
+            return left.Type == typeof(string) && right.Type == typeof(string)
+                ? GenerateStaticMethodCall("Concat", left, right)
+                : Expression.Add(left, right);
         }
 
         private Expression GenerateSubtract(Expression left, Expression right)

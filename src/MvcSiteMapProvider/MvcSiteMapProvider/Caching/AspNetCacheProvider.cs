@@ -13,14 +13,16 @@ namespace MvcSiteMapProvider.Caching
     public class AspNetCacheProvider<T>
         : ICacheProvider<T>
     {
+        private readonly IMvcContextFactory mvcContextFactory;
+
         public AspNetCacheProvider(
-            IMvcContextFactory mvcContextFactory
+                    IMvcContextFactory mvcContextFactory
             )
         {
             this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
         }
 
-        private readonly IMvcContextFactory mvcContextFactory;
+        public event EventHandler<MicroCacheItemRemovedEventArgs<T>> ItemRemoved;
 
         protected HttpContextBase Context
         {
@@ -28,26 +30,6 @@ namespace MvcSiteMapProvider.Caching
             {
                 return mvcContextFactory.CreateHttpContext();
             }
-        }
-
-        #region ICacheProvider<T> Members
-
-        public event EventHandler<MicroCacheItemRemovedEventArgs<T>> ItemRemoved;
-
-        public bool Contains(string key)
-        {
-            return Context.Cache[key] != null;
-        }
-
-        public LazyLock Get(string key)
-        {
-            return (LazyLock)Context.Cache.Get(key);
-        }
-
-        public bool TryGetValue(string key, out LazyLock value)
-        {
-            value = Get(key);
-            return value != null;
         }
 
         public void Add(string key, LazyLock item, ICacheDetails cacheDetails)
@@ -67,16 +49,30 @@ namespace MvcSiteMapProvider.Caching
             Context.Cache.Insert(key, item, dependency, absolute, sliding, CacheItemPriority.NotRemovable, OnItemRemoved);
         }
 
+        public bool Contains(string key)
+        {
+            return Context.Cache[key] != null;
+        }
+
+        public LazyLock Get(string key)
+        {
+            return (LazyLock)Context.Cache.Get(key);
+        }
+
         public void Remove(string key)
         {
             Context.Cache.Remove(key);
         }
 
-        #endregion ICacheProvider<T> Members
-
-        private bool IsTimespanSet(TimeSpan timeSpan)
+        public bool TryGetValue(string key, out LazyLock value)
         {
-            return !timeSpan.Equals(TimeSpan.MinValue);
+            value = Get(key);
+            return value != null;
+        }
+
+        protected virtual void OnCacheItemRemoved(MicroCacheItemRemovedEventArgs<T> e)
+        {
+            ItemRemoved?.Invoke(this, e);
         }
 
         /// <summary>
@@ -91,12 +87,9 @@ namespace MvcSiteMapProvider.Caching
             OnCacheItemRemoved(args);
         }
 
-        protected virtual void OnCacheItemRemoved(MicroCacheItemRemovedEventArgs<T> e)
+        private bool IsTimespanSet(TimeSpan timeSpan)
         {
-            if (ItemRemoved != null)
-            {
-                ItemRemoved(this, e);
-            }
+            return !timeSpan.Equals(TimeSpan.MinValue);
         }
     }
 }

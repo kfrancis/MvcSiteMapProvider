@@ -14,8 +14,6 @@ namespace MvcSiteMapProvider.Web.Mvc.Filters
     public class GlobalFilterProvider
         : IGlobalFilterProvider
     {
-        #region IGlobalFilterProvider Members
-
         public IEnumerable<Filter> GetFilters(ControllerContext controllerContext, ActionDescriptor actionDescriptor)
         {
 #if !MVC2
@@ -24,7 +22,5 @@ namespace MvcSiteMapProvider.Web.Mvc.Filters
             return new List<Filter>();
 #endif
         }
-
-        #endregion IGlobalFilterProvider Members
     }
 }

@@ -11,8 +11,10 @@ namespace MvcSiteMapProvider.Builder
     public class AspNetNamedSiteMapProvider
         : IAspNetSiteMapProvider
     {
+        protected readonly string providerName;
+
         public AspNetNamedSiteMapProvider(
-            string providerName
+                    string providerName
             )
         {
             if (string.IsNullOrEmpty(providerName))
@@ -20,15 +22,9 @@ namespace MvcSiteMapProvider.Builder
             this.providerName = providerName;
         }
 
-        protected readonly string providerName;
-
-        #region IAspNetStaticSiteMapProvider Members
-
         public SiteMapProvider GetProvider()
         {
             return System.Web.SiteMap.Providers[providerName];
         }
-
-        #endregion IAspNetStaticSiteMapProvider Members
     }
 }

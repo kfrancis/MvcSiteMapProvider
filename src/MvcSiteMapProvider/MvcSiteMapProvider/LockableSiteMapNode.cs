@@ -36,250 +36,30 @@ namespace MvcSiteMapProvider
         }
 
         /// <summary>
-        /// Gets or sets the display sort order for the node relative to its sibling nodes.
+        /// Gets or sets the action.
         /// </summary>
-        public override int Order
+        /// <value>The action.</value>
+        public override string Action
         {
-            get { return base.Order; }
+            get { return base.Action; }
             set
             {
-                ThrowIfReadOnly("Order");
-                base.Order = value;
+                ThrowIfReadOnly("Action");
+                base.Action = value;
             }
         }
 
         /// <summary>
-        /// Gets or sets the HTTP method.
+        /// Gets or sets the area.
         /// </summary>
-        /// <value>
-        /// The HTTP method.
-        /// </value>
-        public override string HttpMethod
+        /// <value>The area.</value>
+        public override string Area
         {
-            get { return base.HttpMethod; }
+            get { return base.Area; }
             set
             {
-                ThrowIfReadOnly("HttpMethod");
-                base.HttpMethod = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the title (optional).
-        /// </summary>
-        /// <value>The title.</value>
-        public override string Title
-        {
-            get { return base.Title; }
-            set
-            {
-                ThrowIfReadOnly("Title");
-                base.Title = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the description (optional).
-        /// </summary>
-        /// <value>The description.</value>
-        public override string Description
-        {
-            get { return base.Description; }
-            set
-            {
-                ThrowIfReadOnly("Description");
-                base.Description = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the target frame (optional).
-        /// </summary>
-        /// <value>The target frame.</value>
-        public override string TargetFrame
-        {
-            get { return base.TargetFrame; }
-            set
-            {
-                ThrowIfReadOnly("TargetFrame");
-                base.TargetFrame = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the image URL (optional).
-        /// </summary>
-        /// <value>The image URL.</value>
-        public override string ImageUrl
-        {
-            get { return base.ImageUrl; }
-            set
-            {
-                ThrowIfReadOnly("ImageUrl");
-                base.ImageUrl = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the image URL protocol, such as http, https (optional).
-        /// If not provided, it will default to the protocol of the current request.
-        /// </summary>
-        /// <value>The protocol of the image URL.</value>
-        public override string ImageUrlProtocol
-        {
-            get { return base.ImageUrlProtocol; }
-            set
-            {
-                ThrowIfReadOnly("ImageUrlProtocol");
-                base.ImageUrlProtocol = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the image URL host name, such as www.somewhere.com (optional).
-        /// </summary>
-        /// <value>The protocol of the image URL.</value>
-        public override string ImageUrlHostName
-        {
-            get { return base.ImageUrlHostName; }
-            set
-            {
-                ThrowIfReadOnly("ImageUrlHostName");
-                base.ImageUrlHostName = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the last modified date.
-        /// </summary>
-        /// <value>The last modified date.</value>
-        public override DateTime LastModifiedDate
-        {
-            get { return base.LastModifiedDate; }
-            set
-            {
-                ThrowIfReadOnly("LastModifiedDate");
-                base.LastModifiedDate = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the change frequency.
-        /// </summary>
-        /// <value>The change frequency.</value>
-        public override ChangeFrequency ChangeFrequency
-        {
-            get { return base.ChangeFrequency; }
-            set
-            {
-                ThrowIfReadOnly("ChangeFrequency");
-                base.ChangeFrequency = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the update priority.
-        /// </summary>
-        /// <value>The update priority.</value>
-        public override UpdatePriority UpdatePriority
-        {
-            get { return base.UpdatePriority; }
-            set
-            {
-                ThrowIfReadOnly("UpdatePriority");
-                base.UpdatePriority = value;
-            }
-        }
-
-        #region Visibility
-
-        /// <summary>
-        /// Gets or sets the name or the type of the visibility provider.
-        /// This value will be used to select the concrete type of provider to use to determine
-        /// visibility.
-        /// </summary>
-        /// <value>
-        /// The name or type of the visibility provider.
-        /// </value>
-        public override string VisibilityProvider
-        {
-            get { return base.VisibilityProvider; }
-            set
-            {
-                ThrowIfReadOnly("VisibilityProvider");
-                base.VisibilityProvider = value;
-            }
-        }
-
-        #endregion Visibility
-
-        #region Dynamic Nodes
-
-        /// <summary>
-        /// Gets or sets the name or type of the Dynamic Node Provider.
-        /// </summary>
-        /// <value>
-        /// The name or type of the Dynamic Node Provider.
-        /// </value>
-        public override string DynamicNodeProvider
-        {
-            get { return base.DynamicNodeProvider; }
-            set
-            {
-                ThrowIfReadOnly("DynamicNodeProvider");
-                base.DynamicNodeProvider = value;
-            }
-        }
-
-        #endregion Dynamic Nodes
-
-        #region URL Resolver
-
-        /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="SiteMapNode" /> is clickable.
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if clickable; otherwise, <c>false</c>.
-        /// </value>
-        public override bool Clickable
-        {
-            get { return base.Clickable; }
-            set
-            {
-                ThrowIfReadOnly("Clickable");
-                base.Clickable = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the name or type of the URL resolver.
-        /// </summary>
-        /// <value>
-        /// The name or type of the URL resolver.
-        /// </value>
-        public override string UrlResolver
-        {
-            get { return base.UrlResolver; }
-            set
-            {
-                ThrowIfReadOnly("UrlResolver");
-                base.UrlResolver = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets the URL.
-        /// </summary>
-        /// <value>
-        /// The URL.
-        /// </value>
-        public override string Url
-        {
-            get { return base.Url; }
-            set
-            {
-                ThrowIfReadOnly("Url");
-                base.Url = value;
+                ThrowIfReadOnly("Area");
+                base.Area = value;
             }
         }
 
@@ -296,63 +76,6 @@ namespace MvcSiteMapProvider
                 base.CacheResolvedUrl = value;
             }
         }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to include ambient request values
-        /// (from the RouteValues and/or query string) when resolving URLs.
-        /// </summary>
-        /// <value><b>true</b> to include ambient values (like MVC does); otherwise <b>false</b>.</value>
-        public override bool IncludeAmbientValuesInUrl
-        {
-            get { return base.IncludeAmbientValuesInUrl; }
-            set
-            {
-                ThrowIfReadOnly("IncludeAmbientValuesInUrl");
-                base.IncludeAmbientValuesInUrl = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the protocol, such as http or https that will
-        /// be built into the URL.
-        /// </summary>
-        /// <value>The protocol.</value>
-        public override string Protocol
-        {
-            get { return base.Protocol; }
-            set
-            {
-                ThrowIfReadOnly("Protocol");
-                base.Protocol = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the host name that will be built into the URL.
-        /// </summary>
-        /// <value>The host name.</value>
-        public override string HostName
-        {
-            get { return base.HostName; }
-            set
-            {
-                ThrowIfReadOnly("HostName");
-                base.HostName = value;
-            }
-        }
-
-        /// <summary>
-        /// Sets the ResolvedUrl using the current Url or Url resolver.
-        /// </summary>
-        public override void ResolveUrl()
-        {
-            ThrowIfReadOnly("ResolveUrl");
-            base.ResolveUrl();
-        }
-
-        #endregion URL Resolver
-
-        #region Canonical Tag
 
         /// <summary>
         /// Gets or sets the canonical key. The key is used to reference another <see cref="T:MvcSiteMapProvider.ISiteMapNode"/> to get the canonical URL.
@@ -383,6 +106,20 @@ namespace MvcSiteMapProvider
         }
 
         /// <summary>
+        /// Gets or sets the canonical URL host name, such as www.somewhere.com (optional).
+        /// </summary>
+        /// <value>The protocol of the image URL.</value>
+        public override string CanonicalUrlHostName
+        {
+            get { return base.CanonicalUrlHostName; }
+            set
+            {
+                ThrowIfReadOnly("CanonicalUrlHostName");
+                base.CanonicalUrlHostName = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the canonical URL protocol, such as http, https (optional).
         /// </summary>
         /// <value>The protocol of the image URL.</value>
@@ -397,52 +134,32 @@ namespace MvcSiteMapProvider
         }
 
         /// <summary>
-        /// Gets or sets the canonical URL host name, such as www.somewhere.com (optional).
+        /// Gets or sets the change frequency.
         /// </summary>
-        /// <value>The protocol of the image URL.</value>
-        public override string CanonicalUrlHostName
+        /// <value>The change frequency.</value>
+        public override ChangeFrequency ChangeFrequency
         {
-            get { return base.CanonicalUrlHostName; }
+            get { return base.ChangeFrequency; }
             set
             {
-                ThrowIfReadOnly("CanonicalUrlHostName");
-                base.CanonicalUrlHostName = value;
+                ThrowIfReadOnly("ChangeFrequency");
+                base.ChangeFrequency = value;
             }
         }
 
-        #endregion Canonical Tag
-
-        #region Route
-
         /// <summary>
-        /// Gets or sets the route.
+        /// Gets or sets a value indicating whether this <see cref="SiteMapNode" /> is clickable.
         /// </summary>
-        /// <value>The route.</value>
-        public override string Route
+        /// <value>
+        ///   <c>true</c> if clickable; otherwise, <c>false</c>.
+        /// </value>
+        public override bool Clickable
         {
-            get { return base.Route; }
+            get { return base.Clickable; }
             set
             {
-                ThrowIfReadOnly("Route");
-                base.Route = value;
-            }
-        }
-
-        #endregion Route
-
-        #region MVC
-
-        /// <summary>
-        /// Gets or sets the area.
-        /// </summary>
-        /// <value>The area.</value>
-        public override string Area
-        {
-            get { return base.Area; }
-            set
-            {
-                ThrowIfReadOnly("Area");
-                base.Area = value;
+                ThrowIfReadOnly("Clickable");
+                base.Clickable = value;
             }
         }
 
@@ -461,20 +178,279 @@ namespace MvcSiteMapProvider
         }
 
         /// <summary>
-        /// Gets or sets the action.
+        /// Gets or sets the description (optional).
         /// </summary>
-        /// <value>The action.</value>
-        public override string Action
+        /// <value>The description.</value>
+        public override string Description
         {
-            get { return base.Action; }
+            get { return base.Description; }
             set
             {
-                ThrowIfReadOnly("Action");
-                base.Action = value;
+                ThrowIfReadOnly("Description");
+                base.Description = value;
             }
         }
 
-        #endregion MVC
+        /// <summary>
+        /// Gets or sets the name or type of the Dynamic Node Provider.
+        /// </summary>
+        /// <value>
+        /// The name or type of the Dynamic Node Provider.
+        /// </value>
+        public override string DynamicNodeProvider
+        {
+            get { return base.DynamicNodeProvider; }
+            set
+            {
+                ThrowIfReadOnly("DynamicNodeProvider");
+                base.DynamicNodeProvider = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the host name that will be built into the URL.
+        /// </summary>
+        /// <value>The host name.</value>
+        public override string HostName
+        {
+            get { return base.HostName; }
+            set
+            {
+                ThrowIfReadOnly("HostName");
+                base.HostName = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the HTTP method.
+        /// </summary>
+        /// <value>
+        /// The HTTP method.
+        /// </value>
+        public override string HttpMethod
+        {
+            get { return base.HttpMethod; }
+            set
+            {
+                ThrowIfReadOnly("HttpMethod");
+                base.HttpMethod = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the image URL (optional).
+        /// </summary>
+        /// <value>The image URL.</value>
+        public override string ImageUrl
+        {
+            get { return base.ImageUrl; }
+            set
+            {
+                ThrowIfReadOnly("ImageUrl");
+                base.ImageUrl = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the image URL host name, such as www.somewhere.com (optional).
+        /// </summary>
+        /// <value>The protocol of the image URL.</value>
+        public override string ImageUrlHostName
+        {
+            get { return base.ImageUrlHostName; }
+            set
+            {
+                ThrowIfReadOnly("ImageUrlHostName");
+                base.ImageUrlHostName = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the image URL protocol, such as http, https (optional).
+        /// If not provided, it will default to the protocol of the current request.
+        /// </summary>
+        /// <value>The protocol of the image URL.</value>
+        public override string ImageUrlProtocol
+        {
+            get { return base.ImageUrlProtocol; }
+            set
+            {
+                ThrowIfReadOnly("ImageUrlProtocol");
+                base.ImageUrlProtocol = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to include ambient request values
+        /// (from the RouteValues and/or query string) when resolving URLs.
+        /// </summary>
+        /// <value><b>true</b> to include ambient values (like MVC does); otherwise <b>false</b>.</value>
+        public override bool IncludeAmbientValuesInUrl
+        {
+            get { return base.IncludeAmbientValuesInUrl; }
+            set
+            {
+                ThrowIfReadOnly("IncludeAmbientValuesInUrl");
+                base.IncludeAmbientValuesInUrl = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the last modified date.
+        /// </summary>
+        /// <value>The last modified date.</value>
+        public override DateTime LastModifiedDate
+        {
+            get { return base.LastModifiedDate; }
+            set
+            {
+                ThrowIfReadOnly("LastModifiedDate");
+                base.LastModifiedDate = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the display sort order for the node relative to its sibling nodes.
+        /// </summary>
+        public override int Order
+        {
+            get { return base.Order; }
+            set
+            {
+                ThrowIfReadOnly("Order");
+                base.Order = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the protocol, such as http or https that will
+        /// be built into the URL.
+        /// </summary>
+        /// <value>The protocol.</value>
+        public override string Protocol
+        {
+            get { return base.Protocol; }
+            set
+            {
+                ThrowIfReadOnly("Protocol");
+                base.Protocol = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the route.
+        /// </summary>
+        /// <value>The route.</value>
+        public override string Route
+        {
+            get { return base.Route; }
+            set
+            {
+                ThrowIfReadOnly("Route");
+                base.Route = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the target frame (optional).
+        /// </summary>
+        /// <value>The target frame.</value>
+        public override string TargetFrame
+        {
+            get { return base.TargetFrame; }
+            set
+            {
+                ThrowIfReadOnly("TargetFrame");
+                base.TargetFrame = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the title (optional).
+        /// </summary>
+        /// <value>The title.</value>
+        public override string Title
+        {
+            get { return base.Title; }
+            set
+            {
+                ThrowIfReadOnly("Title");
+                base.Title = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the update priority.
+        /// </summary>
+        /// <value>The update priority.</value>
+        public override UpdatePriority UpdatePriority
+        {
+            get { return base.UpdatePriority; }
+            set
+            {
+                ThrowIfReadOnly("UpdatePriority");
+                base.UpdatePriority = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the URL.
+        /// </summary>
+        /// <value>
+        /// The URL.
+        /// </value>
+        public override string Url
+        {
+            get { return base.Url; }
+            set
+            {
+                ThrowIfReadOnly("Url");
+                base.Url = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the name or type of the URL resolver.
+        /// </summary>
+        /// <value>
+        /// The name or type of the URL resolver.
+        /// </value>
+        public override string UrlResolver
+        {
+            get { return base.UrlResolver; }
+            set
+            {
+                ThrowIfReadOnly("UrlResolver");
+                base.UrlResolver = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the name or the type of the visibility provider.
+        /// This value will be used to select the concrete type of provider to use to determine
+        /// visibility.
+        /// </summary>
+        /// <value>
+        /// The name or type of the visibility provider.
+        /// </value>
+        public override string VisibilityProvider
+        {
+            get { return base.VisibilityProvider; }
+            set
+            {
+                ThrowIfReadOnly("VisibilityProvider");
+                base.VisibilityProvider = value;
+            }
+        }
+
+        /// <summary>
+        /// Sets the ResolvedUrl using the current Url or Url resolver.
+        /// </summary>
+        public override void ResolveUrl()
+        {
+            ThrowIfReadOnly("ResolveUrl");
+            base.ResolveUrl();
+        }
 
         protected virtual void ThrowIfReadOnly(string memberName)
         {

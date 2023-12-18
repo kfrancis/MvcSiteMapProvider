@@ -10,22 +10,18 @@ namespace MvcSiteMapProvider.Web
     public class CustomBindingProvider
         : IBindingProvider
     {
+        protected readonly IEnumerable<IBinding> bindings;
+
         public CustomBindingProvider(
-            IEnumerable<IBinding> bindings
+                    IEnumerable<IBinding> bindings
             )
         {
             this.bindings = bindings ?? throw new ArgumentNullException(nameof(bindings));
         }
 
-        protected readonly IEnumerable<IBinding> bindings;
-
-        #region IBindingProvider Members
-
         public IEnumerable<IBinding> GetBindings()
         {
             return bindings;
         }
-
-        #endregion IBindingProvider Members
     }
 }

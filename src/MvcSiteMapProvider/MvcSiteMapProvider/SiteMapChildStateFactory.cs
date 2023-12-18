@@ -13,8 +13,14 @@ namespace MvcSiteMapProvider
     public class SiteMapChildStateFactory
         : ISiteMapChildStateFactory
     {
+        protected readonly IGenericDictionaryFactory genericDictionaryFactory;
+
+        protected readonly ISiteMapNodeCollectionFactory siteMapNodeCollectionFactory;
+
+        protected readonly IUrlKeyFactory urlKeyFactory;
+
         public SiteMapChildStateFactory(
-            IGenericDictionaryFactory genericDictionaryFactory,
+                                    IGenericDictionaryFactory genericDictionaryFactory,
             ISiteMapNodeCollectionFactory siteMapNodeCollectionFactory,
             IUrlKeyFactory urlKeyFactory
             )
@@ -24,15 +30,14 @@ namespace MvcSiteMapProvider
             this.urlKeyFactory = urlKeyFactory ?? throw new ArgumentNullException(nameof(urlKeyFactory));
         }
 
-        protected readonly IGenericDictionaryFactory genericDictionaryFactory;
-        protected readonly ISiteMapNodeCollectionFactory siteMapNodeCollectionFactory;
-        protected readonly IUrlKeyFactory urlKeyFactory;
-
-        #region ISiteMapChildStateFactory Members
-
         public virtual IDictionary<ISiteMapNode, ISiteMapNodeCollection> CreateChildNodeCollectionDictionary()
         {
             return genericDictionaryFactory.Create<ISiteMapNode, ISiteMapNodeCollection>();
+        }
+
+        public virtual ISiteMapNodeCollection CreateEmptyReadOnlySiteMapNodeCollection()
+        {
+            return siteMapNodeCollectionFactory.CreateEmptyReadOnly();
         }
 
         public virtual IDictionary<string, ISiteMapNode> CreateKeyDictionary()
@@ -40,9 +45,24 @@ namespace MvcSiteMapProvider
             return genericDictionaryFactory.Create<string, ISiteMapNode>();
         }
 
+        public virtual ISiteMapNodeCollection CreateLockableSiteMapNodeCollection(ISiteMap siteMap)
+        {
+            return siteMapNodeCollectionFactory.CreateLockable(siteMap);
+        }
+
         public virtual IDictionary<ISiteMapNode, ISiteMapNode> CreateParentNodeDictionary()
         {
             return genericDictionaryFactory.Create<ISiteMapNode, ISiteMapNode>();
+        }
+
+        public virtual ISiteMapNodeCollection CreateReadOnlySiteMapNodeCollection(ISiteMapNodeCollection siteMapNodeCollection)
+        {
+            return siteMapNodeCollectionFactory.CreateReadOnly(siteMapNodeCollection);
+        }
+
+        public virtual ISiteMapNodeCollection CreateSiteMapNodeCollection()
+        {
+            return siteMapNodeCollectionFactory.Create();
         }
 
         public virtual IDictionary<IUrlKey, ISiteMapNode> CreateUrlDictionary()
@@ -59,27 +79,5 @@ namespace MvcSiteMapProvider
         {
             return urlKeyFactory.Create(relativeOrAbsoluteUrl, hostName);
         }
-
-        public virtual ISiteMapNodeCollection CreateSiteMapNodeCollection()
-        {
-            return siteMapNodeCollectionFactory.Create();
-        }
-
-        public virtual ISiteMapNodeCollection CreateLockableSiteMapNodeCollection(ISiteMap siteMap)
-        {
-            return siteMapNodeCollectionFactory.CreateLockable(siteMap);
-        }
-
-        public virtual ISiteMapNodeCollection CreateReadOnlySiteMapNodeCollection(ISiteMapNodeCollection siteMapNodeCollection)
-        {
-            return siteMapNodeCollectionFactory.CreateReadOnly(siteMapNodeCollection);
-        }
-
-        public virtual ISiteMapNodeCollection CreateEmptyReadOnlySiteMapNodeCollection()
-        {
-            return siteMapNodeCollectionFactory.CreateEmptyReadOnly();
-        }
-
-        #endregion ISiteMapChildStateFactory Members
     }
 }

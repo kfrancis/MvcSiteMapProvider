@@ -9,8 +9,14 @@ namespace MvcSiteMapProvider
     public class SiteMapNodePluginProvider
         : ISiteMapNodePluginProvider
     {
+        protected readonly IDynamicNodeProviderStrategy dynamicNodeProviderStrategy;
+
+        protected readonly ISiteMapNodeUrlResolverStrategy siteMapNodeUrlResolverStrategy;
+
+        protected readonly ISiteMapNodeVisibilityProviderStrategy siteMapNodeVisibilityProviderStrategy;
+
         public SiteMapNodePluginProvider(
-            IDynamicNodeProviderStrategy dynamicNodeProviderStrategy,
+                                    IDynamicNodeProviderStrategy dynamicNodeProviderStrategy,
             ISiteMapNodeUrlResolverStrategy siteMapNodeUrlResolverStrategy,
             ISiteMapNodeVisibilityProviderStrategy siteMapNodeVisibilityProviderStrategy
             )
@@ -19,12 +25,6 @@ namespace MvcSiteMapProvider
             this.siteMapNodeUrlResolverStrategy = siteMapNodeUrlResolverStrategy ?? throw new ArgumentNullException(nameof(siteMapNodeUrlResolverStrategy));
             this.siteMapNodeVisibilityProviderStrategy = siteMapNodeVisibilityProviderStrategy ?? throw new ArgumentNullException(nameof(siteMapNodeVisibilityProviderStrategy));
         }
-
-        protected readonly IDynamicNodeProviderStrategy dynamicNodeProviderStrategy;
-        protected readonly ISiteMapNodeUrlResolverStrategy siteMapNodeUrlResolverStrategy;
-        protected readonly ISiteMapNodeVisibilityProviderStrategy siteMapNodeVisibilityProviderStrategy;
-
-        #region ISiteMapNodePluginService Members
 
         public virtual IDynamicNodeProviderStrategy DynamicNodeProviderStrategy
         {
@@ -40,7 +40,5 @@ namespace MvcSiteMapProvider
         {
             get { return siteMapNodeVisibilityProviderStrategy; }
         }
-
-        #endregion ISiteMapNodePluginService Members
     }
 }

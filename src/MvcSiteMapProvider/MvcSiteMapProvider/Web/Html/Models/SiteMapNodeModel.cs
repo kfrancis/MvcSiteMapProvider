@@ -383,12 +383,7 @@ namespace MvcSiteMapProvider.Web.Html.Models
 
         private IEnumerable<T> SortSiteMapNodes<T>(IList<T> nodesToSort) where T : ISortable
         {
-            if (nodesToSort.Any(x => x.Order != 0))
-            {
-                return nodesToSort.OrderBy(x => x.Order);
-            }
-
-            return nodesToSort;
+            return nodesToSort.Any(x => x.Order != 0) ? nodesToSort.OrderBy(x => x.Order) : (IEnumerable<T>)nodesToSort;
         }
     }
 }

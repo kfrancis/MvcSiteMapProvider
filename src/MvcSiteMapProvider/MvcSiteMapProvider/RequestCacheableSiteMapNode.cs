@@ -250,11 +250,7 @@ namespace MvcSiteMapProvider
 
         protected virtual string GetStringFromValue(object value)
         {
-            if (value.GetType().Equals(typeof(string)))
-            {
-                return value.ToString();
-            }
-            return value.GetHashCode().ToString();
+            return value.GetType().Equals(typeof(string)) ? value.ToString() : value.GetHashCode().ToString();
         }
 
         protected virtual void SetCachedOrMemberValue<T>(Action<T> member, string memberName, T value)

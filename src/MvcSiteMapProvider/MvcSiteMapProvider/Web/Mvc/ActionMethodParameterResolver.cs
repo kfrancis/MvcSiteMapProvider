@@ -14,6 +14,8 @@ namespace MvcSiteMapProvider.Web.Mvc
     public class ActionMethodParameterResolver
         : IActionMethodParameterResolver
     {
+        protected readonly IControllerDescriptorFactory controllerDescriptorFactory;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ActionMethodParameterResolver"/> class.
         /// </summary>
@@ -26,15 +28,11 @@ namespace MvcSiteMapProvider.Web.Mvc
             Cache = new ThreadSafeDictionary<string, IEnumerable<string>>();
         }
 
-        protected readonly IControllerDescriptorFactory controllerDescriptorFactory;
-
         /// <summary>
         /// Gets or sets the cache.
         /// </summary>
         /// <value>The cache.</value>
-        protected ThreadSafeDictionary<string, IEnumerable<string>> Cache { get; private set; }
-
-        #region IActionMethodParameterResolver Members
+        protected ThreadSafeDictionary<string, IEnumerable<string>> Cache { get; }
 
         /// <summary>
         /// Resolves the action method parameters.
@@ -94,7 +92,5 @@ namespace MvcSiteMapProvider.Web.Mvc
             // Return
             return actionParameters;
         }
-
-        #endregion IActionMethodParameterResolver Members
     }
 }

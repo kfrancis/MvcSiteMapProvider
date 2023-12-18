@@ -38,11 +38,7 @@ namespace MvcSiteMapProvider.Web.Mvc
         /// </returns>
         public override bool FileExists(string virtualPath)
         {
-            if (PathExists(virtualPath))
-            {
-                return true;
-            }
-            return base.FileExists(virtualPath);
+            return PathExists(virtualPath) ? true : base.FileExists(virtualPath);
         }
 
         /// <summary>
@@ -54,11 +50,7 @@ namespace MvcSiteMapProvider.Web.Mvc
         /// </returns>
         public override VirtualFile GetFile(string virtualPath)
         {
-            if (PathExists(virtualPath))
-            {
-                return new MvcSiteMapProviderViewEngineVirtualFile(virtualPath);
-            }
-            return base.GetFile(virtualPath);
+            return PathExists(virtualPath) ? new MvcSiteMapProviderViewEngineVirtualFile(virtualPath) : base.GetFile(virtualPath);
         }
 
         /// <summary>

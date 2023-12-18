@@ -20,8 +20,6 @@ namespace MvcSiteMapProvider.Web.Mvc
     public class MvcContextFactory
         : IMvcContextFactory
     {
-        #region IMvcContextFactory Members
-
         public virtual HttpContextBase CreateHttpContext()
         {
             return CreateHttpContext(null);
@@ -57,8 +55,8 @@ namespace MvcSiteMapProvider.Web.Mvc
         public virtual RequestContext CreateRequestContext()
         {
             var httpContext = CreateHttpContext();
-            if (httpContext.Handler is MvcHandler)
-                return ((MvcHandler)httpContext.Handler).RequestContext;
+            if (httpContext.Handler is MvcHandler handler)
+                return handler.RequestContext;
 #if !NET35
             else if (httpContext.Handler is Page) // Fixes #15 for interop with ASP.NET Webforms
                 return new RequestContext(httpContext, ((Page)HttpContext.Current.Handler).RouteData);
@@ -117,12 +115,9 @@ namespace MvcSiteMapProvider.Web.Mvc
         {
             if (controllerContext == null)
                 throw new ArgumentNullException(nameof(controllerContext));
-            if (actionDescriptor == null)
-                throw new ArgumentNullException(nameof(actionDescriptor));
-
-            return new AuthorizationContext(controllerContext, actionDescriptor);
+            return actionDescriptor == null
+                ? throw new ArgumentNullException(nameof(actionDescriptor))
+                : new AuthorizationContext(controllerContext, actionDescriptor);
         }
-
-        #endregion IMvcContextFactory Members
     }
 }

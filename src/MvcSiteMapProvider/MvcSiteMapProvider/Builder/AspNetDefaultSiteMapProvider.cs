@@ -10,13 +10,9 @@ namespace MvcSiteMapProvider.Builder
     public class AspNetDefaultSiteMapProvider
         : IAspNetSiteMapProvider
     {
-        #region IAspNetStaticSiteMapProvider Members
-
         public SiteMapProvider GetProvider()
         {
             return System.Web.SiteMap.Provider;
         }
-
-        #endregion IAspNetStaticSiteMapProvider Members
     }
 }

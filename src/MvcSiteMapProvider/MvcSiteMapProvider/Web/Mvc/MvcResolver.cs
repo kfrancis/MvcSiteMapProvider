@@ -11,8 +11,12 @@ namespace MvcSiteMapProvider.Web.Mvc
     public class MvcResolver
         : IMvcResolver
     {
+        protected readonly IActionMethodParameterResolver actionMethodParameterResolver;
+
+        protected readonly IControllerTypeResolver controllerTypeResolver;
+
         public MvcResolver(
-            IControllerTypeResolver controllerTypeResolver,
+                            IControllerTypeResolver controllerTypeResolver,
             IActionMethodParameterResolver actionMethodParameterResolver
             )
         {
@@ -20,21 +24,14 @@ namespace MvcSiteMapProvider.Web.Mvc
             this.actionMethodParameterResolver = actionMethodParameterResolver ?? throw new ArgumentNullException(nameof(actionMethodParameterResolver));
         }
 
-        protected readonly IControllerTypeResolver controllerTypeResolver;
-        protected readonly IActionMethodParameterResolver actionMethodParameterResolver;
-
-        #region IMvcResolver Members
-
-        public Type ResolveControllerType(string areaName, string controllerName)
-        {
-            return controllerTypeResolver.ResolveControllerType(areaName, controllerName);
-        }
-
         public IEnumerable<string> ResolveActionMethodParameters(string areaName, string controllerName, string actionMethodName)
         {
             return actionMethodParameterResolver.ResolveActionMethodParameters(controllerTypeResolver, areaName, controllerName, actionMethodName);
         }
 
-        #endregion IMvcResolver Members
+        public Type ResolveControllerType(string areaName, string controllerName)
+        {
+            return controllerTypeResolver.ResolveControllerType(areaName, controllerName);
+        }
     }
 }

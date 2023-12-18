@@ -10,8 +10,6 @@ namespace MvcSiteMapProvider.Builder
     public class SiteMapHierarchyBuilder
         : ISiteMapHierarchyBuilder
     {
-        #region ISiteMapHierarchyBuilder Members
-
         public IEnumerable<ISiteMapNodeToParentRelation> BuildHierarchy(ISiteMap siteMap, IEnumerable<ISiteMapNodeToParentRelation> nodes)
         {
             var sourceNodesByParent = nodes.ToLookup(n => n.ParentKey);
@@ -44,10 +42,20 @@ namespace MvcSiteMapProvider.Builder
             return sourceNodes;
         }
 
-        #endregion ISiteMapHierarchyBuilder Members
+        protected virtual void AddAndTrackNode(
+            ISiteMap siteMap,
+            ISiteMapNodeToParentRelation nodeParentMap,
+            ISiteMapNode parentNode,
+            IList<ISiteMapNodeToParentRelation> sourceNodes,
+            HashSet<string> nodesAlreadyAdded)
+        {
+            siteMap.AddNode(nodeParentMap.Node, parentNode);
+            nodesAlreadyAdded.Add(nodeParentMap.Node.Key);
+            sourceNodes.Remove(nodeParentMap);
+        }
 
         protected virtual void AddDescendantNodes(
-            ISiteMap siteMap,
+                    ISiteMap siteMap,
             ISiteMapNode currentNode,
             IList<ISiteMapNodeToParentRelation> sourceNodes,
             ILookup<string, ISiteMapNodeToParentRelation> sourceNodesByParent,
@@ -59,7 +67,7 @@ namespace MvcSiteMapProvider.Builder
             }
 
             var children = sourceNodesByParent[currentNode.Key].OrderBy(x => x.Node.Order).ToArray();
-            if (children.Count() == 0)
+            if (children.Length == 0)
             {
                 return;
             }
@@ -80,18 +88,6 @@ namespace MvcSiteMapProvider.Builder
 
                 AddDescendantNodes(siteMap, child.Node, sourceNodes, sourceNodesByParent, nodesAlreadyAdded);
             }
-        }
-
-        protected virtual void AddAndTrackNode(
-            ISiteMap siteMap,
-            ISiteMapNodeToParentRelation nodeParentMap,
-            ISiteMapNode parentNode,
-            IList<ISiteMapNodeToParentRelation> sourceNodes,
-            HashSet<string> nodesAlreadyAdded)
-        {
-            siteMap.AddNode(nodeParentMap.Node, parentNode);
-            nodesAlreadyAdded.Add(nodeParentMap.Node.Key);
-            sourceNodes.Remove(nodeParentMap);
         }
     }
 }

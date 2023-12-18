@@ -12,8 +12,10 @@ namespace MvcSiteMapProvider.Caching
     public class RuntimeFileCacheDependency
         : ICacheDependency
     {
+        protected readonly string fileName;
+
         public RuntimeFileCacheDependency(
-            string fileName
+                    string fileName
             )
         {
             if (string.IsNullOrEmpty(fileName))
@@ -22,21 +24,17 @@ namespace MvcSiteMapProvider.Caching
             this.fileName = fileName;
         }
 
-        protected readonly string fileName;
-
-        #region ICacheDependency Members
-
         public virtual object Dependency
         {
-            get 
+            get
             {
-                var list = new List<ChangeMonitor>();
-                list.Add(new HostFileChangeMonitor(new string[] { fileName }));
-                return list; 
+                return new List<ChangeMonitor>
+                {
+                    new HostFileChangeMonitor(new string[] { fileName })
+                };
             }
         }
-
-        #endregion
     }
 }
+
 #endif

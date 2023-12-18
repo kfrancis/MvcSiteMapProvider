@@ -36,8 +36,7 @@ namespace MvcSiteMapProvider.Web.UrlResolver
         public string ResolveUrl(string providerName, ISiteMapNode node, string area, string controller, string action, IDictionary<string, object> routeValues)
         {
             var provider = GetProvider(providerName);
-            if (provider == null) return string.Empty;
-            return provider.ResolveUrl(node, area, controller, action, routeValues);
+            return provider == null ? string.Empty : provider.ResolveUrl(node, area, controller, action, routeValues);
         }
     }
 }

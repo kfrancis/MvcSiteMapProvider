@@ -12,8 +12,6 @@ namespace MvcSiteMapProvider.Web.Mvc
     public class ControllerDescriptorFactory
         : IControllerDescriptorFactory
     {
-        #region IControllerDescriptorFactory Members
-
         public ControllerDescriptor Create(Type controllerType)
         {
             ControllerDescriptor controllerDescriptor = null;
@@ -27,7 +25,5 @@ namespace MvcSiteMapProvider.Web.Mvc
             }
             return controllerDescriptor;
         }
-
-        #endregion IControllerDescriptorFactory Members
     }
 }

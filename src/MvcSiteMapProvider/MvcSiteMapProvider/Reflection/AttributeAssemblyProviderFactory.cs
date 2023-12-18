@@ -8,13 +8,9 @@ namespace MvcSiteMapProvider.Reflection
     public class AttributeAssemblyProviderFactory
         : IAttributeAssemblyProviderFactory
     {
-        #region IAttributeAssemblyProviderFactory Members
-
         public IAttributeAssemblyProvider Create(IEnumerable<string> includeAssemblies, IEnumerable<string> excludeAssemblies)
         {
             return new AttributeAssemblyProvider(includeAssemblies, excludeAssemblies);
         }
-
-        #endregion IAttributeAssemblyProviderFactory Members
     }
 }

@@ -11,8 +11,6 @@ namespace MvcSiteMapProvider
     public class FilteredSiteMapNodeVisibilityProvider
         : SiteMapNodeVisibilityProviderBase
     {
-        #region ISiteMapNodeVisibilityProvider Members
-
         /// <summary>
         /// Determines whether the node is visible.
         /// </summary>
@@ -83,7 +81,5 @@ namespace MvcSiteMapProvider
             // Still nothing? Then it's OK!
             return true;
         }
-
-        #endregion ISiteMapNodeVisibilityProvider Members
     }
 }

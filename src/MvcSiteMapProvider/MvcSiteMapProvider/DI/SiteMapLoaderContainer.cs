@@ -156,14 +156,7 @@ namespace MvcSiteMapProvider.DI
 
         private ISiteMapNodeVisitor ResolveSiteMapNodeVisitor(ConfigurationSettings settings)
         {
-            if (settings.EnableResolvedUrlCaching)
-            {
-                return new UrlResolvingSiteMapNodeVisitor();
-            }
-            else
-            {
-                return new NullSiteMapNodeVisitor();
-            }
+            return settings.EnableResolvedUrlCaching ? new UrlResolvingSiteMapNodeVisitor() : (ISiteMapNodeVisitor)new NullSiteMapNodeVisitor();
         }
 
         private ISiteMapNodeCreatorFactory ResolveSiteMapNodeCreatorFactory()

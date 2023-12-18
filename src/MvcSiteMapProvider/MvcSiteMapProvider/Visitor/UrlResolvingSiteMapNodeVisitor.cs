@@ -7,13 +7,9 @@
     public class UrlResolvingSiteMapNodeVisitor
         : ISiteMapNodeVisitor
     {
-        #region ISiteMapNodeVisitor Members
-
         public void Execute(ISiteMapNode node)
         {
             node.ResolveUrl();
         }
-
-        #endregion ISiteMapNodeVisitor Members
     }
 }

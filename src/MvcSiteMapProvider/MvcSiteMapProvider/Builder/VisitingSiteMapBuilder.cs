@@ -11,16 +11,14 @@ namespace MvcSiteMapProvider.Builder
     public class VisitingSiteMapBuilder
         : ISiteMapBuilder
     {
+        protected readonly ISiteMapNodeVisitor siteMapNodeVisitor;
+
         public VisitingSiteMapBuilder(
-            ISiteMapNodeVisitor siteMapNodeVisitor
+                    ISiteMapNodeVisitor siteMapNodeVisitor
             )
         {
             this.siteMapNodeVisitor = siteMapNodeVisitor ?? throw new ArgumentNullException(nameof(siteMapNodeVisitor));
         }
-
-        protected readonly ISiteMapNodeVisitor siteMapNodeVisitor;
-
-        #region ISiteMapBuilder Members
 
         public virtual ISiteMapNode BuildSiteMap(ISiteMap siteMap, ISiteMapNode rootNode)
         {
@@ -45,7 +43,5 @@ namespace MvcSiteMapProvider.Builder
                 }
             }
         }
-
-        #endregion ISiteMapBuilder Members
     }
 }

@@ -36,8 +36,6 @@ namespace MvcSiteMapProvider.DI
             return new XmlSiteMapController(xmlSiteMapResultFactoryContainer.ResolveXmlSiteMapResultFactory());
         }
 
-        #region IControllerFactory Members
-
         public override IController CreateController(RequestContext requestContext, string controllerName)
         {
             if (requestContext == null)
@@ -52,11 +50,9 @@ namespace MvcSiteMapProvider.DI
 
             // Yield control back to the original controller factory if this isn't an
             // internal controller.
-            if (!typeof(XmlSiteMapController).Equals(controllerType))
-            {
-                return innerControllerFactory.CreateController(requestContext, controllerName);
-            }
-            return GetControllerInstance(requestContext, controllerType);
+            return !typeof(XmlSiteMapController).Equals(controllerType)
+                ? innerControllerFactory.CreateController(requestContext, controllerName)
+                : GetControllerInstance(requestContext, controllerType);
         }
 
 #if !MVC2
@@ -72,7 +68,5 @@ namespace MvcSiteMapProvider.DI
         {
             innerControllerFactory.ReleaseController(controller);
         }
-
-        #endregion IControllerFactory Members
     }
 }

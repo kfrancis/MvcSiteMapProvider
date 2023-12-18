@@ -11,14 +11,12 @@ namespace MvcSiteMapProvider
     public class CompositeSiteMapNodeProvider
         : ISiteMapNodeProvider
     {
+        protected readonly IEnumerable<ISiteMapNodeProvider> siteMapNodeProviders;
+
         public CompositeSiteMapNodeProvider(params ISiteMapNodeProvider[] siteMapNodeProviders)
         {
             this.siteMapNodeProviders = siteMapNodeProviders ?? throw new ArgumentNullException(nameof(siteMapNodeProviders));
         }
-
-        protected readonly IEnumerable<ISiteMapNodeProvider> siteMapNodeProviders;
-
-        #region ISiteMapNodeProvider Members
 
         public IEnumerable<ISiteMapNodeToParentRelation> GetSiteMapNodes(ISiteMapNodeHelper helper)
         {
@@ -29,7 +27,5 @@ namespace MvcSiteMapProvider
             }
             return result;
         }
-
-        #endregion ISiteMapNodeProvider Members
     }
 }

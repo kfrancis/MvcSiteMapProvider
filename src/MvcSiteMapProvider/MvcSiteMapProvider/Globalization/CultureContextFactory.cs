@@ -19,20 +19,16 @@ namespace MvcSiteMapProvider.Globalization
         {
             if (string.IsNullOrEmpty(cultureName))
                 throw new ArgumentNullException(nameof(cultureName));
-            if (string.IsNullOrEmpty(uiCultureName))
-                throw new ArgumentNullException(nameof(uiCultureName));
-
-            return new CultureContext(new CultureInfo(cultureName), new CultureInfo(uiCultureName));
+            return string.IsNullOrEmpty(uiCultureName)
+                ? throw new ArgumentNullException(nameof(uiCultureName))
+                : (ICultureContext)new CultureContext(new CultureInfo(cultureName), new CultureInfo(uiCultureName));
         }
 
         public ICultureContext Create(CultureInfo culture, CultureInfo uiCulture)
         {
             if (culture == null)
                 throw new ArgumentNullException(nameof(culture));
-            if (uiCulture == null)
-                throw new ArgumentNullException(nameof(uiCulture));
-
-            return new CultureContext(culture, uiCulture);
+            return uiCulture == null ? throw new ArgumentNullException(nameof(uiCulture)) : (ICultureContext)new CultureContext(culture, uiCulture);
         }
     }
 }

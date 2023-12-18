@@ -12,22 +12,18 @@ namespace MvcSiteMapProvider
     public class SiteMapPluginProviderFactory
         : ISiteMapPluginProviderFactory
     {
+        protected readonly IAclModule aclModule;
+
         public SiteMapPluginProviderFactory(
-            IAclModule aclModule
+                    IAclModule aclModule
             )
         {
             this.aclModule = aclModule ?? throw new ArgumentNullException(nameof(aclModule));
         }
 
-        protected readonly IAclModule aclModule;
-
-        #region ISiteMapPluginProviderFactory Members
-
         public virtual ISiteMapPluginProvider Create(ISiteMapBuilder siteMapBuilder, IMvcResolver mvcResolver)
         {
             return new SiteMapPluginProvider(mvcResolver, siteMapBuilder, aclModule);
         }
-
-        #endregion ISiteMapPluginProviderFactory Members
     }
 }

@@ -7,7 +7,7 @@ using System.Web.Mvc;
 namespace MvcSiteMapProvider.DI
 {
     /// <summary>
-    /// An implementation of <see cref="T:System.Web.Mvc.IDependencyResolver"/> that wraps another instance of 
+    /// An implementation of <see cref="T:System.Web.Mvc.IDependencyResolver"/> that wraps another instance of
     /// <see cref="T:System.Web.Mvc.IDependencyResolver"/> so they can be used in conjunction with each other.
     /// </summary>
     public class DependencyResolverDecorator
@@ -24,8 +24,6 @@ namespace MvcSiteMapProvider.DI
 
         private readonly IDependencyResolver innerDependencyResolver;
         private readonly ConfigurationSettings settings;
-
-        #region IDependencyResolver Members
 
         public object GetService(Type serviceType)
         {
@@ -48,8 +46,6 @@ namespace MvcSiteMapProvider.DI
 
             return innerDependencyResolver.GetServices(serviceType);
         }
-
-        #endregion
     }
 }
 #endif

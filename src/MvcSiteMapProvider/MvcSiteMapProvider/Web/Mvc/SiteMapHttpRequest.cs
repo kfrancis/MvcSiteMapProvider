@@ -66,13 +66,11 @@ namespace MvcSiteMapProvider.Web.Mvc
                 bool useRequest = node == null ||
                     string.Equals(node.HttpMethod, "*") ||
                     string.Equals(node.HttpMethod, "request", StringComparison.OrdinalIgnoreCase);
-                if (!useRequest)
-                {
-                    return string.IsNullOrEmpty(node.HttpMethod)
+                return !useRequest
+                    ? string.IsNullOrEmpty(node.HttpMethod)
                         ? HttpVerbs.Get.ToString().ToUpperInvariant()
-                        : node.HttpMethod.ToUpperInvariant();
-                }
-                return base.HttpMethod;
+                        : node.HttpMethod.ToUpperInvariant()
+                    : base.HttpMethod;
             }
         }
     }

@@ -8,11 +8,9 @@ namespace MvcSiteMapProvider.Xml
     public class SiteMapXmlNameProvider
         : ISiteMapXmlNameProvider
     {
-        protected const string xmlRootName = "mvcSiteMap";
         protected const string xmlNodeName = "mvcSiteMapNode";
+        protected const string xmlRootName = "mvcSiteMap";
         protected readonly XNamespace xmlSiteMapNamespace = "http://mvcsitemap.codeplex.com/schemas/MvcSiteMap-File-4.0";
-
-        #region ISiteMapXmlNameProvider Members
 
         public virtual XName NodeName
         {
@@ -35,7 +33,5 @@ namespace MvcSiteMapProvider.Xml
                 }
             }
         }
-
-        #endregion ISiteMapXmlNameProvider Members
     }
 }

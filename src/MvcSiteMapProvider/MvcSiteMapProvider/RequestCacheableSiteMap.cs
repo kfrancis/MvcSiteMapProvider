@@ -15,8 +15,10 @@ namespace MvcSiteMapProvider
     public class RequestCacheableSiteMap
         : LockableSiteMap
     {
+        private readonly IRequestCache requestCache;
+
         public RequestCacheableSiteMap(
-            ISiteMapPluginProvider pluginProvider,
+                    ISiteMapPluginProvider pluginProvider,
             IMvcContextFactory mvcContextFactory,
             ISiteMapChildStateFactory siteMapChildStateFactory,
             IUrlPath urlPath,
@@ -27,10 +29,6 @@ namespace MvcSiteMapProvider
         {
             this.requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
         }
-
-        private readonly IRequestCache requestCache;
-
-        #region Request Cacheable Members
 
         public override ISiteMapNode FindSiteMapNode(string rawUrl)
         {
@@ -47,13 +45,13 @@ namespace MvcSiteMapProvider
             return result;
         }
 
-        public override ISiteMapNode FindSiteMapNodeFromCurrentContext()
+        public override ISiteMapNode FindSiteMapNode(ControllerContext context)
         {
-            var key = GetCacheKey("FindSiteMapNodeFromCurrentContext");
+            var key = GetCacheKey("FindSiteMapNode_ControllerContext" + GetDictionaryKey(context.RouteData.Values));
             var result = requestCache.GetValue<ISiteMapNode>(key);
             if (result == null)
             {
-                result = base.FindSiteMapNodeFromCurrentContext();
+                result = base.FindSiteMapNode(context);
                 if (result != null)
                 {
                     requestCache.SetValue<ISiteMapNode>(key, result);
@@ -62,13 +60,13 @@ namespace MvcSiteMapProvider
             return result;
         }
 
-        public override ISiteMapNode FindSiteMapNode(ControllerContext context)
+        public override ISiteMapNode FindSiteMapNodeFromCurrentContext()
         {
-            var key = GetCacheKey("FindSiteMapNode_ControllerContext" + GetDictionaryKey(context.RouteData.Values));
+            var key = GetCacheKey("FindSiteMapNodeFromCurrentContext");
             var result = requestCache.GetValue<ISiteMapNode>(key);
             if (result == null)
             {
-                result = base.FindSiteMapNode(context);
+                result = base.FindSiteMapNodeFromCurrentContext();
                 if (result != null)
                 {
                     requestCache.SetValue<ISiteMapNode>(key, result);
@@ -98,10 +96,6 @@ namespace MvcSiteMapProvider
             return (bool)result;
         }
 
-        #endregion Request Cacheable Members
-
-        #region Protected Members
-
         protected virtual string GetCacheKey(string memberName)
         {
             // NOTE: We must include IsReadOnly in the request cache key because we may have a different
@@ -124,13 +118,7 @@ namespace MvcSiteMapProvider
 
         protected virtual string GetStringFromValue(object value)
         {
-            if (value.GetType().Equals(typeof(string)))
-            {
-                return value.ToString();
-            }
-            return value.GetHashCode().ToString();
+            return value.GetType().Equals(typeof(string)) ? value.ToString() : value.GetHashCode().ToString();
         }
-
-        #endregion Protected Members
     }
 }

@@ -38,11 +38,9 @@ namespace MvcSiteMapProvider.Web.UrlResolver
         /// <returns>The resolved URL.</returns>
         public override string ResolveUrl(ISiteMapNode node, string area, string controller, string action, IDictionary<string, object> routeValues)
         {
-            if (!string.IsNullOrEmpty(node.UnresolvedUrl))
-            {
-                return ResolveVirtualPath(node);
-            }
-            return ResolveRouteUrl(node, area, controller, action, routeValues);
+            return !string.IsNullOrEmpty(node.UnresolvedUrl)
+                ? ResolveVirtualPath(node)
+                : ResolveRouteUrl(node, area, controller, action, routeValues);
         }
 
         protected virtual HttpContextBase CreateHttpContext(ISiteMapNode node, TextWriter writer)

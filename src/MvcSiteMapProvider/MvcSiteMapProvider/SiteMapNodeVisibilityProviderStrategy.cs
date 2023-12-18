@@ -30,12 +30,9 @@ namespace MvcSiteMapProvider
             }
 
             var provider = Array.Find(siteMapNodeVisibilityProviders, x => x.AppliesTo(providerName));
-            if (provider == null && !string.IsNullOrEmpty(providerName))
-            {
-                throw new MvcSiteMapException(string.Format(Resources.Messages.NamedSiteMapNodeVisibilityProviderNotFound, providerName));
-            }
-
-            return provider;
+            return provider == null && !string.IsNullOrEmpty(providerName)
+                ? throw new MvcSiteMapException(string.Format(Resources.Messages.NamedSiteMapNodeVisibilityProviderNotFound, providerName))
+                : provider;
         }
 
         public bool IsVisible(string providerName, ISiteMapNode node, IDictionary<string, object> sourceMetadata)

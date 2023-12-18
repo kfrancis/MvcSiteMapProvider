@@ -19,8 +19,59 @@ namespace MvcSiteMapProvider
     public class SiteMapNode
         : SiteMapNodePositioningBase, ISiteMapNode
     {
+        // Child collections and dictionaries
+        protected readonly IAttributeDictionary attributes;
+
+        protected readonly bool isDynamic;
+
+        protected readonly string key;
+
+        protected readonly ILocalizationService localizationService;
+
+        protected readonly IMetaRobotsValueCollection metaRobotsValues;
+
+        protected readonly IMvcContextFactory mvcContextFactory;
+
+        // Services
+        protected readonly ISiteMapNodePluginProvider pluginProvider;
+
+        protected readonly IPreservedRouteParameterCollection preservedRouteParameters;
+
+        protected readonly IRoleCollection roles;
+
+        protected readonly IRouteValueDictionary routeValues;
+
+        // Object State
+        protected readonly ISiteMap siteMap;
+
+        protected readonly IUrlPath urlPath;
+
+        protected string canonicalKey = string.Empty;
+
+        protected string canonicalUrl = string.Empty;
+
+        protected ChangeFrequency changeFrequency = ChangeFrequency.Undefined;
+
+        protected bool clickable = true;
+
+        protected string description = string.Empty;
+
+        protected string httpMethod = HttpVerbs.Get.ToString().ToUpperInvariant();
+
+        protected string imageUrl = string.Empty;
+
+        protected DateTime lastModifiedDate = DateTime.MinValue;
+
+        protected string resolvedUrl = string.Empty;
+
+        protected string title = string.Empty;
+
+        protected UpdatePriority updatePriority = UpdatePriority.Undefined;
+
+        protected string url = string.Empty;
+
         public SiteMapNode(
-            ISiteMap siteMap,
+                                                                                                                                                                                                            ISiteMap siteMap,
             string key,
             bool isDynamic,
             ISiteMapNodePluginProvider pluginProvider,
@@ -50,163 +101,25 @@ namespace MvcSiteMapProvider
             metaRobotsValues = siteMapNodeChildStateFactory.CreateMetaRobotsValueCollection(siteMap);
         }
 
-        // Services
-        protected readonly ISiteMapNodePluginProvider pluginProvider;
-
-        protected readonly IMvcContextFactory mvcContextFactory;
-        protected readonly ILocalizationService localizationService;
-        protected readonly IUrlPath urlPath;
-
-        // Child collections and dictionaries
-        protected readonly IAttributeDictionary attributes;
-
-        protected readonly IRouteValueDictionary routeValues;
-        protected readonly IPreservedRouteParameterCollection preservedRouteParameters;
-        protected readonly IRoleCollection roles;
-        protected readonly IMetaRobotsValueCollection metaRobotsValues;
-
-        // Object State
-        protected readonly ISiteMap siteMap;
-
-        protected readonly string key;
-        protected readonly bool isDynamic;
-        protected string httpMethod = HttpVerbs.Get.ToString().ToUpperInvariant();
-        protected string title = string.Empty;
-        protected string description = string.Empty;
-        protected string imageUrl = string.Empty;
-        protected DateTime lastModifiedDate = DateTime.MinValue;
-        protected ChangeFrequency changeFrequency = ChangeFrequency.Undefined;
-        protected UpdatePriority updatePriority = UpdatePriority.Undefined;
-        protected bool clickable = true;
-        protected string url = string.Empty;
-        protected string resolvedUrl = string.Empty;
-        protected string canonicalUrl = string.Empty;
-        protected string canonicalKey = string.Empty;
-
         /// <summary>
-        /// Gets the current HTTP context.
+        /// Gets or sets the action.
         /// </summary>
-        protected virtual HttpContextBase HttpContext
-        { get { return mvcContextFactory.CreateHttpContext(); } }
-
-        /// <summary>
-        /// Gets the key.
-        /// </summary>
-        /// <value>The key.</value>
-        public override string Key
-        { get { return key; } }
-
-        /// <summary>
-        /// Gets whether the current node was created from a dynamic source.
-        /// </summary>
-        /// <value>True if the current node is dynamic.</value>
-        public override bool IsDynamic
-        { get { return isDynamic; } }
-
-        /// <summary>
-        /// Gets whether the current node is read-only.
-        /// </summary>
-        /// <value>True if the current node is read-only.</value>
-        public override bool IsReadOnly
-        { get { return SiteMap.IsReadOnly; } }
-
-        /// <summary>
-        /// A reference to the root SiteMap object for the current graph.
-        /// </summary>
-        public override ISiteMap SiteMap
+        /// <value>The action.</value>
+        public override string Action
         {
-            get { return siteMap; }
+            get { return RouteValues.ContainsKey("action") && RouteValues["action"] != null ? RouteValues["action"].ToString() : string.Empty; }
+            set { RouteValues["action"] = value; }
         }
 
         /// <summary>
-        /// Gets or sets the HTTP method (such as GET, POST, or HEAD) to use to determine
-        /// node accessibility.
+        /// Gets or sets the area.
         /// </summary>
-        /// <value>
-        /// The HTTP method.
-        /// </value>
-        public override string HttpMethod
+        /// <value>The area.</value>
+        public override string Area
         {
-            get { return httpMethod; }
-            set { httpMethod = value; }
+            get { return RouteValues.ContainsKey("area") && RouteValues["area"] != null ? RouteValues["area"].ToString() : string.Empty; }
+            set { RouteValues["area"] = value; }
         }
-
-        /// <summary>
-        /// Gets the implicit resource key (optional).
-        /// </summary>
-        /// <value>The implicit resource key.</value>
-        public override string ResourceKey
-        {
-            get { return localizationService.ResourceKey; }
-        }
-
-        /// <summary>
-        /// Gets or sets the title (optional).
-        /// </summary>
-        /// <value>The title.</value>
-        /// <remarks>The title can be localized using a resource provider.</remarks>
-        public override string Title
-        {
-            get { return localizationService.GetResourceString("title", title, SiteMap); }
-            set { title = localizationService.ExtractExplicitResourceKey("title", value); }
-        }
-
-        /// <summary>
-        /// Gets or sets the description (optional).
-        /// </summary>
-        /// <value>The description.</value>
-        /// <remarks>The description can be localized using a resource provider.</remarks>
-        public override string Description
-        {
-            get
-            {
-                var result = localizationService.GetResourceString("description", description, SiteMap);
-                if (SiteMap.UseTitleIfDescriptionNotProvided && string.IsNullOrEmpty(result))
-                {
-                    result = Title;
-                }
-
-                return result;
-            }
-            set
-            {
-                description = localizationService.ExtractExplicitResourceKey("description", value);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the target frame (optional).
-        /// </summary>
-        /// <value>The target frame.</value>
-        public override string TargetFrame { get; set; }
-
-        /// <summary>
-        /// Gets or sets the image URL (optional).
-        /// </summary>
-        /// <value>The image URL.</value>
-        /// <remarks>The image URL can be localized using a resource provider.</remarks>
-        public override string ImageUrl
-        {
-            get
-            {
-                var imageUrl = localizationService.GetResourceString("imageUrl", this.imageUrl, SiteMap);
-                return urlPath.ResolveContentUrl(imageUrl, ImageUrlProtocol, ImageUrlHostName);
-            }
-            set { imageUrl = localizationService.ExtractExplicitResourceKey("imageUrl", value); }
-        }
-
-        /// <summary>
-        /// Gets or sets the image URL protocol, such as http, https (optional).
-        /// If not provided, it will default to the protocol of the current request.
-        /// </summary>
-        /// <value>The protocol of the image URL.</value>
-        public override string ImageUrlProtocol { get; set; }
-
-        /// <summary>
-        /// Gets or sets the image URL host name, such as www.somewhere.com (optional).
-        /// </summary>
-        /// <value>The protocol of the image URL.</value>
-        public override string ImageUrlHostName { get; set; }
 
         /// <summary>
         /// Gets the attributes (optional).
@@ -217,242 +130,10 @@ namespace MvcSiteMapProvider
         { get { return attributes; } }
 
         /// <summary>
-        /// Gets the roles.
-        /// </summary>
-        /// <value>The roles.</value>
-        public override IRoleCollection Roles
-        { get { return roles; } }
-
-        /// <summary>
-        /// Gets or sets the last modified date.
-        /// </summary>
-        /// <value>The last modified date.</value>
-        public override DateTime LastModifiedDate
-        {
-            get { return lastModifiedDate; }
-            set { lastModifiedDate = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets the change frequency.
-        /// </summary>
-        /// <value>The change frequency.</value>
-        public override ChangeFrequency ChangeFrequency
-        {
-            get { return changeFrequency; }
-            set { changeFrequency = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets the update priority.
-        /// </summary>
-        /// <value>The update priority.</value>
-        public override UpdatePriority UpdatePriority
-        {
-            get { return updatePriority; }
-            set { updatePriority = value; }
-        }
-
-        #region Visibility
-
-        /// <summary>
-        /// Gets or sets the name or the type of the visibility provider.
-        /// This value will be used to select the concrete type of provider to use to determine
-        /// visibility.
-        /// </summary>
-        /// <value>
-        /// The name or type of the visibility provider.
-        /// </value>
-        public override string VisibilityProvider { get; set; }
-
-        /// <summary>
-        /// Determines whether the node is visible.
-        /// </summary>
-        /// <param name="sourceMetadata">The source metadata.</param>
-        /// <returns>
-        /// 	<c>true</c> if the specified node is visible; otherwise, <c>false</c>.
-        /// </returns>
-        public override bool IsVisible(IDictionary<string, object> sourceMetadata)
-        {
-            // use strategy factory to provide implementation logic from concrete provider
-            // http://stackoverflow.com/questions/1499442/best-way-to-use-structuremap-to-implement-strategy-pattern
-            return pluginProvider.VisibilityProviderStrategy.IsVisible(VisibilityProvider, this, sourceMetadata);
-        }
-
-        #endregion Visibility
-
-        #region Dynamic Nodes
-
-        /// <summary>
-        /// Gets or sets the name or type of the Dynamic Node Provider.
-        /// </summary>
-        /// <value>
-        /// The name or type of the Dynamic Node Provider.
-        /// </value>
-        public override string DynamicNodeProvider { get; set; }
-
-        /// <summary>
-        /// Gets the dynamic node collection.
-        /// </summary>
-        /// <returns>A dynamic node collection.</returns>
-        public override IEnumerable<DynamicNode> GetDynamicNodeCollection()
-        {
-            // use strategy factory to provide implementation logic from concrete provider
-            // http://stackoverflow.com/questions/1499442/best-way-to-use-structuremap-to-implement-strategy-pattern
-            return pluginProvider.DynamicNodeProviderStrategy.GetDynamicNodeCollection(DynamicNodeProvider, this);
-        }
-
-        /// <summary>
-        /// Gets whether the current node has a dynamic node provider.
-        /// </summary>
-        /// <value>
-        /// <c>true</c> if there is a provider; otherwise <c>false</c>.
-        /// </value>
-        public override bool HasDynamicNodeProvider
-        {
-            // use strategy factory to provide implementation logic from concrete provider
-            // http://stackoverflow.com/questions/1499442/best-way-to-use-structuremap-to-implement-strategy-pattern
-            get { return pluginProvider.DynamicNodeProviderStrategy.GetProvider(DynamicNodeProvider) != null; }
-        }
-
-        #endregion Dynamic Nodes
-
-        #region URL Resolver
-
-        /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="SiteMapNode" /> is clickable.
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if clickable; otherwise, <c>false</c>.
-        /// </value>
-        public override bool Clickable
-        {
-            get { return clickable; }
-            set { clickable = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets the name or type of the URL resolver.
-        /// </summary>
-        /// <value>
-        /// The name or type of the URL resolver.
-        /// </value>
-        public override string UrlResolver { get; set; }
-
-        /// <summary>
-        /// Gets the URL.
-        /// </summary>
-        /// <value>
-        /// The URL.
-        /// </value>
-        public override string Url
-        {
-            get
-            {
-                if (!Clickable)
-                {
-                    return string.Empty;
-                }
-                if (!string.IsNullOrEmpty(ResolvedUrl))
-                {
-                    return ResolvedUrl;
-                }
-                return GetResolvedUrl();
-            }
-            set
-            {
-                url = value;
-            }
-        }
-
-        /// <summary>
-        /// The raw URL before being evaluated by any URL resolver.
-        /// </summary>
-        public override string UnresolvedUrl
-        { get { return url; } }
-
-        /// <summary>
-        /// The resolved url that has been cached, if any.
-        /// </summary>
-        public override string ResolvedUrl
-        { get { return resolvedUrl; } }
-
-        /// <summary>
         /// A value indicating to cache the resolved URL. If false, the URL will be
         /// resolved every time it is accessed.
         /// </summary>
         public override bool CacheResolvedUrl { get; set; }
-
-        /// <summary>
-        /// Sets the ResolvedUrl using the current Url or Url resolver.
-        /// </summary>
-        public override void ResolveUrl()
-        {
-            var isProtocolOrHostNameFromRequest =
-                (!string.IsNullOrEmpty(Protocol) && (string.IsNullOrEmpty(HostName) || Protocol == "*"));
-
-            // NOTE: In all cases where values from the current request can be included in the URL,
-            // we need to disable URL resolution caching.
-            if (CacheResolvedUrl && string.IsNullOrEmpty(UnresolvedUrl) &&
-                preservedRouteParameters.Count == 0 && !IncludeAmbientValuesInUrl &&
-                !isProtocolOrHostNameFromRequest)
-            {
-                resolvedUrl = GetResolvedUrl();
-            }
-        }
-
-        protected string GetResolvedUrl()
-        {
-            // use strategy factory to provide implementation logic from concrete provider
-            // http://stackoverflow.com/questions/1499442/best-way-to-use-structuremap-to-implement-strategy-pattern
-            return pluginProvider.UrlResolverStrategy.ResolveUrl(
-                UrlResolver, this, Area, Controller, Action, RouteValues);
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to include ambient request values
-        /// (from the RouteValues and/or query string) when resolving URLs.
-        /// </summary>
-        /// <value><b>true</b> to include ambient values (like MVC does); otherwise <b>false</b>.</value>
-        public override bool IncludeAmbientValuesInUrl { get; set; }
-
-        /// <summary>
-        /// Gets or sets the protocol, such as http or https that will
-        /// be built into the URL.
-        /// </summary>
-        /// <value>The protocol.</value>
-        public override string Protocol { get; set; }
-
-        /// <summary>
-        /// Gets or sets the host name that will be built into the URL.
-        /// </summary>
-        /// <value>The host name.</value>
-        public override string HostName { get; set; }
-
-        /// <summary>
-        /// Gets a boolean value that indicates this is an external URL by checking whether it
-        /// looks like an absolute path.
-        /// </summary>
-        /// <returns></returns>
-        public override bool HasAbsoluteUrl()
-        {
-            return urlPath.IsAbsoluteUrl(Url);
-        }
-
-        /// <summary>
-        /// Gets a boolean value that indicates this is an external URL by checking whether it
-        /// looks like an absolute path and comparing the DnsSafeHost with the passed in context.
-        /// </summary>
-        /// <param name="httpContext">The http context for the current request.</param>
-        /// <returns></returns>
-        public override bool HasExternalUrl(HttpContextBase httpContext)
-        {
-            return urlPath.IsExternalUrl(Url, httpContext);
-        }
-
-        #endregion URL Resolver
-
-        #region Canonical Tag
 
         /// <summary>
         /// Gets or sets the canonical key. The key is used to reference another <see cref="T:MvcSiteMapProvider.ISiteMapNode"/> to get the canonical URL.
@@ -507,16 +188,541 @@ namespace MvcSiteMapProvider
         }
 
         /// <summary>
+        /// Gets or sets the canonical URL host name, such as www.somewhere.com (optional).
+        /// </summary>
+        /// <value>The protocol of the image URL.</value>
+        public override string CanonicalUrlHostName { get; set; }
+
+        /// <summary>
         /// Gets or sets the canonical URL protocol, such as http, https (optional).
         /// </summary>
         /// <value>The protocol of the image URL.</value>
         public override string CanonicalUrlProtocol { get; set; }
 
         /// <summary>
-        /// Gets or sets the canonical URL host name, such as www.somewhere.com (optional).
+        /// Gets or sets the change frequency.
+        /// </summary>
+        /// <value>The change frequency.</value>
+        public override ChangeFrequency ChangeFrequency
+        {
+            get { return changeFrequency; }
+            set { changeFrequency = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="SiteMapNode" /> is clickable.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if clickable; otherwise, <c>false</c>.
+        /// </value>
+        public override bool Clickable
+        {
+            get { return clickable; }
+            set { clickable = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the controller.
+        /// </summary>
+        /// <value>The controller.</value>
+        public override string Controller
+        {
+            get { return RouteValues.ContainsKey("controller") && RouteValues["controller"] != null ? RouteValues["controller"].ToString() : string.Empty; }
+            set { RouteValues["controller"] = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the description (optional).
+        /// </summary>
+        /// <value>The description.</value>
+        /// <remarks>The description can be localized using a resource provider.</remarks>
+        public override string Description
+        {
+            get
+            {
+                var result = localizationService.GetResourceString("description", description, SiteMap);
+                if (SiteMap.UseTitleIfDescriptionNotProvided && string.IsNullOrEmpty(result))
+                {
+                    result = Title;
+                }
+
+                return result;
+            }
+            set
+            {
+                description = localizationService.ExtractExplicitResourceKey("description", value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the name or type of the Dynamic Node Provider.
+        /// </summary>
+        /// <value>
+        /// The name or type of the Dynamic Node Provider.
+        /// </value>
+        public override string DynamicNodeProvider { get; set; }
+
+        /// <summary>
+        /// Gets whether the current node has a dynamic node provider.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if there is a provider; otherwise <c>false</c>.
+        /// </value>
+        public override bool HasDynamicNodeProvider
+        {
+            // use strategy factory to provide implementation logic from concrete provider
+            // http://stackoverflow.com/questions/1499442/best-way-to-use-structuremap-to-implement-strategy-pattern
+            get { return pluginProvider.DynamicNodeProviderStrategy.GetProvider(DynamicNodeProvider) != null; }
+        }
+
+        /// <summary>
+        /// Gets a boolean value indicating whether both the noindex and nofollow values are included in the
+        /// list of robots meta values.
+        /// </summary>
+        public override bool HasNoIndexAndNoFollow
+        {
+            get { return MetaRobotsValues.HasNoIndexAndNoFollow; }
+        }
+
+        /// <summary>
+        /// Gets or sets the host name that will be built into the URL.
+        /// </summary>
+        /// <value>The host name.</value>
+        public override string HostName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the HTTP method (such as GET, POST, or HEAD) to use to determine
+        /// node accessibility.
+        /// </summary>
+        /// <value>
+        /// The HTTP method.
+        /// </value>
+        public override string HttpMethod
+        {
+            get { return httpMethod; }
+            set { httpMethod = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the image URL (optional).
+        /// </summary>
+        /// <value>The image URL.</value>
+        /// <remarks>The image URL can be localized using a resource provider.</remarks>
+        public override string ImageUrl
+        {
+            get
+            {
+                var imageUrl = localizationService.GetResourceString("imageUrl", this.imageUrl, SiteMap);
+                return urlPath.ResolveContentUrl(imageUrl, ImageUrlProtocol, ImageUrlHostName);
+            }
+            set { imageUrl = localizationService.ExtractExplicitResourceKey("imageUrl", value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the image URL host name, such as www.somewhere.com (optional).
         /// </summary>
         /// <value>The protocol of the image URL.</value>
-        public override string CanonicalUrlHostName { get; set; }
+        public override string ImageUrlHostName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the image URL protocol, such as http, https (optional).
+        /// If not provided, it will default to the protocol of the current request.
+        /// </summary>
+        /// <value>The protocol of the image URL.</value>
+        public override string ImageUrlProtocol { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to include ambient request values
+        /// (from the RouteValues and/or query string) when resolving URLs.
+        /// </summary>
+        /// <value><b>true</b> to include ambient values (like MVC does); otherwise <b>false</b>.</value>
+        public override bool IncludeAmbientValuesInUrl { get; set; }
+
+        /// <summary>
+        /// Gets whether the current node was created from a dynamic source.
+        /// </summary>
+        /// <value>True if the current node is dynamic.</value>
+        public override bool IsDynamic
+        { get { return isDynamic; } }
+
+        /// <summary>
+        /// Gets whether the current node is read-only.
+        /// </summary>
+        /// <value>True if the current node is read-only.</value>
+        public override bool IsReadOnly
+        { get { return SiteMap.IsReadOnly; } }
+
+        /// <summary>
+        /// Gets the key.
+        /// </summary>
+        /// <value>The key.</value>
+        public override string Key
+        { get { return key; } }
+
+        /// <summary>
+        /// Gets or sets the last modified date.
+        /// </summary>
+        /// <value>The last modified date.</value>
+        public override DateTime LastModifiedDate
+        {
+            get { return lastModifiedDate; }
+            set { lastModifiedDate = value; }
+        }
+
+        /// <summary>
+        /// Gets the robots meta values.
+        /// </summary>
+        /// <value>The robots meta values.</value>
+        public override IMetaRobotsValueCollection MetaRobotsValues
+        { get { return metaRobotsValues; } }
+
+        /// <summary>
+        /// Gets the preserved route parameter names (= values that will be used from the current request route).
+        /// </summary>
+        /// <value>The preserved route parameters.</value>
+        public override IPreservedRouteParameterCollection PreservedRouteParameters
+        { get { return preservedRouteParameters; } }
+
+        /// <summary>
+        /// Gets or sets the protocol, such as http or https that will
+        /// be built into the URL.
+        /// </summary>
+        /// <value>The protocol.</value>
+        public override string Protocol { get; set; }
+
+        /// <summary>
+        /// The resolved url that has been cached, if any.
+        /// </summary>
+        public override string ResolvedUrl
+        { get { return resolvedUrl; } }
+
+        /// <summary>
+        /// Gets the implicit resource key (optional).
+        /// </summary>
+        /// <value>The implicit resource key.</value>
+        public override string ResourceKey
+        {
+            get { return localizationService.ResourceKey; }
+        }
+
+        /// <summary>
+        /// Gets the roles.
+        /// </summary>
+        /// <value>The roles.</value>
+        public override IRoleCollection Roles
+        { get { return roles; } }
+
+        /// <summary>
+        /// Gets or sets the route.
+        /// </summary>
+        /// <value>The route.</value>
+        public override string Route { get; set; }
+
+        /// <summary>
+        /// Gets the route values.
+        /// </summary>
+        /// <value>The route values.</value>
+        public override IRouteValueDictionary RouteValues
+        {
+            get
+            {
+                if (IsReadOnly && !AreRouteParametersPreserved)
+                {
+                    PreserveRouteParameters();
+                    AreRouteParametersPreserved = true;
+                }
+                return routeValues;
+            }
+        }
+
+        /// <summary>
+        /// A reference to the root SiteMap object for the current graph.
+        /// </summary>
+        public override ISiteMap SiteMap
+        {
+            get { return siteMap; }
+        }
+
+        /// <summary>
+        /// Gets or sets the target frame (optional).
+        /// </summary>
+        /// <value>The target frame.</value>
+        public override string TargetFrame { get; set; }
+
+        /// <summary>
+        /// Gets or sets the title (optional).
+        /// </summary>
+        /// <value>The title.</value>
+        /// <remarks>The title can be localized using a resource provider.</remarks>
+        public override string Title
+        {
+            get { return localizationService.GetResourceString("title", title, SiteMap); }
+            set { title = localizationService.ExtractExplicitResourceKey("title", value); }
+        }
+
+        /// <summary>
+        /// The raw URL before being evaluated by any URL resolver.
+        /// </summary>
+        public override string UnresolvedUrl
+        { get { return url; } }
+
+        /// <summary>
+        /// Gets or sets the update priority.
+        /// </summary>
+        /// <value>The update priority.</value>
+        public override UpdatePriority UpdatePriority
+        {
+            get { return updatePriority; }
+            set { updatePriority = value; }
+        }
+
+        /// <summary>
+        /// Gets the URL.
+        /// </summary>
+        /// <value>
+        /// The URL.
+        /// </value>
+        public override string Url
+        {
+            get
+            {
+                if (!Clickable)
+                {
+                    return string.Empty;
+                }
+                return !string.IsNullOrEmpty(ResolvedUrl) ? ResolvedUrl : GetResolvedUrl();
+            }
+            set
+            {
+                url = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the name or type of the URL resolver.
+        /// </summary>
+        /// <value>
+        /// The name or type of the URL resolver.
+        /// </value>
+        public override string UrlResolver { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name or the type of the visibility provider.
+        /// This value will be used to select the concrete type of provider to use to determine
+        /// visibility.
+        /// </summary>
+        /// <value>
+        /// The name or type of the visibility provider.
+        /// </value>
+        public override string VisibilityProvider { get; set; }
+
+        /// <summary>
+        /// Flag to ensure the route values are only preserved from the current request a single time.
+        /// </summary>
+        /// <returns><c>true</c> if the route values have been preserved for the current request; otherwise <c>false</c>.</returns>
+        /// <remarks>This property must be overridden and provide an implementation that is stored in the request cache.</remarks>
+        protected virtual bool AreRouteParametersPreserved
+        {
+            get { return false; }
+            set { }
+        }
+
+        /// <summary>
+        /// Gets the current HTTP context.
+        /// </summary>
+        protected virtual HttpContextBase HttpContext
+        { get { return mvcContextFactory.CreateHttpContext(); } }
+
+        public static bool operator !=(SiteMapNode node1, SiteMapNode node2)
+        {
+            return !(node1 == node2);
+        }
+
+        public static bool operator ==(SiteMapNode node1, SiteMapNode node2)
+        {
+            // If both are null, or both are same instance, return true.
+            if (object.ReferenceEquals(node1, node2))
+            {
+                return true;
+            }
+
+            // If one is null, but not both, return false.
+            return !(node1 is null) && !(node2 is null) && node1.Equals(node2);
+        }
+
+        public override void CopyTo(ISiteMapNode node)
+        {
+            // NOTE: Expected behavior is to reference
+            // the same child nodes, so this is okay.
+            node.ChildNodes.AddRange(ChildNodes);
+            node.HttpMethod = HttpMethod;
+            node.Title = title; // Get protected member
+            node.Description = description; // Get protected member
+            node.TargetFrame = TargetFrame;
+            node.ImageUrl = ImageUrl;
+            node.ImageUrlProtocol = ImageUrlProtocol;
+            node.ImageUrlHostName = ImageUrlHostName;
+            Attributes.CopyTo(node.Attributes);
+            Roles.CopyTo(node.Roles);
+            node.LastModifiedDate = LastModifiedDate;
+            node.ChangeFrequency = ChangeFrequency;
+            node.UpdatePriority = UpdatePriority;
+            node.VisibilityProvider = VisibilityProvider;
+            node.Clickable = Clickable;
+            node.UrlResolver = UrlResolver;
+            node.Url = url; // Get protected member
+            node.CacheResolvedUrl = CacheResolvedUrl;
+            node.IncludeAmbientValuesInUrl = IncludeAmbientValuesInUrl;
+            node.Protocol = Protocol;
+            node.HostName = HostName;
+            node.CanonicalKey = CanonicalKey;
+            node.CanonicalUrl = canonicalUrl; // Get protected member
+            node.CanonicalUrlProtocol = CanonicalUrlProtocol;
+            node.CanonicalUrlHostName = CanonicalUrlHostName;
+            MetaRobotsValues.CopyTo(node.MetaRobotsValues);
+            node.DynamicNodeProvider = DynamicNodeProvider;
+            node.Route = Route;
+            RouteValues.CopyTo(node.RouteValues);
+            PreservedRouteParameters.CopyTo(node.PreservedRouteParameters);
+            // NOTE: Area, Controller, and Action are covered under RouteValues.
+        }
+
+        public override bool Equals(ISiteMapNode node)
+        {
+            if (base.Equals((object)node))
+            {
+                return true;
+            }
+
+            return node != null && Key.Equals(node.Key);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ISiteMapNode node && Equals(node);
+        }
+
+        /// <summary>
+        /// Gets the dynamic node collection.
+        /// </summary>
+        /// <returns>A dynamic node collection.</returns>
+        public override IEnumerable<DynamicNode> GetDynamicNodeCollection()
+        {
+            // use strategy factory to provide implementation logic from concrete provider
+            // http://stackoverflow.com/questions/1499442/best-way-to-use-structuremap-to-implement-strategy-pattern
+            return pluginProvider.DynamicNodeProviderStrategy.GetDynamicNodeCollection(DynamicNodeProvider, this);
+        }
+
+        public override int GetHashCode()
+        {
+            return Key.GetHashCode();
+        }
+
+        /// <summary>
+        /// Gets a string containing the pre-formatted comma delimited list of values that can be inserted into the
+        /// content attribute of the meta robots tag.
+        /// </summary>
+        public override string GetMetaRobotsContentString()
+        {
+            return MetaRobotsValues.GetMetaRobotsContentString();
+        }
+
+        /// <summary>
+        /// Gets the route data associated with the current node.
+        /// </summary>
+        /// <param name="httpContext">The HTTP context.</param>
+        /// <returns>The route data associated with the current node.</returns>
+        public override RouteData GetRouteData(HttpContextBase httpContext)
+        {
+            var routes = mvcContextFactory.GetRoutes();
+            return !string.IsNullOrEmpty(Route) ? routes[Route].GetRouteData(httpContext) : routes.GetRouteData(httpContext);
+        }
+
+        /// <summary>
+        /// Gets a boolean value that indicates this is an external URL by checking whether it
+        /// looks like an absolute path.
+        /// </summary>
+        /// <returns></returns>
+        public override bool HasAbsoluteUrl()
+        {
+            return urlPath.IsAbsoluteUrl(Url);
+        }
+
+        /// <summary>
+        /// Gets a boolean value that indicates this is an external URL by checking whether it
+        /// looks like an absolute path and comparing the DnsSafeHost with the passed in context.
+        /// </summary>
+        /// <param name="httpContext">The http context for the current request.</param>
+        /// <returns></returns>
+        public override bool HasExternalUrl(HttpContextBase httpContext)
+        {
+            return urlPath.IsExternalUrl(Url, httpContext);
+        }
+
+        /// <summary>
+        /// Determines whether the node is visible.
+        /// </summary>
+        /// <param name="sourceMetadata">The source metadata.</param>
+        /// <returns>
+        /// 	<c>true</c> if the specified node is visible; otherwise, <c>false</c>.
+        /// </returns>
+        public override bool IsVisible(IDictionary<string, object> sourceMetadata)
+        {
+            // use strategy factory to provide implementation logic from concrete provider
+            // http://stackoverflow.com/questions/1499442/best-way-to-use-structuremap-to-implement-strategy-pattern
+            return pluginProvider.VisibilityProviderStrategy.IsVisible(VisibilityProvider, this, sourceMetadata);
+        }
+
+        /// <summary>
+        /// Determines whether this node matches the supplied route values.
+        /// </summary>
+        /// <param name="routeValues">An <see cref="T:System.Collections.Generic.IDictionary{string, object}"/> of route values.</param>
+        /// <returns><c>true</c> if the route matches this node's RouteValues collection; otherwise <c>false</c>.</returns>
+        public override bool MatchesRoute(IDictionary<string, object> routeValues)
+        {
+            // If not clickable, we never want to match the node.
+            if (!Clickable)
+                return false;
+
+            // If URL is set explicitly, we should never match based on route values.
+            if (!string.IsNullOrEmpty(UnresolvedUrl))
+                return false;
+
+            // Check whether the configured host name matches (only if it is supplied).
+            if (!string.IsNullOrEmpty(HostName) && !urlPath.IsPublicHostName(HostName, HttpContext))
+                return false;
+
+            // Merge in any query string values from the current context that match keys with
+            // the route values configured in the current node (MVC doesn't automatically assign them
+            // as route values). This allows matching on query string values, but only if they
+            // are configured in the node.
+            var values = MergeRouteValuesAndNamedQueryStringValues(routeValues, RouteValues.Keys, HttpContext);
+
+            return RouteValues.MatchesRoute(values);
+        }
+
+        /// <summary>
+        /// Sets the ResolvedUrl using the current Url or Url resolver.
+        /// </summary>
+        public override void ResolveUrl()
+        {
+            var isProtocolOrHostNameFromRequest =
+                (!string.IsNullOrEmpty(Protocol) && (string.IsNullOrEmpty(HostName) || Protocol == "*"));
+
+            // NOTE: In all cases where values from the current request can be included in the URL,
+            // we need to disable URL resolution caching.
+            if (CacheResolvedUrl && string.IsNullOrEmpty(UnresolvedUrl) &&
+                preservedRouteParameters.Count == 0 && !IncludeAmbientValuesInUrl &&
+                !isProtocolOrHostNameFromRequest)
+            {
+                resolvedUrl = GetResolvedUrl();
+            }
+        }
+
+        public override string ToString()
+        {
+            return Key;
+        }
 
         /// <summary>
         /// Gets the absolute value of the canonical URL, finding the value by
@@ -544,104 +750,6 @@ namespace MvcSiteMapProvider
                 }
             }
             return string.Empty;
-        }
-
-        #endregion Canonical Tag
-
-        #region Meta Robots Tag
-
-        /// <summary>
-        /// Gets the robots meta values.
-        /// </summary>
-        /// <value>The robots meta values.</value>
-        public override IMetaRobotsValueCollection MetaRobotsValues
-        { get { return metaRobotsValues; } }
-
-        /// <summary>
-        /// Gets a string containing the pre-formatted comma delimited list of values that can be inserted into the
-        /// content attribute of the meta robots tag.
-        /// </summary>
-        public override string GetMetaRobotsContentString()
-        {
-            return MetaRobotsValues.GetMetaRobotsContentString();
-        }
-
-        /// <summary>
-        /// Gets a boolean value indicating whether both the noindex and nofollow values are included in the
-        /// list of robots meta values.
-        /// </summary>
-        public override bool HasNoIndexAndNoFollow
-        {
-            get { return MetaRobotsValues.HasNoIndexAndNoFollow; }
-        }
-
-        #endregion Meta Robots Tag
-
-        #region Route
-
-        /// <summary>
-        /// Gets or sets the route.
-        /// </summary>
-        /// <value>The route.</value>
-        public override string Route { get; set; }
-
-        /// <summary>
-        /// Gets the route values.
-        /// </summary>
-        /// <value>The route values.</value>
-        public override IRouteValueDictionary RouteValues
-        {
-            get
-            {
-                if (IsReadOnly && !AreRouteParametersPreserved)
-                {
-                    PreserveRouteParameters();
-                    AreRouteParametersPreserved = true;
-                }
-                return routeValues;
-            }
-        }
-
-        /// <summary>
-        /// Gets the preserved route parameter names (= values that will be used from the current request route).
-        /// </summary>
-        /// <value>The preserved route parameters.</value>
-        public override IPreservedRouteParameterCollection PreservedRouteParameters
-        { get { return preservedRouteParameters; } }
-
-        /// <summary>
-        /// Sets the preserved route parameters of the current request to the routeValues collection.
-        /// </summary>
-        /// <remarks>
-        /// This method relies on the fact that the route value collection is request cached. The
-        /// values written are for the current request only, after which they will be discarded.
-        /// </remarks>
-        protected virtual void PreserveRouteParameters()
-        {
-            if (PreservedRouteParameters.Count > 0)
-            {
-                var requestContext = mvcContextFactory.CreateRequestContext();
-                var routeDataValues = requestContext.RouteData.Values;
-                var queryStringValues = GetCaseCorrectedQueryString(requestContext.HttpContext);
-
-                foreach (var item in PreservedRouteParameters)
-                {
-                    var preservedParameterName = item.Trim();
-                    if (!string.IsNullOrEmpty(preservedParameterName))
-                    {
-                        if (routeDataValues.ContainsKey(preservedParameterName))
-                        {
-                            routeValues[preservedParameterName] =
-                                routeDataValues[preservedParameterName];
-                        }
-                        else if (queryStringValues[preservedParameterName] != null)
-                        {
-                            routeValues[preservedParameterName] =
-                                queryStringValues[preservedParameterName];
-                        }
-                    }
-                }
-            }
         }
 
         /// <summary>
@@ -686,54 +794,12 @@ namespace MvcSiteMapProvider
             return result;
         }
 
-        /// <summary>
-        /// Flag to ensure the route values are only preserved from the current request a single time.
-        /// </summary>
-        /// <returns><c>true</c> if the route values have been preserved for the current request; otherwise <c>false</c>.</returns>
-        /// <remarks>This property must be overridden and provide an implementation that is stored in the request cache.</remarks>
-        protected virtual bool AreRouteParametersPreserved
+        protected string GetResolvedUrl()
         {
-            get { return false; }
-            set { }
-        }
-
-        /// <summary>
-        /// Gets the route data associated with the current node.
-        /// </summary>
-        /// <param name="httpContext">The HTTP context.</param>
-        /// <returns>The route data associated with the current node.</returns>
-        public override RouteData GetRouteData(HttpContextBase httpContext)
-        {
-            var routes = mvcContextFactory.GetRoutes();
-            return !string.IsNullOrEmpty(Route) ? routes[Route].GetRouteData(httpContext) : routes.GetRouteData(httpContext);
-        }
-
-        /// <summary>
-        /// Determines whether this node matches the supplied route values.
-        /// </summary>
-        /// <param name="routeValues">An <see cref="T:System.Collections.Generic.IDictionary{string, object}"/> of route values.</param>
-        /// <returns><c>true</c> if the route matches this node's RouteValues collection; otherwise <c>false</c>.</returns>
-        public override bool MatchesRoute(IDictionary<string, object> routeValues)
-        {
-            // If not clickable, we never want to match the node.
-            if (!Clickable)
-                return false;
-
-            // If URL is set explicitly, we should never match based on route values.
-            if (!string.IsNullOrEmpty(UnresolvedUrl))
-                return false;
-
-            // Check whether the configured host name matches (only if it is supplied).
-            if (!string.IsNullOrEmpty(HostName) && !urlPath.IsPublicHostName(HostName, HttpContext))
-                return false;
-
-            // Merge in any query string values from the current context that match keys with
-            // the route values configured in the current node (MVC doesn't automatically assign them
-            // as route values). This allows matching on query string values, but only if they
-            // are configured in the node.
-            var values = MergeRouteValuesAndNamedQueryStringValues(routeValues, RouteValues.Keys, HttpContext);
-
-            return RouteValues.MatchesRoute(values);
+            // use strategy factory to provide implementation logic from concrete provider
+            // http://stackoverflow.com/questions/1499442/best-way-to-use-structuremap-to-implement-strategy-pattern
+            return pluginProvider.UrlResolverStrategy.ResolveUrl(
+                UrlResolver, this, Area, Controller, Action, RouteValues);
         }
 
         /// <summary>
@@ -771,146 +837,39 @@ namespace MvcSiteMapProvider
             return result;
         }
 
-        #endregion Route
-
-        #region MVC
-
         /// <summary>
-        /// Gets or sets the area.
+        /// Sets the preserved route parameters of the current request to the routeValues collection.
         /// </summary>
-        /// <value>The area.</value>
-        public override string Area
+        /// <remarks>
+        /// This method relies on the fact that the route value collection is request cached. The
+        /// values written are for the current request only, after which they will be discarded.
+        /// </remarks>
+        protected virtual void PreserveRouteParameters()
         {
-            get { return RouteValues.ContainsKey("area") && RouteValues["area"] != null ? RouteValues["area"].ToString() : string.Empty; }
-            set { RouteValues["area"] = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets the controller.
-        /// </summary>
-        /// <value>The controller.</value>
-        public override string Controller
-        {
-            get { return RouteValues.ContainsKey("controller") && RouteValues["controller"] != null ? RouteValues["controller"].ToString() : string.Empty; }
-            set { RouteValues["controller"] = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets the action.
-        /// </summary>
-        /// <value>The action.</value>
-        public override string Action
-        {
-            get { return RouteValues.ContainsKey("action") && RouteValues["action"] != null ? RouteValues["action"].ToString() : string.Empty; }
-            set { RouteValues["action"] = value; }
-        }
-
-        #endregion MVC
-
-        #region CopyTo
-
-        public override void CopyTo(ISiteMapNode node)
-        {
-            // NOTE: Expected behavior is to reference
-            // the same child nodes, so this is okay.
-            node.ChildNodes.AddRange(ChildNodes);
-            node.HttpMethod = HttpMethod;
-            node.Title = title; // Get protected member
-            node.Description = description; // Get protected member
-            node.TargetFrame = TargetFrame;
-            node.ImageUrl = ImageUrl;
-            node.ImageUrlProtocol = ImageUrlProtocol;
-            node.ImageUrlHostName = ImageUrlHostName;
-            Attributes.CopyTo(node.Attributes);
-            Roles.CopyTo(node.Roles);
-            node.LastModifiedDate = LastModifiedDate;
-            node.ChangeFrequency = ChangeFrequency;
-            node.UpdatePriority = UpdatePriority;
-            node.VisibilityProvider = VisibilityProvider;
-            node.Clickable = Clickable;
-            node.UrlResolver = UrlResolver;
-            node.Url = url; // Get protected member
-            node.CacheResolvedUrl = CacheResolvedUrl;
-            node.IncludeAmbientValuesInUrl = IncludeAmbientValuesInUrl;
-            node.Protocol = Protocol;
-            node.HostName = HostName;
-            node.CanonicalKey = CanonicalKey;
-            node.CanonicalUrl = canonicalUrl; // Get protected member
-            node.CanonicalUrlProtocol = CanonicalUrlProtocol;
-            node.CanonicalUrlHostName = CanonicalUrlHostName;
-            MetaRobotsValues.CopyTo(node.MetaRobotsValues);
-            node.DynamicNodeProvider = DynamicNodeProvider;
-            node.Route = Route;
-            RouteValues.CopyTo(node.RouteValues);
-            PreservedRouteParameters.CopyTo(node.PreservedRouteParameters);
-            // NOTE: Area, Controller, and Action are covered under RouteValues.
-        }
-
-        #endregion CopyTo
-
-        #region IEquatable<ISiteMapNode> Members
-
-        public override bool Equals(ISiteMapNode node)
-        {
-            if (base.Equals((object)node))
+            if (PreservedRouteParameters.Count > 0)
             {
-                return true;
+                var requestContext = mvcContextFactory.CreateRequestContext();
+                var routeDataValues = requestContext.RouteData.Values;
+                var queryStringValues = GetCaseCorrectedQueryString(requestContext.HttpContext);
+
+                foreach (var item in PreservedRouteParameters)
+                {
+                    var preservedParameterName = item.Trim();
+                    if (!string.IsNullOrEmpty(preservedParameterName))
+                    {
+                        if (routeDataValues.ContainsKey(preservedParameterName))
+                        {
+                            routeValues[preservedParameterName] =
+                                routeDataValues[preservedParameterName];
+                        }
+                        else if (queryStringValues[preservedParameterName] != null)
+                        {
+                            routeValues[preservedParameterName] =
+                                queryStringValues[preservedParameterName];
+                        }
+                    }
+                }
             }
-
-            if (node == null)
-            {
-                return false;
-            }
-
-            return Key.Equals(node.Key);
         }
-
-        #endregion IEquatable<ISiteMapNode> Members
-
-        #region System.Object Overrides
-
-        public override bool Equals(object obj)
-        {
-            if (!(obj is ISiteMapNode node))
-            {
-                return false;
-            }
-
-            return Equals(node);
-        }
-
-        public static bool operator ==(SiteMapNode node1, SiteMapNode node2)
-        {
-            // If both are null, or both are same instance, return true.
-            if (object.ReferenceEquals(node1, node2))
-            {
-                return true;
-            }
-
-            // If one is null, but not both, return false.
-            if ((node1 is null) || (node2 is null))
-            {
-                return false;
-            }
-
-            return node1.Equals(node2);
-        }
-
-        public static bool operator !=(SiteMapNode node1, SiteMapNode node2)
-        {
-            return !(node1 == node2);
-        }
-
-        public override int GetHashCode()
-        {
-            return Key.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            return Key;
-        }
-
-        #endregion System.Object Overrides
     }
 }

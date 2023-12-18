@@ -244,14 +244,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
             get
             {
                 var value = base[key];
-                if (value.GetType().Equals(typeof(string)))
-                {
-                    return localizationService.GetResourceString(key, value.ToString(), base.siteMap);
-                }
-                else
-                {
-                    return value;
-                }
+                return value.GetType().Equals(typeof(string)) ? localizationService.GetResourceString(key, value.ToString(), base.siteMap) : value;
             }
             set
             {

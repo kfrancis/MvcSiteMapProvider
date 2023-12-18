@@ -44,8 +44,9 @@ namespace MvcSiteMapProvider.Reflection
                 fi = t.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                 t = t.BaseType;
             }
-            if (fi == null) throw new ArgumentOutOfRangeException(nameof(fieldName), string.Format(Resources.Messages.ObjectFieldNotFound, fieldName, obj.GetType().FullName));
-            return (T)fi.GetValue(obj);
+            return fi == null
+                ? throw new ArgumentOutOfRangeException(nameof(fieldName), string.Format(Resources.Messages.ObjectFieldNotFound, fieldName, obj.GetType().FullName))
+                : (T)fi.GetValue(obj);
         }
     }
 }

@@ -44,11 +44,7 @@ namespace MvcSiteMapProvider.Globalization
                     return resourceString;
                 }
             }
-            if (value != null)
-            {
-                return value;
-            }
-            return string.Empty;
+            return value ?? string.Empty;
         }
 
         protected virtual string GetImplicitResourceString(string attributeName, string implicitResourceKey, string classKey)

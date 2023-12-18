@@ -16,8 +16,12 @@ namespace MvcSiteMapProvider.Caching
     public class MicroCache<T>
         : IMicroCache<T>
     {
+        protected readonly ICacheProvider<T> cacheProvider;
+
+        private readonly ReaderWriterLockSlim synclock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+
         public MicroCache(
-            ICacheProvider<T> cacheProvider
+                            ICacheProvider<T> cacheProvider
             )
         {
             this.cacheProvider = cacheProvider ?? throw new ArgumentNullException(nameof(cacheProvider));
@@ -25,11 +29,6 @@ namespace MvcSiteMapProvider.Caching
             // Attach our event so we can receive notifications when objects are removed
             this.cacheProvider.ItemRemoved += cacheProvider_ItemRemoved;
         }
-
-        protected readonly ICacheProvider<T> cacheProvider;
-        private ReaderWriterLockSlim synclock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
-
-        #region IMicroCache<T> Members
 
         public event EventHandler<MicroCacheItemRemovedEventArgs<T>> ItemRemoved;
 
@@ -95,8 +94,6 @@ namespace MvcSiteMapProvider.Caching
             }
         }
 
-        #endregion IMicroCache<T> Members
-
         protected virtual void cacheProvider_ItemRemoved(object sender, MicroCacheItemRemovedEventArgs<T> e)
         {
             // Skip the event if the item is null, empty, or otherwise a default value,
@@ -110,10 +107,7 @@ namespace MvcSiteMapProvider.Caching
 
         protected virtual void OnCacheItemRemoved(MicroCacheItemRemovedEventArgs<T> e)
         {
-            if (ItemRemoved != null)
-            {
-                ItemRemoved(this, e);
-            }
+            ItemRemoved?.Invoke(this, e);
         }
     }
 }

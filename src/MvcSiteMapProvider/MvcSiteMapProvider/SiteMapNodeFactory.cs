@@ -12,8 +12,19 @@ namespace MvcSiteMapProvider
     public class SiteMapNodeFactory
         : ISiteMapNodeFactory
     {
+        protected readonly ILocalizationServiceFactory localizationServiceFactory;
+
+        protected readonly IMvcContextFactory mvcContextFactory;
+
+        protected readonly ISiteMapNodePluginProvider pluginProvider;
+
+        // Services
+        protected readonly ISiteMapNodeChildStateFactory siteMapNodeChildStateFactory;
+
+        protected readonly IUrlPath urlPath;
+
         public SiteMapNodeFactory(
-            ISiteMapNodeChildStateFactory siteMapNodeChildStateFactory,
+                                                    ISiteMapNodeChildStateFactory siteMapNodeChildStateFactory,
             ILocalizationServiceFactory localizationServiceFactory,
             ISiteMapNodePluginProvider pluginProvider,
             IUrlPath urlPath,
@@ -26,16 +37,6 @@ namespace MvcSiteMapProvider
             this.urlPath = urlPath ?? throw new ArgumentNullException(nameof(urlPath));
             this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
         }
-
-        // Services
-        protected readonly ISiteMapNodeChildStateFactory siteMapNodeChildStateFactory;
-
-        protected readonly ILocalizationServiceFactory localizationServiceFactory;
-        protected readonly ISiteMapNodePluginProvider pluginProvider;
-        protected readonly IUrlPath urlPath;
-        protected readonly IMvcContextFactory mvcContextFactory;
-
-        #region ISiteMapNodeFactory Members
 
         public ISiteMapNode Create(ISiteMap siteMap, string key, string implicitResourceKey)
         {
@@ -62,7 +63,5 @@ namespace MvcSiteMapProvider
                 localizationService,
                 urlPath);
         }
-
-        #endregion ISiteMapNodeFactory Members
     }
 }

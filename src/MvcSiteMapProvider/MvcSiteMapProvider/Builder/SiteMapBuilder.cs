@@ -16,8 +16,18 @@ namespace MvcSiteMapProvider.Builder
     public class SiteMapBuilder
         : ISiteMapBuilder
     {
+        protected readonly ICultureContextFactory cultureContextFactory;
+
+        protected readonly ISiteMapHierarchyBuilder siteMapHierarchyBuilder;
+
+        protected readonly ISiteMapNodeHelperFactory siteMapNodeHelperFactory;
+
+        protected readonly ISiteMapNodeProvider siteMapNodeProvider;
+
+        protected readonly ISiteMapNodeVisitor siteMapNodeVisitor;
+
         public SiteMapBuilder(
-            ISiteMapNodeProvider siteMapNodeProvider,
+                                                    ISiteMapNodeProvider siteMapNodeProvider,
             ISiteMapNodeVisitor siteMapNodeVisitor,
             ISiteMapHierarchyBuilder siteMapHierarchyBuilder,
             ISiteMapNodeHelperFactory siteMapNodeHelperFactory,
@@ -30,14 +40,6 @@ namespace MvcSiteMapProvider.Builder
             this.siteMapNodeVisitor = siteMapNodeVisitor ?? throw new ArgumentNullException(nameof(siteMapNodeVisitor));
             this.cultureContextFactory = cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
         }
-
-        protected readonly ISiteMapNodeProvider siteMapNodeProvider;
-        protected readonly ISiteMapHierarchyBuilder siteMapHierarchyBuilder;
-        protected readonly ISiteMapNodeHelperFactory siteMapNodeHelperFactory;
-        protected readonly ISiteMapNodeVisitor siteMapNodeVisitor;
-        protected readonly ICultureContextFactory cultureContextFactory;
-
-        #region ISiteMapBuilder Members
 
         public ISiteMapNode BuildSiteMap(ISiteMap siteMap, ISiteMapNode rootNode)
         {
@@ -76,19 +78,6 @@ namespace MvcSiteMapProvider.Builder
             return root;
         }
 
-        #endregion ISiteMapBuilder Members
-
-        protected virtual void LoadSourceNodes(ISiteMap siteMap, List<ISiteMapNodeToParentRelation> sourceNodes)
-        {
-            // Temporarily override the current thread's culture with the invariant culture
-            // while running the ISiteMapNodeProvider instances.
-            using (var cultureContext = cultureContextFactory.CreateInvariant())
-            {
-                var siteMapNodeHelper = siteMapNodeHelperFactory.Create(siteMap, cultureContext);
-                sourceNodes.AddRange(siteMapNodeProvider.GetSiteMapNodes(siteMapNodeHelper));
-            }
-        }
-
         protected virtual ISiteMapNode GetRootNode(ISiteMap siteMap, IList<ISiteMapNodeToParentRelation> sourceNodes)
         {
             var rootNodes = sourceNodes.Where(x => string.IsNullOrEmpty(x.ParentKey) || x.ParentKey.Trim() == string.Empty);
@@ -112,6 +101,17 @@ namespace MvcSiteMapProvider.Builder
             sourceNodes.Remove(root);
 
             return root.Node;
+        }
+
+        protected virtual void LoadSourceNodes(ISiteMap siteMap, List<ISiteMapNodeToParentRelation> sourceNodes)
+        {
+            // Temporarily override the current thread's culture with the invariant culture
+            // while running the ISiteMapNodeProvider instances.
+            using (var cultureContext = cultureContextFactory.CreateInvariant())
+            {
+                var siteMapNodeHelper = siteMapNodeHelperFactory.Create(siteMap, cultureContext);
+                sourceNodes.AddRange(siteMapNodeProvider.GetSiteMapNodes(siteMapNodeHelper));
+            }
         }
 
         protected virtual void VisitNodes(ISiteMapNode node)

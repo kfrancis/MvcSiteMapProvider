@@ -36,8 +36,6 @@ namespace MvcSiteMapProvider.Security
         protected readonly IControllerBuilder controllerBuilder;
         protected readonly IGlobalFilterProvider filterProvider;
 
-        #region IAclModule Members
-
         /// <summary>
         /// Determines whether node is accessible to user.
         /// </summary>
@@ -55,15 +53,8 @@ namespace MvcSiteMapProvider.Security
             var httpContext = mvcContextFactory.CreateHttpContext();
 
             // Is it an external Url?
-            if (node.HasExternalUrl(httpContext))
-                return true;
-
-            return VerifyNode(siteMap, node, httpContext);
+            return node.HasExternalUrl(httpContext) || VerifyNode(siteMap, node, httpContext);
         }
-
-        #endregion IAclModule Members
-
-        #region Protected Members
 
         protected virtual bool VerifyNode(ISiteMap siteMap, ISiteMapNode node, HttpContextBase httpContext)
         {
@@ -74,10 +65,7 @@ namespace MvcSiteMapProvider.Security
             // Time to delve into the AuthorizeAttribute defined on the node.
             // Let's start by getting all metadata for the controller...
             var controllerType = siteMap.ResolveControllerType(routes.GetAreaName(), routes.GetOptionalString("controller"));
-            if (controllerType == null)
-                return true;
-
-            return VerifyController(node, routes, controllerType);
+            return controllerType == null || VerifyController(node, routes, controllerType);
         }
 
         protected virtual bool VerifyController(ISiteMapNode node, RouteData routes, Type controllerType)
@@ -86,8 +74,7 @@ namespace MvcSiteMapProvider.Security
             var controllerFactory = controllerBuilder.GetControllerFactory();
 
             // Create controller context
-            bool factoryBuiltController = false;
-            var controllerContext = CreateControllerContext(node, routes, controllerType, controllerFactory, out factoryBuiltController);
+            var controllerContext = CreateControllerContext(node, routes, controllerType, controllerFactory, out bool factoryBuiltController);
             try
             {
                 return VerifyControllerAttributes(routes, controllerType, controllerContext);
@@ -190,11 +177,10 @@ namespace MvcSiteMapProvider.Security
 
         protected virtual ActionDescriptor GetActionDescriptor(string actionName, ControllerDescriptor controllerDescriptor, ControllerContext controllerContext)
         {
-            ActionDescriptor actionDescriptor = null;
-            var found = TryFindActionDescriptor(actionName, controllerContext, controllerDescriptor, out actionDescriptor);
+            var found = TryFindActionDescriptor(actionName, controllerContext, controllerDescriptor, out ActionDescriptor actionDescriptor);
             if (!found)
             {
-                actionDescriptor = controllerDescriptor.GetCanonicalActions().Where(a => a.ActionName == actionName).FirstOrDefault();
+                actionDescriptor = Array.Find(controllerDescriptor.GetCanonicalActions(), a => a.ActionName == actionName);
             }
             return actionDescriptor;
         }
@@ -219,11 +205,10 @@ namespace MvcSiteMapProvider.Security
         protected virtual ControllerContext CreateControllerContext(ISiteMapNode node, RouteData routes, Type controllerType, IControllerFactory controllerFactory, out bool factoryBuiltController)
         {
             var requestContext = mvcContextFactory.CreateRequestContext(node, routes);
-            ControllerBase controller = null;
             string controllerName = requestContext.RouteData.GetOptionalString("controller");
 
             // Whether controller is built by the ControllerFactory (or otherwise by Activator)
-            factoryBuiltController = TryCreateController(requestContext, controllerName, controllerFactory, out controller);
+            factoryBuiltController = TryCreateController(requestContext, controllerName, controllerFactory, out ControllerBase controller);
             if (!factoryBuiltController)
             {
                 TryCreateController(controllerType, out controller);
@@ -268,8 +253,6 @@ namespace MvcSiteMapProvider.Security
             }
             return false;
         }
-
-        #endregion Protected Members
 
         private class ActionSelector
             : AsyncControllerActionInvoker

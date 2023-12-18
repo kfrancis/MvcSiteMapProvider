@@ -33,8 +33,18 @@ namespace MvcSiteMapProvider.Builder
     public class AspNetSiteMapBuilder
         : ISiteMapBuilder
     {
+        protected readonly bool reflectAttributes;
+
+        protected readonly bool reflectRouteValues;
+
+        protected readonly ISiteMapXmlReservedAttributeNameProvider reservedAttributeNameProvider;
+
+        protected readonly ISiteMapNodeFactory siteMapNodeFactory;
+
+        protected readonly IAspNetSiteMapProvider siteMapProvider;
+
         public AspNetSiteMapBuilder(
-            bool reflectAttributes,
+                                                    bool reflectAttributes,
             bool reflectRouteValues,
             ISiteMapXmlReservedAttributeNameProvider reservedAttributeNameProvider,
             IAspNetSiteMapProvider siteMapProvider,
@@ -47,14 +57,6 @@ namespace MvcSiteMapProvider.Builder
             this.siteMapProvider = siteMapProvider ?? throw new ArgumentNullException(nameof(siteMapProvider));
             this.siteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
         }
-
-        protected readonly bool reflectAttributes;
-        protected readonly bool reflectRouteValues;
-        protected readonly ISiteMapXmlReservedAttributeNameProvider reservedAttributeNameProvider;
-        protected readonly IAspNetSiteMapProvider siteMapProvider;
-        protected readonly ISiteMapNodeFactory siteMapNodeFactory;
-
-        #region ISiteMapBuilder Members
 
         public ISiteMapNode BuildSiteMap(ISiteMap siteMap, ISiteMapNode rootNode)
         {
@@ -73,26 +75,10 @@ namespace MvcSiteMapProvider.Builder
             return rootNode;
         }
 
-        #endregion ISiteMapBuilder Members
-
         protected virtual ISiteMapNode GetRootNode(ISiteMap siteMap, SiteMapProvider provider)
         {
             var root = provider.RootNode;
             return GetSiteMapNodeFromProviderNode(siteMap, root, null);
-        }
-
-        protected virtual void ProcessNodes(ISiteMap siteMap, ISiteMapNode rootNode, System.Web.SiteMapNode providerRootNode)
-        {
-            foreach (System.Web.SiteMapNode node in providerRootNode.ChildNodes)
-            {
-                var childNode = GetSiteMapNodeFromProviderNode(siteMap, node, rootNode);
-                ISiteMapNode parentNode = rootNode;
-
-                siteMap.AddNode(childNode, parentNode);
-
-                // Continue recursively processing
-                ProcessNodes(siteMap, childNode, node);
-            }
         }
 
         protected virtual ISiteMapNode GetSiteMapNodeFromProviderNode(ISiteMap siteMap, System.Web.SiteMapNode node, ISiteMapNode parentNode)
@@ -207,6 +193,20 @@ namespace MvcSiteMapProvider.Builder
             }
 
             return result;
+        }
+
+        protected virtual void ProcessNodes(ISiteMap siteMap, ISiteMapNode rootNode, System.Web.SiteMapNode providerRootNode)
+        {
+            foreach (System.Web.SiteMapNode node in providerRootNode.ChildNodes)
+            {
+                var childNode = GetSiteMapNodeFromProviderNode(siteMap, node, rootNode);
+                ISiteMapNode parentNode = rootNode;
+
+                siteMap.AddNode(childNode, parentNode);
+
+                // Continue recursively processing
+                ProcessNodes(siteMap, childNode, node);
+            }
         }
     }
 }

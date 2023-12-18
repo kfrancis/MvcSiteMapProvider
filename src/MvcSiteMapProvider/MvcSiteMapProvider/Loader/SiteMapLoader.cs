@@ -10,8 +10,14 @@ namespace MvcSiteMapProvider.Loader
     public class SiteMapLoader
         : ISiteMapLoader
     {
+        protected readonly ISiteMapCache siteMapCache;
+
+        protected readonly ISiteMapCacheKeyGenerator siteMapCacheKeyGenerator;
+
+        protected readonly ISiteMapCreator siteMapCreator;
+
         public SiteMapLoader(
-            ISiteMapCache siteMapCache,
+                                    ISiteMapCache siteMapCache,
             ISiteMapCacheKeyGenerator siteMapCacheKeyGenerator,
             ISiteMapCreator siteMapCreator
             )
@@ -20,12 +26,6 @@ namespace MvcSiteMapProvider.Loader
             this.siteMapCacheKeyGenerator = siteMapCacheKeyGenerator ?? throw new ArgumentNullException(nameof(siteMapCacheKeyGenerator));
             this.siteMapCreator = siteMapCreator ?? throw new ArgumentNullException(nameof(siteMapCreator));
         }
-
-        protected readonly ISiteMapCache siteMapCache;
-        protected readonly ISiteMapCacheKeyGenerator siteMapCacheKeyGenerator;
-        protected readonly ISiteMapCreator siteMapCreator;
-
-        #region ISiteMapLoader Members
 
         public virtual ISiteMap GetSiteMap()
         {
@@ -57,7 +57,5 @@ namespace MvcSiteMapProvider.Loader
             }
             siteMapCache.Remove(siteMapCacheKey);
         }
-
-        #endregion ISiteMapLoader Members
     }
 }

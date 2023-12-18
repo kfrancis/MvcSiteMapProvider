@@ -12,8 +12,6 @@ namespace MvcSiteMapProvider.Globalization
     public class ExplicitResourceKeyParser
         : IExplicitResourceKeyParser
     {
-        #region IExplicitResourceKeyParser Members
-
         public void HandleResourceAttribute(string attributeName, ref string value, ref NameValueCollection explicitResourceKeys)
         {
             if (!string.IsNullOrEmpty(value))
@@ -38,16 +36,10 @@ namespace MvcSiteMapProvider.Globalization
                         // attributes can still be identified as string vs another datatype.
                         value = string.Empty;
                     }
-                    if (explicitResourceKeys == null)
-                    {
-                        explicitResourceKeys = new NameValueCollection();
-                    }
-                    explicitResourceKeys.Add(attributeName, resourceLocation.Trim());
+                    (explicitResourceKeys ?? (explicitResourceKeys = new NameValueCollection())).Add(attributeName, resourceLocation.Trim());
                     explicitResourceKeys.Add(attributeName, resourceName.Trim());
                 }
             }
         }
-
-        #endregion IExplicitResourceKeyParser Members
     }
 }

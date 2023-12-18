@@ -26,8 +26,12 @@ namespace MvcSiteMapProvider.Web
     public class BindingProvider
         : IBindingProvider
     {
+        protected readonly IBindingFactory bindingFactory;
+
+        protected readonly IMvcContextFactory mvcContextFactory;
+
         public BindingProvider(
-            IBindingFactory bindingFactory,
+                            IBindingFactory bindingFactory,
             IMvcContextFactory mvcContextFactory
             )
         {
@@ -35,20 +39,7 @@ namespace MvcSiteMapProvider.Web
             this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
         }
 
-        protected readonly IBindingFactory bindingFactory;
-        protected readonly IMvcContextFactory mvcContextFactory;
-
-        #region IBindingProvider Members
-
-        public IEnumerable<IBinding> GetBindings()
-        {
-            if (Bindings == null)
-                LoadBindings();
-
-            return Bindings;
-        }
-
-        #endregion IBindingProvider Members
+        protected IEnumerable<IBinding> Bindings { get; set; }
 
         protected HttpContextBase HttpContext
         { get { return mvcContextFactory.CreateHttpContext(); } }
@@ -58,11 +49,17 @@ namespace MvcSiteMapProvider.Web
             get
             {
                 var serverSoftware = HttpContext.Request.ServerVariables["SERVER_SOFTWARE"] as string;
-                return string.IsNullOrEmpty(serverSoftware) ? false : serverSoftware.StartsWith("Microsoft-IIS/");
+                return !string.IsNullOrEmpty(serverSoftware) && serverSoftware.StartsWith("Microsoft-IIS/");
             }
         }
 
-        protected IEnumerable<IBinding> Bindings { get; set; }
+        public IEnumerable<IBinding> GetBindings()
+        {
+            if (Bindings == null)
+                LoadBindings();
+
+            return Bindings;
+        }
 
         /// <summary>
         /// Loads the IIS bindings for the current application, if running on IIS.
@@ -79,7 +76,7 @@ namespace MvcSiteMapProvider.Web
                 // Get the sites section from the AppPool.config
                 var sitesSection = WebConfigurationManager.GetSection(null, null, "system.applicationHost/sites");
 
-                var site = sitesSection.GetCollection().Where(x => string.Equals((string)x["name"], siteName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                var site = sitesSection.GetCollection().FirstOrDefault(x => string.Equals((string)x["name"], siteName, StringComparison.OrdinalIgnoreCase));
 
                 if (site != null)
                 {

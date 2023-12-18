@@ -6,40 +6,23 @@ using System.Runtime.Caching;
 namespace MvcSiteMapProvider.Caching
 {
     /// <summary>
-    /// A cache provider that uses an <see cref="System.Runtime.Caching.ObjectCache"/> instance to 
+    /// A cache provider that uses an <see cref="System.Runtime.Caching.ObjectCache"/> instance to
     /// cache items that are added.
     /// </summary>
     /// <typeparam name="T">The type of item that will be stored in the cache.</typeparam>
     public class RuntimeCacheProvider<T>
         : ICacheProvider<T>
     {
+        private readonly ObjectCache cache;
+
         public RuntimeCacheProvider(
-            ObjectCache cache
+                    ObjectCache cache
             )
         {
             this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
         }
-        private readonly ObjectCache cache;
-
-        #region ICacheProvider<T> Members
 
         public event EventHandler<MicroCacheItemRemovedEventArgs<T>> ItemRemoved;
-
-        public bool Contains(string key)
-        {
-            return cache.Contains(key);
-        }
-
-        public LazyLock Get(string key)
-        {
-            return (LazyLock)cache.Get(key);
-        }
-
-        public bool TryGetValue(string key, out LazyLock value)
-        {
-            value = Get(key);
-            return value != null;
-        }
 
         public void Add(string key, LazyLock item, ICacheDetails cacheDetails)
         {
@@ -67,7 +50,7 @@ namespace MvcSiteMapProvider.Caching
                 }
             }
 
-            // Setting priority to not removable ensures an 
+            // Setting priority to not removable ensures an
             // app pool recycle doesn't unload the item, but a timeout will.
             policy.Priority = CacheItemPriority.NotRemovable;
 
@@ -77,16 +60,25 @@ namespace MvcSiteMapProvider.Caching
             cache.Add(key, item, policy);
         }
 
+        public bool Contains(string key)
+        {
+            return cache.Contains(key);
+        }
+
+        public LazyLock Get(string key)
+        {
+            return (LazyLock)cache.Get(key);
+        }
+
         public void Remove(string key)
         {
             cache.Remove(key);
         }
 
-        #endregion
-
-        private bool IsTimespanSet(TimeSpan timeSpan)
+        public bool TryGetValue(string key, out LazyLock value)
         {
-            return !timeSpan.Equals(TimeSpan.MinValue);
+            value = Get(key);
+            return value != null;
         }
 
         protected virtual void CacheItemRemoved(CacheEntryRemovedArguments arguments)
@@ -98,11 +90,14 @@ namespace MvcSiteMapProvider.Caching
 
         protected virtual void OnCacheItemRemoved(MicroCacheItemRemovedEventArgs<T> e)
         {
-            if (ItemRemoved != null)
-            {
-                ItemRemoved(this, e);
-            }
+            ItemRemoved?.Invoke(this, e);
+        }
+
+        private bool IsTimespanSet(TimeSpan timeSpan)
+        {
+            return !timeSpan.Equals(TimeSpan.MinValue);
         }
     }
 }
+
 #endif

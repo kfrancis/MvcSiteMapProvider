@@ -11,22 +11,20 @@ namespace MvcSiteMapProvider.Caching
     public class AspNetCompositeCacheDependency
         : ICacheDependency
     {
+        protected readonly ICacheDependency[] cacheDependencies;
+
         public AspNetCompositeCacheDependency(
-            params ICacheDependency[] cacheDependencies
+                    params ICacheDependency[] cacheDependencies
             )
         {
             this.cacheDependencies = cacheDependencies ?? throw new ArgumentNullException(nameof(cacheDependencies));
         }
 
-        protected readonly ICacheDependency[] cacheDependencies;
-
-        #region ICacheDependency Members
-
         public object Dependency
         {
             get
             {
-                if (cacheDependencies.Count() > 0)
+                if (cacheDependencies.Length > 0)
                 {
                     var list = new AggregateCacheDependency();
                     foreach (var item in cacheDependencies)
@@ -38,7 +36,5 @@ namespace MvcSiteMapProvider.Caching
                 return null;
             }
         }
-
-        #endregion ICacheDependency Members
     }
 }

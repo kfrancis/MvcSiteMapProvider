@@ -9,15 +9,6 @@ namespace MvcSiteMapProvider
     public abstract class DynamicNodeProviderBase
         : IDynamicNodeProvider
     {
-        #region IDynamicNodeProvider Members
-
-        /// <summary>
-        /// Gets the dynamic node collection.
-        /// </summary>
-        /// <param name="node">The current node.</param>
-        /// <returns>A dynamic node collection.</returns>
-        public abstract IEnumerable<DynamicNode> GetDynamicNodeCollection(ISiteMapNode node);
-
         /// <summary>
         /// Determines whether the provider instance matches the name
         /// </summary>
@@ -27,12 +18,14 @@ namespace MvcSiteMapProvider
         /// </returns>
         public virtual bool AppliesTo(string providerName)
         {
-            if (string.IsNullOrEmpty(providerName))
-                return false;
-
-            return GetType().Equals(Type.GetType(providerName, false));
+            return !string.IsNullOrEmpty(providerName) && GetType().Equals(Type.GetType(providerName, false));
         }
 
-        #endregion IDynamicNodeProvider Members
+        /// <summary>
+        /// Gets the dynamic node collection.
+        /// </summary>
+        /// <param name="node">The current node.</param>
+        /// <returns>A dynamic node collection.</returns>
+        public abstract IEnumerable<DynamicNode> GetDynamicNodeCollection(ISiteMapNode node);
     }
 }

@@ -12,8 +12,22 @@ namespace MvcSiteMapProvider
     public class SiteMapFactory
         : ISiteMapFactory
     {
+        protected readonly IActionMethodParameterResolverFactory actionMethodParameterResolverFactory;
+
+        protected readonly IControllerTypeResolverFactory controllerTypeResolverFactory;
+
+        protected readonly IMvcContextFactory mvcContextFactory;
+
+        protected readonly IMvcResolverFactory mvcResolverFactory;
+
+        protected readonly ISiteMapPluginProviderFactory pluginProviderFactory;
+
+        protected readonly ISiteMapChildStateFactory siteMapChildStateFactory;
+
+        protected readonly IUrlPath urlPath;
+
         public SiteMapFactory(
-            ISiteMapPluginProviderFactory pluginProviderFactory,
+                                                                    ISiteMapPluginProviderFactory pluginProviderFactory,
             IMvcResolverFactory mvcResolverFactory,
             IMvcContextFactory mvcContextFactory,
             ISiteMapChildStateFactory siteMapChildStateFactory,
@@ -30,16 +44,6 @@ namespace MvcSiteMapProvider
             this.controllerTypeResolverFactory = controllerTypeResolverFactory ?? throw new ArgumentNullException(nameof(controllerTypeResolverFactory));
             this.actionMethodParameterResolverFactory = actionMethodParameterResolverFactory ?? throw new ArgumentNullException(nameof(actionMethodParameterResolverFactory));
         }
-
-        protected readonly ISiteMapPluginProviderFactory pluginProviderFactory;
-        protected readonly IMvcResolverFactory mvcResolverFactory;
-        protected readonly IMvcContextFactory mvcContextFactory;
-        protected readonly ISiteMapChildStateFactory siteMapChildStateFactory;
-        protected readonly IUrlPath urlPath;
-        protected readonly IControllerTypeResolverFactory controllerTypeResolverFactory;
-        protected readonly IActionMethodParameterResolverFactory actionMethodParameterResolverFactory;
-
-        #region ISiteMapFactory Members
 
         public virtual ISiteMap Create(ISiteMapBuilder siteMapBuilder, ISiteMapSettings siteMapSettings)
         {
@@ -62,7 +66,5 @@ namespace MvcSiteMapProvider
                 siteMapSettings,
                 requestCache);
         }
-
-        #endregion ISiteMapFactory Members
     }
 }

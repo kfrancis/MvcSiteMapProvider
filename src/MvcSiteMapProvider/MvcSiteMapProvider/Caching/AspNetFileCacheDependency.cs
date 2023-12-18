@@ -10,8 +10,10 @@ namespace MvcSiteMapProvider.Caching
     public class AspNetFileCacheDependency
         : ICacheDependency
     {
+        protected readonly string fileName;
+
         public AspNetFileCacheDependency(
-            string fileName
+                    string fileName
             )
         {
             if (string.IsNullOrEmpty(fileName))
@@ -20,15 +22,9 @@ namespace MvcSiteMapProvider.Caching
             this.fileName = fileName;
         }
 
-        protected readonly string fileName;
-
-        #region ICacheDependency Members
-
         public object Dependency
         {
             get { return new CacheDependency(fileName); }
         }
-
-        #endregion ICacheDependency Members
     }
 }

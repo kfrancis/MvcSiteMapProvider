@@ -10,18 +10,17 @@ namespace MvcSiteMapProvider.Reflection
     public class AttributeAssemblyProvider
         : IAttributeAssemblyProvider
     {
+        protected readonly IEnumerable<string> excludeAssemblies;
+
+        protected readonly IEnumerable<string> includeAssemblies;
+
         public AttributeAssemblyProvider(
-            IEnumerable<string> includeAssemblies,
+                            IEnumerable<string> includeAssemblies,
             IEnumerable<string> excludeAssemblies)
         {
             this.includeAssemblies = includeAssemblies ?? throw new ArgumentNullException(nameof(includeAssemblies));
             this.excludeAssemblies = excludeAssemblies ?? throw new ArgumentNullException(nameof(excludeAssemblies));
         }
-
-        protected readonly IEnumerable<string> includeAssemblies;
-        protected readonly IEnumerable<string> excludeAssemblies;
-
-        #region IAttributeAssemblyProvider Members
 
         public IEnumerable<System.Reflection.Assembly> GetAssemblies()
         {
@@ -54,7 +53,5 @@ namespace MvcSiteMapProvider.Reflection
                     && a.ManifestModule.GetType().Namespace != "System.Reflection.Emit"
                 );
         }
-
-        #endregion IAttributeAssemblyProvider Members
     }
 }

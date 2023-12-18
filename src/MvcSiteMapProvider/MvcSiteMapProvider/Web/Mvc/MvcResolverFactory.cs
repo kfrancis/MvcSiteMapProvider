@@ -7,15 +7,11 @@
     public class MvcResolverFactory
         : IMvcResolverFactory
     {
-        #region IMvcResolverFactory Members
-
         public IMvcResolver Create(
             IControllerTypeResolver controllerTypeResolver,
             IActionMethodParameterResolver actionMethodParameterResolver)
         {
             return new MvcResolver(controllerTypeResolver, actionMethodParameterResolver);
         }
-
-        #endregion IMvcResolverFactory Members
     }
 }

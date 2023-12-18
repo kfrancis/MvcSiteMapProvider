@@ -11,8 +11,12 @@ namespace MvcSiteMapProvider
     public class SiteMapNodeChildStateFactory
         : ISiteMapNodeChildStateFactory
     {
+        protected readonly IAttributeDictionaryFactory attributeDictionaryFactory;
+
+        protected readonly IRouteValueDictionaryFactory routeValueDictionaryFactory;
+
         public SiteMapNodeChildStateFactory(
-            IAttributeDictionaryFactory attributeDictionaryFactory,
+                            IAttributeDictionaryFactory attributeDictionaryFactory,
             IRouteValueDictionaryFactory routeValueDictionaryFactory
             )
         {
@@ -20,19 +24,14 @@ namespace MvcSiteMapProvider
             this.routeValueDictionaryFactory = routeValueDictionaryFactory ?? throw new ArgumentNullException(nameof(routeValueDictionaryFactory));
         }
 
-        protected readonly IAttributeDictionaryFactory attributeDictionaryFactory;
-        protected readonly IRouteValueDictionaryFactory routeValueDictionaryFactory;
-
-        #region ISiteMapNodeChildStateFactory Members
-
         public virtual IAttributeDictionary CreateAttributeDictionary(string siteMapNodeKey, string memberName, ISiteMap siteMap, ILocalizationService localizationService)
         {
             return attributeDictionaryFactory.Create(siteMapNodeKey, memberName, siteMap, localizationService);
         }
 
-        public virtual IRouteValueDictionary CreateRouteValueDictionary(string siteMapNodeKey, string memberName, ISiteMap siteMap)
+        public virtual IMetaRobotsValueCollection CreateMetaRobotsValueCollection(ISiteMap siteMap)
         {
-            return routeValueDictionaryFactory.Create(siteMapNodeKey, memberName, siteMap);
+            return new MetaRobotsValueCollection(siteMap);
         }
 
         public virtual IPreservedRouteParameterCollection CreatePreservedRouteParameterCollection(ISiteMap siteMap)
@@ -45,11 +44,9 @@ namespace MvcSiteMapProvider
             return new RoleCollection(siteMap);
         }
 
-        public virtual IMetaRobotsValueCollection CreateMetaRobotsValueCollection(ISiteMap siteMap)
+        public virtual IRouteValueDictionary CreateRouteValueDictionary(string siteMapNodeKey, string memberName, ISiteMap siteMap)
         {
-            return new MetaRobotsValueCollection(siteMap);
+            return routeValueDictionaryFactory.Create(siteMapNodeKey, memberName, siteMap);
         }
-
-        #endregion ISiteMapNodeChildStateFactory Members
     }
 }
