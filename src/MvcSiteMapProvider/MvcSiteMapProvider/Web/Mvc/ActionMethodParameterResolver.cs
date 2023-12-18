@@ -1,5 +1,6 @@
 ﻿using MvcSiteMapProvider.Collections;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
@@ -25,14 +26,14 @@ namespace MvcSiteMapProvider.Web.Mvc
         {
             this.controllerDescriptorFactory = controllerDescriptorFactory ?? throw new ArgumentNullException(nameof(controllerDescriptorFactory));
 
-            Cache = new ThreadSafeDictionary<string, IEnumerable<string>>();
+            Cache = new ConcurrentDictionary<string, IEnumerable<string>>();
         }
 
         /// <summary>
         /// Gets or sets the cache.
         /// </summary>
         /// <value>The cache.</value>
-        protected ThreadSafeDictionary<string, IEnumerable<string>> Cache { get; }
+        protected ConcurrentDictionary<string, IEnumerable<string>> Cache { get; }
 
         /// <summary>
         /// Resolves the action method parameters.
@@ -81,7 +82,7 @@ namespace MvcSiteMapProvider.Web.Mvc
             {
                 try
                 {
-                    Cache.Add(cacheKey, actionParameters);
+                    Cache.AddOrUpdate(cacheKey, actionParameters, (_, __) => actionParameters);
                 }
                 catch (ArgumentException)
                 {

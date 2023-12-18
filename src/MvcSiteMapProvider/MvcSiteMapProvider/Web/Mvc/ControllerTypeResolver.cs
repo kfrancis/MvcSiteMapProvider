@@ -2,6 +2,7 @@
 using MvcSiteMapProvider.DI;
 using MvcSiteMapProvider.Web.Compilation;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -39,20 +40,20 @@ namespace MvcSiteMapProvider.Web.Mvc
             this.controllerBuilder = controllerBuilder ?? throw new ArgumentNullException(nameof(controllerBuilder));
             this.buildManager = buildManager ?? throw new ArgumentNullException(nameof(buildManager));
 
-            Cache = new ThreadSafeDictionary<string, Type>();
+            Cache = new ConcurrentDictionary<string, Type>();
         }
 
         /// <summary>
         /// Gets or sets the assembly cache.
         /// </summary>
         /// <value>The assembly cache.</value>
-        protected Dictionary<string, ILookup<string, Type>> AssemblyCache { get; private set; }
+        protected Lazy<Dictionary<string, ILookup<string, Type>>> AssemblyCache { get; private set; }
 
         /// <summary>
         /// Gets or sets the cache.
         /// </summary>
         /// <value>The cache.</value>
-        protected ThreadSafeDictionary<string, Type> Cache { get; }
+        protected ConcurrentDictionary<string, Type> Cache { get; }
 
         /// <summary>
         /// Resolves the type of the controller.
@@ -62,47 +63,39 @@ namespace MvcSiteMapProvider.Web.Mvc
         /// <returns>Controller type</returns>
         public Type ResolveControllerType(string areaName, string controllerName)
         {
-            // Is the type cached?
             string cacheKey = areaName + "_" + controllerName;
-            if (Cache.ContainsKey(cacheKey))
+
+            // Try to get the value from the cache first
+            if (Cache.TryGetValue(cacheKey, out Type cachedType))
             {
-                return Cache[cacheKey];
+                return cachedType;
             }
 
-            // Find controller details
-            IEnumerable<string> areaNamespaces = FindNamespacesForArea(areaName, routes);
-
-            string area = areaName;
-            string controller = controllerName;
-
-            // Find controller type
-            Type controllerType;
+            // Compute areaNamespaces only if necessary
+            var areaNamespaces = FindNamespacesForArea(areaName, routes)?.Except(areaNamespacesToIgnore, StringComparer.OrdinalIgnoreCase).ToList();
             HashSet<string> namespaces = null;
-            if (areaNamespaces != null)
+
+            if (areaNamespaces?.Any() == true)
             {
-                areaNamespaces = (from ns in areaNamespaces
-                                  where ns != "Elmah.Mvc"
-                                  where !areaNamespacesToIgnore.Contains(ns)
-                                  select ns).ToList();
-                if (areaNamespaces.Any())
+                namespaces = new HashSet<string>(areaNamespaces, StringComparer.OrdinalIgnoreCase);
+                if (string.IsNullOrEmpty(areaName))
                 {
-                    namespaces = new HashSet<string>(areaNamespaces, StringComparer.OrdinalIgnoreCase);
-                    if (string.IsNullOrEmpty(areaName))
-                    {
-                        namespaces = new HashSet<string>(namespaces.Union(controllerBuilder.DefaultNamespaces, StringComparer.OrdinalIgnoreCase), StringComparer.OrdinalIgnoreCase);
-                    }
+                    namespaces.UnionWith(controllerBuilder.DefaultNamespaces);
                 }
             }
-            else if (controllerBuilder.DefaultNamespaces.Count > 0)
+            else if (controllerBuilder.DefaultNamespaces.Any())
             {
-                namespaces = controllerBuilder.DefaultNamespaces;
+                namespaces = new HashSet<string>(controllerBuilder.DefaultNamespaces, StringComparer.OrdinalIgnoreCase);
             }
-            controllerType = GetControllerTypeWithinNamespaces(area, controller, namespaces);
 
-            // Cache the result
-            Cache.Add(cacheKey, controllerType);
+            Type controllerType = GetControllerTypeWithinNamespaces(areaName, controllerName, namespaces);
 
-            // Return
+            // Update the cache
+            if (controllerType != null)
+            {
+                Cache.AddOrUpdate(cacheKey, controllerType, (_, __) => controllerType);
+            }
+
             return controllerType;
         }
 
@@ -157,7 +150,7 @@ namespace MvcSiteMapProvider.Web.Mvc
             InitAssemblyCache();
 
             HashSet<Type> matchingTypes = new HashSet<Type>();
-            if (AssemblyCache.TryGetValue(controller, out ILookup<string, Type> nsLookup))
+            if (AssemblyCache.Value.TryGetValue(controller, out ILookup<string, Type> nsLookup))
             {
                 // this friendly name was located in the cache, now cycle through namespaces
                 if (namespaces != null)
@@ -298,14 +291,18 @@ namespace MvcSiteMapProvider.Web.Mvc
                 {
                     if (AssemblyCache == null)
                     {
-                        List<Type> controllerTypes = GetListOfControllerTypes();
-                        var groupedByName = controllerTypes.GroupBy(
-                            t => t.Name.Substring(0, t.Name.IndexOf("Controller")),
-                            StringComparer.OrdinalIgnoreCase);
-                        AssemblyCache = groupedByName.ToDictionary(
-                            g => g.Key,
-                            g => g.ToLookup(t => t.Namespace ?? string.Empty, StringComparer.OrdinalIgnoreCase),
-                            StringComparer.OrdinalIgnoreCase);
+                        AssemblyCache = new Lazy<Dictionary<string, ILookup<string, Type>>>(() =>
+                        {
+                            var controllerTypes = GetListOfControllerTypes();
+                            var groupedByName = controllerTypes.GroupBy(
+                                t => t.Name.Substring(0, t.Name.IndexOf("Controller")),
+                                StringComparer.OrdinalIgnoreCase);
+
+                            return groupedByName.ToDictionary(
+                                g => g.Key,
+                                g => g.ToLookup(t => t.Namespace ?? string.Empty, StringComparer.OrdinalIgnoreCase),
+                                StringComparer.OrdinalIgnoreCase);
+                        });
                     }
                 }
             }
