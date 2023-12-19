@@ -1,12 +1,12 @@
-﻿using MvcSiteMapProvider.Builder;
-using MvcSiteMapProvider.Caching;
-using MvcSiteMapProvider.DI;
-using MvcSiteMapProvider.Globalization;
-using MvcSiteMapProvider.Web.Script.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Xml.Linq;
+using MvcSiteMapProvider.Builder;
+using MvcSiteMapProvider.Caching;
+using MvcSiteMapProvider.DI;
+using MvcSiteMapProvider.Globalization;
+using MvcSiteMapProvider.Web.Script.Serialization;
 
 namespace MvcSiteMapProvider.Collections.Specialized
 {
@@ -18,8 +18,14 @@ namespace MvcSiteMapProvider.Collections.Specialized
     public class AttributeDictionary
         : CacheableDictionary<string, object>, IAttributeDictionary
     {
+        private readonly IJsonToDictionaryDeserializer _jsonToDictionaryDeserializer;
+        private readonly ILocalizationService _localizationService;
+        private readonly string _memberName;
+        private readonly IReservedAttributeNameProvider _reservedAttributeNameProvider;
+        private readonly string _siteMapNodeKey;
+
         public AttributeDictionary(
-            string siteMapNodeKey,
+                                                    string siteMapNodeKey,
             string memberName,
             ISiteMap siteMap,
             ILocalizationService localizationService,
@@ -33,22 +39,38 @@ namespace MvcSiteMapProvider.Collections.Specialized
                 throw new ArgumentNullException(nameof(siteMapNodeKey));
             if (string.IsNullOrEmpty(memberName))
                 throw new ArgumentNullException(nameof(memberName));
-            this.siteMapNodeKey = siteMapNodeKey;
-            this.memberName = memberName;
-            this.localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
-            this.reservedAttributeNameProvider = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
-            this.jsonToDictionaryDeserializer = jsonToDictionaryDeserializer ?? throw new ArgumentNullException(nameof(jsonToDictionaryDeserializer));
+            _siteMapNodeKey = siteMapNodeKey;
+            _memberName = memberName;
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+            _reservedAttributeNameProvider = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
+            _jsonToDictionaryDeserializer = jsonToDictionaryDeserializer ?? throw new ArgumentNullException(nameof(jsonToDictionaryDeserializer));
         }
 
-        protected readonly string siteMapNodeKey;
-        protected readonly string memberName;
-        protected readonly ILocalizationService localizationService;
-        protected readonly IReservedAttributeNameProvider reservedAttributeNameProvider;
-        protected readonly IJsonToDictionaryDeserializer jsonToDictionaryDeserializer;
-
-        protected override string GetCacheKey()
+        public override object this[string key]
         {
-            return "__ATTRIBUTE_DICTIONARY_" + siteMap.CacheKey + "_" + siteMapNodeKey + "_" + memberName + "_";
+            get
+            {
+                var value = base[key];
+                return value.GetType().Equals(typeof(string)) ? _localizationService.GetResourceString(key, value.ToString(), base.siteMap) : value;
+            }
+            set
+            {
+                if (_reservedAttributeNameProvider.IsRegularAttribute(key))
+                {
+                    if (value.GetType().Equals(typeof(string)))
+                    {
+                        base[key] = _localizationService.ExtractExplicitResourceKey(key, value.ToString());
+                    }
+                    else
+                    {
+                        base[key] = value;
+                    }
+                }
+                else
+                {
+                    throw new ReservedKeyException(string.Format(Resources.Messages.AttributeKeyReserved, _siteMapNodeKey, key, value));
+                }
+            }
         }
 
         /// <summary>
@@ -88,10 +110,10 @@ namespace MvcSiteMapProvider.Collections.Specialized
         /// <param name="throwIfReservedKey"><c>true</c> to throw an exception if one of the keys being added is a reserved key name; otherwise, <c>false</c>.</param>
         public void Add(string key, object value, bool throwIfReservedKey)
         {
-            if (reservedAttributeNameProvider.IsRegularAttribute(key))
+            if (_reservedAttributeNameProvider.IsRegularAttribute(key))
             {
                 if (value.GetType().Equals(typeof(string)))
-                    value = localizationService.ExtractExplicitResourceKey(key, value.ToString());
+                    value = _localizationService.ExtractExplicitResourceKey(key, value.ToString());
 
                 if (!ContainsKey(key))
                     base.Add(key, value);
@@ -100,7 +122,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
             }
             else if (throwIfReservedKey)
             {
-                throw new ReservedKeyException(string.Format(Resources.Messages.AttributeKeyReserved, siteMapNodeKey, key, value));
+                throw new ReservedKeyException(string.Format(Resources.Messages.AttributeKeyReserved, _siteMapNodeKey, key, value));
             }
         }
 
@@ -144,7 +166,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
         /// <param name="throwIfReservedKey"><c>true</c> to throw an exception if one of the keys being added is a reserved key name; otherwise, <c>false</c>.</param>
         public void AddRange(string jsonString, bool throwIfReservedKey)
         {
-            var items = jsonToDictionaryDeserializer.Deserialize(jsonString);
+            var items = _jsonToDictionaryDeserializer.Deserialize(jsonString);
             AddRange(items, throwIfReservedKey);
         }
 
@@ -199,9 +221,30 @@ namespace MvcSiteMapProvider.Collections.Specialized
             {
                 foreach (var key in Keys)
                 {
-                    localizationService.RemoveResourceKey(key);
+                    _localizationService.RemoveResourceKey(key);
                 }
             }
+        }
+
+        public override bool Remove(KeyValuePair<string, object> item)
+        {
+            var removed = base.Remove(item);
+            if (removed && !IsReadOnly)
+                _localizationService.RemoveResourceKey(item.Key);
+            return removed;
+        }
+
+        public override bool Remove(string key)
+        {
+            var removed = base.Remove(key);
+            if (removed && !IsReadOnly)
+                _localizationService.RemoveResourceKey(key);
+            return removed;
+        }
+
+        protected override string GetCacheKey()
+        {
+            return "__ATTRIBUTE_DICTIONARY_" + siteMap.CacheKey + "_" + _siteMapNodeKey + "_" + _memberName + "_";
         }
 
         protected override void Insert(string key, object value, bool add)
@@ -211,58 +254,15 @@ namespace MvcSiteMapProvider.Collections.Specialized
 
         protected void Insert(string key, object value, bool add, bool throwIfReservedKey)
         {
-            if (reservedAttributeNameProvider.IsRegularAttribute(key))
+            if (_reservedAttributeNameProvider.IsRegularAttribute(key))
             {
                 if (value.GetType().Equals(typeof(string)))
-                    value = localizationService.ExtractExplicitResourceKey(key, value.ToString());
+                    value = _localizationService.ExtractExplicitResourceKey(key, value.ToString());
                 base.Insert(key, value, add);
             }
             else if (throwIfReservedKey)
             {
-                throw new ReservedKeyException(string.Format(Resources.Messages.AttributeKeyReserved, siteMapNodeKey, key, value));
-            }
-        }
-
-        public override bool Remove(KeyValuePair<string, object> item)
-        {
-            var removed = base.Remove(item);
-            if (removed && !IsReadOnly)
-                localizationService.RemoveResourceKey(item.Key);
-            return removed;
-        }
-
-        public override bool Remove(string key)
-        {
-            var removed = base.Remove(key);
-            if (removed && !IsReadOnly)
-                localizationService.RemoveResourceKey(key);
-            return removed;
-        }
-
-        public override object this[string key]
-        {
-            get
-            {
-                var value = base[key];
-                return value.GetType().Equals(typeof(string)) ? localizationService.GetResourceString(key, value.ToString(), base.siteMap) : value;
-            }
-            set
-            {
-                if (reservedAttributeNameProvider.IsRegularAttribute(key))
-                {
-                    if (value.GetType().Equals(typeof(string)))
-                    {
-                        base[key] = localizationService.ExtractExplicitResourceKey(key, value.ToString());
-                    }
-                    else
-                    {
-                        base[key] = value;
-                    }
-                }
-                else
-                {
-                    throw new ReservedKeyException(string.Format(Resources.Messages.AttributeKeyReserved, siteMapNodeKey, key, value));
-                }
+                throw new ReservedKeyException(string.Format(Resources.Messages.AttributeKeyReserved, _siteMapNodeKey, key, value));
             }
         }
     }

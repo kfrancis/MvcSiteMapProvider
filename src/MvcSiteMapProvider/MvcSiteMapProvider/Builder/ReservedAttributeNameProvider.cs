@@ -19,7 +19,7 @@ namespace MvcSiteMapProvider.Builder
                     IEnumerable<string> attributesToIgnore
             )
         {
-            this.AttributesToIgnore = attributesToIgnore ?? throw new ArgumentNullException(nameof(attributesToIgnore));
+            AttributesToIgnore = attributesToIgnore ?? throw new ArgumentNullException(nameof(attributesToIgnore));
         }
 
         public virtual bool IsRegularAttribute(string attributeName)

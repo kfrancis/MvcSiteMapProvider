@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,7 +12,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
     public class SourceMetadataDictionary
         : IDictionary<string, object>, ICollection<KeyValuePair<string, object>>, IEnumerable<KeyValuePair<string, object>>, IEnumerable
     {
-        private Dictionary<string, object> _dictionary;
+        private readonly Dictionary<string, object> _dictionary;
 
         public SourceMetadataDictionary()
         {
@@ -119,8 +119,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
         {
             get
             {
-                object obj2;
-                TryGetValue(key, out obj2);
+                TryGetValue(key, out var obj2);
                 return obj2;
             }
             set

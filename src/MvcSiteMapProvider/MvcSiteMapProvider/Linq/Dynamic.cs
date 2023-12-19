@@ -148,19 +148,15 @@ namespace MvcSiteMapProvider.Linq
 
     public class DynamicProperty
     {
-        private string name;
         private Type type;
 
         public DynamicProperty(string name, Type type)
         {
-            this.name = name ?? throw new ArgumentNullException(nameof(name));
+            Name = name ?? throw new ArgumentNullException(nameof(name));
             this.type = type ?? throw new ArgumentNullException(nameof(type));
         }
 
-        public string Name
-        {
-            get { return name; }
-        }
+        public string Name { get; }
 
         public Type Type
         {
@@ -424,12 +420,10 @@ namespace MvcSiteMapProvider.Linq
 
     public sealed class ParseException : Exception
     {
-        private int position;
-
         public ParseException(string message, int position)
             : base(message)
         {
-            this.position = position;
+            Position = position;
         }
 
         public ParseException() : base()
@@ -444,14 +438,11 @@ namespace MvcSiteMapProvider.Linq
         {
         }
 
-        public int Position
-        {
-            get { return position; }
-        }
+        public int Position { get; }
 
         public override string ToString()
         {
-            return string.Format(Res.ParseExceptionFormat, Message, position);
+            return string.Format(Res.ParseExceptionFormat, Message, Position);
         }
     }
 

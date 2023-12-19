@@ -25,8 +25,8 @@ namespace MvcSiteMapProvider.Builder
             )
         {
             SiteMapNodeCreator = siteMapNodeCreator ?? throw new ArgumentNullException(nameof(siteMapNodeCreator));
-            this.CultureContext = cultureContext ?? throw new ArgumentNullException(nameof(cultureContext));
-            this.CultureContextFactory = cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
+            CultureContext = cultureContext ?? throw new ArgumentNullException(nameof(cultureContext));
+            CultureContextFactory = cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
         }
 
         /// <summary>

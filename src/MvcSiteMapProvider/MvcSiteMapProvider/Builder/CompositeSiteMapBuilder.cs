@@ -14,7 +14,7 @@ namespace MvcSiteMapProvider.Builder
 
         public CompositeSiteMapBuilder(params ISiteMapBuilder[] siteMapBuilders)
         {
-            this.SiteMapBuilders = siteMapBuilders ?? throw new ArgumentNullException(nameof(siteMapBuilders));
+            SiteMapBuilders = siteMapBuilders ?? throw new ArgumentNullException(nameof(siteMapBuilders));
         }
 
         public ISiteMapNode BuildSiteMap(ISiteMap siteMap, ISiteMapNode rootNode)

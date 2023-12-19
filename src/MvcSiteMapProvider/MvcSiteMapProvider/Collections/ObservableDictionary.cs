@@ -27,41 +27,36 @@ namespace MvcSiteMapProvider.Collections
         private const string KeysName = "Keys";
         private const string ValuesName = "Values";
 
-        private IDictionary<TKey, TValue> dictionary;
-
-        protected IDictionary<TKey, TValue> Dictionary
-        {
-            get { return dictionary; }
-        }
+        protected IDictionary<TKey, TValue> Dictionary { get; private set; }
 
         public ObservableDictionary()
         {
-            dictionary = new Dictionary<TKey, TValue>();
+            Dictionary = new Dictionary<TKey, TValue>();
         }
 
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary)
         {
-            this.dictionary = new Dictionary<TKey, TValue>(dictionary);
+            Dictionary = new Dictionary<TKey, TValue>(dictionary);
         }
 
         public ObservableDictionary(IEqualityComparer<TKey> comparer)
         {
-            dictionary = new Dictionary<TKey, TValue>(comparer);
+            Dictionary = new Dictionary<TKey, TValue>(comparer);
         }
 
         public ObservableDictionary(int capacity)
         {
-            dictionary = new Dictionary<TKey, TValue>(capacity);
+            Dictionary = new Dictionary<TKey, TValue>(capacity);
         }
 
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
         {
-            this.dictionary = new Dictionary<TKey, TValue>(dictionary, comparer);
+            Dictionary = new Dictionary<TKey, TValue>(dictionary, comparer);
         }
 
         public ObservableDictionary(int capacity, IEqualityComparer<TKey> comparer)
         {
-            dictionary = new Dictionary<TKey, TValue>(capacity, comparer);
+            Dictionary = new Dictionary<TKey, TValue>(capacity, comparer);
         }
 
         public virtual void Add(TKey key, TValue value)
@@ -187,7 +182,7 @@ namespace MvcSiteMapProvider.Collections
                 }
                 else
                 {
-                    dictionary = new Dictionary<TKey, TValue>(items);
+                    Dictionary = new Dictionary<TKey, TValue>(items);
                 }
 #if !NET35
                 OnCollectionChanged(NotifyCollectionChangedAction.Add, items.ToArray());

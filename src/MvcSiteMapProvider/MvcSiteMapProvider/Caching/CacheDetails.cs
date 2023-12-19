@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace MvcSiteMapProvider.Caching
 {
@@ -9,41 +9,25 @@ namespace MvcSiteMapProvider.Caching
         : ICacheDetails
     {
         public CacheDetails(
-            TimeSpan absoluteCacheExpiration,
+                                    TimeSpan absoluteCacheExpiration,
             TimeSpan slidingCacheExpiration,
             ICacheDependency cacheDependency
             )
         {
-            if (absoluteCacheExpiration == null)
+            if (absoluteCacheExpiration == default)
                 throw new ArgumentNullException(nameof(absoluteCacheExpiration));
-            if (slidingCacheExpiration == null)
+            if (slidingCacheExpiration == default)
                 throw new ArgumentNullException(nameof(slidingCacheExpiration));
-            this.absoluteCacheExpiration = absoluteCacheExpiration;
-            this.slidingCacheExpiration = slidingCacheExpiration;
-            this.cacheDependency = cacheDependency ?? throw new ArgumentNullException(nameof(cacheDependency));
+
+            AbsoluteCacheExpiration = absoluteCacheExpiration;
+            SlidingCacheExpiration = slidingCacheExpiration;
+            CacheDependency = cacheDependency ?? throw new ArgumentNullException(nameof(cacheDependency));
         }
 
-        protected readonly TimeSpan absoluteCacheExpiration;
-        protected readonly TimeSpan slidingCacheExpiration;
-        protected readonly ICacheDependency cacheDependency;
+        public TimeSpan AbsoluteCacheExpiration { get; }
 
-        #region ICacheDetails Members
+        public ICacheDependency CacheDependency { get; }
 
-        public TimeSpan AbsoluteCacheExpiration
-        {
-            get { return absoluteCacheExpiration; }
-        }
-
-        public TimeSpan SlidingCacheExpiration
-        {
-            get { return slidingCacheExpiration; }
-        }
-
-        public ICacheDependency CacheDependency
-        {
-            get { return cacheDependency; }
-        }
-
-        #endregion ICacheDetails Members
+        public TimeSpan SlidingCacheExpiration { get; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -23,13 +23,12 @@ namespace MvcSiteMapProvider.Xml
             var xml = xmlSource.GetXml();
             xmlNameProvider.FixXmlNamespaces(xml);
 
-            var result = xml.Element(xmlNameProvider.RootName)
+            return xml.Element(xmlNameProvider.RootName)
                             .Descendants()
                             .Select(e => (string)e.Attribute(attributeName))
                             .Where(x => x != null)
                             .Distinct()
                             .ToList();
-            return result;
         }
     }
 }

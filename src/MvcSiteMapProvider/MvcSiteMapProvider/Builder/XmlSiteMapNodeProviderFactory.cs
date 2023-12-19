@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Xml;
+using MvcSiteMapProvider.Xml;
 using System;
 
 namespace MvcSiteMapProvider.Builder
@@ -10,18 +10,18 @@ namespace MvcSiteMapProvider.Builder
     /// </summary>
     public class XmlSiteMapNodeProviderFactory
     {
-        protected readonly ISiteMapXmlNameProvider xmlNameProvider;
+        protected readonly ISiteMapXmlNameProvider XmlNameProvider;
 
         public XmlSiteMapNodeProviderFactory(
                     ISiteMapXmlNameProvider xmlNameProvider
             )
         {
-            this.xmlNameProvider = xmlNameProvider ?? throw new ArgumentNullException(nameof(xmlNameProvider));
+            XmlNameProvider = xmlNameProvider ?? throw new ArgumentNullException(nameof(xmlNameProvider));
         }
 
         public virtual XmlSiteMapNodeProvider Create(IXmlSource xmlSource, bool includeRootNode, bool useNestedDynamicNodeRecursion)
         {
-            return new XmlSiteMapNodeProvider(includeRootNode, useNestedDynamicNodeRecursion, xmlSource, xmlNameProvider);
+            return new XmlSiteMapNodeProvider(includeRootNode, useNestedDynamicNodeRecursion, xmlSource, XmlNameProvider);
         }
 
         public virtual XmlSiteMapNodeProvider Create(IXmlSource xmlSource, bool includeRootNode)

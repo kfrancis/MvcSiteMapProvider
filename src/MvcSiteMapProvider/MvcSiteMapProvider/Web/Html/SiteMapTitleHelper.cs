@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Collections.Specialized;
+using MvcSiteMapProvider.Collections.Specialized;
 using MvcSiteMapProvider.Web.Html.Models;
 using System.Collections.Generic;
 using System.Web.Mvc;
@@ -78,14 +78,14 @@ namespace MvcSiteMapProvider.Web.Html
             var model = BuildModel(GetSourceMetadata(sourceMetadata), helper.SiteMap.CurrentNode ?? helper.SiteMap.RootNode);
             return helper
                 .CreateHtmlHelperForModel(model)
-                .DisplayFor(m => model, templateName);
+                .DisplayFor(_ => model, templateName);
         }
 
         /// <summary>
         /// Builds the model.
         /// </summary>
-        /// <param name="startingNode">The starting node.</param>
         /// <param name="sourceMetadata">User-defined meta data.</param>
+        /// <param name="startingNode">The starting node.</param>
         /// <returns>The model.</returns>
         private static SiteMapTitleHelperModel BuildModel(SourceMetadataDictionary sourceMetadata, ISiteMapNode startingNode)
         {

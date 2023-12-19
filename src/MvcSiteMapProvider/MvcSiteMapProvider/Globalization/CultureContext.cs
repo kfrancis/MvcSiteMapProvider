@@ -21,7 +21,7 @@ namespace MvcSiteMapProvider.Globalization
             currentThread = Thread.CurrentThread;
 
             // Record the current culture settings so they can be restored later.
-            originalCulture = currentThread.CurrentCulture;
+            OriginalCulture = currentThread.CurrentCulture;
             originalUICulture = currentThread.CurrentUICulture;
 
             // Set both the culture and UI culture for this context.
@@ -30,13 +30,9 @@ namespace MvcSiteMapProvider.Globalization
         }
 
         private readonly Thread currentThread;
-        private readonly CultureInfo originalCulture;
         private readonly CultureInfo originalUICulture;
 
-        public CultureInfo OriginalCulture
-        {
-            get { return originalCulture; }
-        }
+        public CultureInfo OriginalCulture { get; }
 
         public CultureInfo OriginalUICulture
         {
@@ -46,7 +42,7 @@ namespace MvcSiteMapProvider.Globalization
         public void Dispose()
         {
             // Restore the culture to the way it was before the constructor was called.
-            currentThread.CurrentCulture = originalCulture;
+            currentThread.CurrentCulture = OriginalCulture;
             currentThread.CurrentUICulture = originalUICulture;
         }
     }

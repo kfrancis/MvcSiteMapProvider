@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Xml;
+using MvcSiteMapProvider.Xml;
 using System;
 using System.Collections.Generic;
 using System.Web.Mvc;
@@ -15,13 +15,13 @@ namespace MvcSiteMapProvider.Builder
     {
         protected const string SourceName = ".sitemap XML File";
 
-        protected readonly bool includeRootNode;
+        protected readonly bool IncludeRootNode;
 
-        protected readonly bool useNestedDynamicNodeRecursion;
+        protected readonly bool UseNestedDynamicNodeRecursion;
 
-        protected readonly ISiteMapXmlNameProvider xmlNameProvider;
+        protected readonly ISiteMapXmlNameProvider XmlNameProvider;
 
-        protected readonly IXmlSource xmlSource;
+        protected readonly IXmlSource XmlSource;
 
         public XmlSiteMapNodeProvider(
                                                     bool includeRootNode,
@@ -30,10 +30,10 @@ namespace MvcSiteMapProvider.Builder
             ISiteMapXmlNameProvider xmlNameProvider
             )
         {
-            this.includeRootNode = includeRootNode;
-            this.useNestedDynamicNodeRecursion = useNestedDynamicNodeRecursion;
-            this.xmlSource = xmlSource ?? throw new ArgumentNullException(nameof(xmlSource));
-            this.xmlNameProvider = xmlNameProvider ?? throw new ArgumentNullException(nameof(xmlNameProvider));
+            IncludeRootNode = includeRootNode;
+            UseNestedDynamicNodeRecursion = useNestedDynamicNodeRecursion;
+            XmlSource = xmlSource ?? throw new ArgumentNullException(nameof(xmlSource));
+            XmlNameProvider = xmlNameProvider ?? throw new ArgumentNullException(nameof(xmlNameProvider));
         }
 
         [Flags]
@@ -48,7 +48,7 @@ namespace MvcSiteMapProvider.Builder
         public IEnumerable<ISiteMapNodeToParentRelation> GetSiteMapNodes(ISiteMapNodeHelper helper)
         {
             var result = new List<ISiteMapNodeToParentRelation>();
-            var xml = xmlSource.GetXml();
+            var xml = XmlSource.GetXml();
             if (xml != null)
             {
                 result.AddRange(LoadSiteMapNodesFromXml(xml, helper));
@@ -65,7 +65,7 @@ namespace MvcSiteMapProvider.Builder
         protected virtual XElement GetRootElement(XDocument xml)
         {
             // Get the root mvcSiteMapNode element, and map this to an MvcSiteMapNode
-            return xml.Element(xmlNameProvider.RootName).Element(xmlNameProvider.NodeName);
+            return xml.Element(XmlNameProvider.RootName).Element(XmlNameProvider.NodeName);
         }
 
         protected virtual ISiteMapNodeToParentRelation GetRootNode(XDocument xml, XElement rootElement, ISiteMapNodeHelper helper)
@@ -204,13 +204,13 @@ namespace MvcSiteMapProvider.Builder
         protected virtual IEnumerable<ISiteMapNodeToParentRelation> LoadSiteMapNodesFromXml(XDocument xml, ISiteMapNodeHelper helper)
         {
             var result = new List<ISiteMapNodeToParentRelation>();
-            xmlNameProvider.FixXmlNamespaces(xml);
+            XmlNameProvider.FixXmlNamespaces(xml);
 
             // Get the root mvcSiteMapNode element, and map this to an MvcSiteMapNode
             var rootElement = GetRootElement(xml) ?? throw new MvcSiteMapException(string.Format(Resources.Messages.XmlSiteMapNodeProviderRootNodeNotDefined, helper.SiteMapCacheKey));
             // Add the root node
             var rootNode = GetRootNode(xml, rootElement, helper);
-            if (includeRootNode)
+            if (IncludeRootNode)
             {
                 result.Add(rootNode);
             }
@@ -237,7 +237,7 @@ namespace MvcSiteMapProvider.Builder
 
             foreach (var node in parentElement.Elements())
             {
-                if (node.Name != xmlNameProvider.NodeName)
+                if (node.Name != XmlNameProvider.NodeName)
                 {
                     // If the current node is not one of the known node types throw and exception
                     throw new MvcSiteMapException(string.Format(Resources.Messages.XmlSiteMapNodeProviderInvalidSiteMapElement, helper.SiteMapCacheKey));
@@ -261,7 +261,7 @@ namespace MvcSiteMapProvider.Builder
                     {
                         result.Add(dynamicNode);
 
-                        if (!useNestedDynamicNodeRecursion)
+                        if (!UseNestedDynamicNodeRecursion)
                         {
                             // Recursively add non-dynamic children for every dynamic node
                             result.AddRange(ProcessXmlNodes(dynamicNode.Node, node, NodesToProcess.StandardNodes, helper));
@@ -274,7 +274,7 @@ namespace MvcSiteMapProvider.Builder
                         }
                     }
 
-                    if (!useNestedDynamicNodeRecursion)
+                    if (!UseNestedDynamicNodeRecursion)
                     {
                         // Process the next nested dynamic node provider. We pass in the parent node as the default
                         // parent because the dynamic node definition node (child) is never added to the sitemap.

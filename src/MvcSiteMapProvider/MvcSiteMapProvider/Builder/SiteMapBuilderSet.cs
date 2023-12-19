@@ -1,5 +1,5 @@
-using MvcSiteMapProvider.Caching;
 using System;
+using MvcSiteMapProvider.Caching;
 
 namespace MvcSiteMapProvider.Builder
 {
@@ -9,19 +9,19 @@ namespace MvcSiteMapProvider.Builder
     public class SiteMapBuilderSet
         : ISiteMapBuilderSet
     {
-        protected readonly ICacheDetails cacheDetails;
+        private readonly ICacheDetails _cacheDetails;
 
-        protected readonly bool enableLocalization;
+        private readonly bool _enableLocalization;
 
-        protected readonly string instanceName;
+        private readonly string _instanceName;
 
-        protected readonly bool securityTrimmingEnabled;
+        private readonly bool _securityTrimmingEnabled;
 
-        protected readonly ISiteMapBuilder siteMapBuilder;
+        private readonly ISiteMapBuilder _siteMapBuilder;
 
-        protected readonly bool useTitleIfDescriptionNotProvided;
+        private readonly bool _useTitleIfDescriptionNotProvided;
 
-        protected readonly bool visibilityAffectsDescendants;
+        private readonly bool _visibilityAffectsDescendants;
 
         public SiteMapBuilderSet(
                                                                    string instanceName,
@@ -35,13 +35,13 @@ namespace MvcSiteMapProvider.Builder
         {
             if (string.IsNullOrEmpty(instanceName))
                 throw new ArgumentNullException(nameof(instanceName));
-            this.instanceName = instanceName;
-            this.securityTrimmingEnabled = securityTrimmingEnabled;
-            this.enableLocalization = enableLocalization;
-            this.visibilityAffectsDescendants = visibilityAffectsDescendants;
-            this.useTitleIfDescriptionNotProvided = useTitleIfDescriptionNotProvided;
-            this.siteMapBuilder = siteMapBuilder ?? throw new ArgumentNullException(nameof(siteMapBuilder));
-            this.cacheDetails = cacheDetails ?? throw new ArgumentNullException(nameof(cacheDetails));
+            _instanceName = instanceName;
+            _securityTrimmingEnabled = securityTrimmingEnabled;
+            _enableLocalization = enableLocalization;
+            _visibilityAffectsDescendants = visibilityAffectsDescendants;
+            _useTitleIfDescriptionNotProvided = useTitleIfDescriptionNotProvided;
+            _siteMapBuilder = siteMapBuilder ?? throw new ArgumentNullException(nameof(siteMapBuilder));
+            _cacheDetails = cacheDetails ?? throw new ArgumentNullException(nameof(cacheDetails));
         }
 
         /// <summary>
@@ -71,39 +71,39 @@ namespace MvcSiteMapProvider.Builder
 
         public virtual ISiteMapBuilder Builder
         {
-            get { return siteMapBuilder; }
+            get { return _siteMapBuilder; }
         }
 
         public virtual ICacheDetails CacheDetails
         {
-            get { return cacheDetails; }
+            get { return _cacheDetails; }
         }
 
         public virtual bool EnableLocalization
         {
-            get { return enableLocalization; }
+            get { return _enableLocalization; }
         }
 
         public virtual bool SecurityTrimmingEnabled
         {
-            get { return securityTrimmingEnabled; }
+            get { return _securityTrimmingEnabled; }
         }
 
         public virtual string SiteMapCacheKey { get; set; }
 
         public virtual bool UseTitleIfDescriptionNotProvided
         {
-            get { return useTitleIfDescriptionNotProvided; }
+            get { return _useTitleIfDescriptionNotProvided; }
         }
 
         public virtual bool VisibilityAffectsDescendants
         {
-            get { return visibilityAffectsDescendants; }
+            get { return _visibilityAffectsDescendants; }
         }
 
         public virtual bool AppliesTo(string builderSetName)
         {
-            return instanceName.Equals(builderSetName, StringComparison.Ordinal);
+            return _instanceName.Equals(builderSetName, StringComparison.Ordinal);
         }
     }
 }

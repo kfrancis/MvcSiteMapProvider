@@ -1,4 +1,4 @@
-﻿#if !NET35
+#if !NET35
 using System;
 using System.Collections.Generic;
 using System.Runtime.Caching;
@@ -12,7 +12,7 @@ namespace MvcSiteMapProvider.Caching
     public class RuntimeFileCacheDependency
         : ICacheDependency
     {
-        protected readonly string fileName;
+        protected readonly string FileName;
 
         public RuntimeFileCacheDependency(
                     string fileName
@@ -21,7 +21,7 @@ namespace MvcSiteMapProvider.Caching
             if (string.IsNullOrEmpty(fileName))
                 throw new ArgumentNullException(nameof(fileName));
 
-            this.fileName = fileName;
+            FileName = fileName;
         }
 
         public virtual object Dependency
@@ -30,7 +30,7 @@ namespace MvcSiteMapProvider.Caching
             {
                 return new List<ChangeMonitor>
                 {
-                    new HostFileChangeMonitor(new string[] { fileName })
+                    new HostFileChangeMonitor(new string[] { FileName })
                 };
             }
         }

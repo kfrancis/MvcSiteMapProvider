@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace MvcSiteMapProvider.Web.UrlResolver
@@ -18,7 +18,7 @@ namespace MvcSiteMapProvider.Web.UrlResolver
         /// </returns>
         public virtual bool AppliesTo(string providerName)
         {
-            return string.IsNullOrEmpty(providerName) ? false : GetType().Equals(Type.GetType(providerName, false));
+            return !string.IsNullOrEmpty(providerName) && GetType().Equals(Type.GetType(providerName, false));
         }
 
         /// <summary>

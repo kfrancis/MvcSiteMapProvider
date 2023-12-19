@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcSiteMapProvider", "MvcSiteMapProvider\MvcSiteMapProvider.csproj", "{8625FB9C-BE71-41EF-993D-3C05EA11DEF4}"
 EndProject
@@ -45,6 +45,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector", "CodeAsConfiguration\SimpleInjector\SimpleInjector.csproj", "{029EA3F0-37FA-4A67-AD8E-075226FBC950}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcSiteMapProvider.Sample.Mvc5", "MvcSiteMapProvider.Sample.Mvc5\MvcSiteMapProvider.Sample.Mvc5.csproj", "{025D53CF-2FFB-435A-8CAF-0EE09F579194}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0922288B-8073-4102-9E96-B9B3E44F6535}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,7 +106,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{025D53CF-2FFB-435A-8CAF-0EE09F579194} = {0EC6B430-52BD-4514-9174-8BE70C3029E3}
 		{8625FB9C-BE71-41EF-993D-3C05EA11DEF4} = {EBBE2F83-8F97-4A25-BF8C-C6A43112926A}
 		{406FDBF5-BD07-4BCD-8801-BDC3F22E152F} = {7DFCAC9C-4458-457F-9F1A-EA7637653D31}
 		{7C763B28-50B2-4201-9BD0-659FC155E5F3} = {FAADDBE0-A4D5-4EEE-A924-FE2582D734A9}
@@ -112,6 +116,7 @@ Global
 		{4EC1AAED-4179-4ADC-96BC-18CCCF429B65} = {FAADDBE0-A4D5-4EEE-A924-FE2582D734A9}
 		{B559B084-8AFF-457B-9054-373ECC7F979D} = {FAADDBE0-A4D5-4EEE-A924-FE2582D734A9}
 		{029EA3F0-37FA-4A67-AD8E-075226FBC950} = {FAADDBE0-A4D5-4EEE-A924-FE2582D734A9}
+		{025D53CF-2FFB-435A-8CAF-0EE09F579194} = {0EC6B430-52BD-4514-9174-8BE70C3029E3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPath = packages\Unity.2.1.505.2\lib\NET35

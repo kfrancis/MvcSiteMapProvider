@@ -51,11 +51,11 @@ namespace MvcSiteMapProvider.Builder
             ISiteMapNodeFactory siteMapNodeFactory
             )
         {
-            this.ReflectAttributes = reflectAttributes;
-            this.ReflectRouteValues = reflectRouteValues;
-            this.ReservedAttributeNameProvider = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
-            this.SiteMapProvider = siteMapProvider ?? throw new ArgumentNullException(nameof(siteMapProvider));
-            this.SiteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
+            ReflectAttributes = reflectAttributes;
+            ReflectRouteValues = reflectRouteValues;
+            ReservedAttributeNameProvider = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
+            SiteMapProvider = siteMapProvider ?? throw new ArgumentNullException(nameof(siteMapProvider));
+            SiteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
         }
 
         public ISiteMapNode BuildSiteMap(ISiteMap siteMap, ISiteMapNode rootNode)

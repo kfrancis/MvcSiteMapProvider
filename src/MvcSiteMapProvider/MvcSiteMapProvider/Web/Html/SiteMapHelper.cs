@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Collections.Specialized;
+using MvcSiteMapProvider.Collections.Specialized;
 using MvcSiteMapProvider.Web.Html.Models;
 using System;
 using System.Collections.Generic;
@@ -345,7 +345,7 @@ namespace MvcSiteMapProvider.Web.Html
             var model = BuildModel(helper, GetSourceMetadata(sourceMetadata), startingNode, rootInChildLevel, visibilityAffectsDescendants);
             return helper
                 .CreateHtmlHelperForModel(model)
-                .DisplayFor(m => model, templateName);
+                .DisplayFor(_ => model, templateName);
         }
 
         /// <summary>
@@ -402,9 +402,10 @@ namespace MvcSiteMapProvider.Web.Html
         /// <returns>SourceMetadataDictionary for the current request.</returns>
         private static SourceMetadataDictionary GetSourceMetadata(IDictionary<string, object> sourceMetadata)
         {
-            var result = new SourceMetadataDictionary(sourceMetadata);
-            result.Add("HtmlHelper", typeof(SiteMapHelper).FullName);
-            return result;
+            return new SourceMetadataDictionary(sourceMetadata)
+            {
+                { "HtmlHelper", typeof(SiteMapHelper).FullName }
+            };
         }
     }
 }

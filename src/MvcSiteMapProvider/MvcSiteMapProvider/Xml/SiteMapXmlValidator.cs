@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Xml;
 using System.Xml.Schema;
 
@@ -12,11 +12,11 @@ namespace MvcSiteMapProvider.Xml
     {
         public void ValidateXml(string xmlPath)
         {
-            const string resourceNamespace = "MvcSiteMapProvider.Xml";
-            const string resourceFileName = "MvcSiteMapSchema.xsd";
+            const string ResourceNamespace = "MvcSiteMapProvider.Xml";
+            const string ResourceFileName = "MvcSiteMapSchema.xsd";
 
-            var xsdPath = resourceNamespace + "." + resourceFileName;
-            var xsdStream = GetType().Assembly.GetManifestResourceStream(xsdPath);
+            const string XsdPath = ResourceNamespace + "." + ResourceFileName;
+            var xsdStream = GetType().Assembly.GetManifestResourceStream(XsdPath);
             using (var xsd = XmlReader.Create(xsdStream))
             {
                 var schema = new XmlSchemaSet();

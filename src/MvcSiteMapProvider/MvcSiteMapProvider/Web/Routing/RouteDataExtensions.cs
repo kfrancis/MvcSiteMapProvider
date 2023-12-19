@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Routing;
@@ -16,8 +16,7 @@ namespace MvcSiteMapProvider.Web.Routing
         /// <returns>The value with the specified key, or an empty string if not found.</returns>
         public static string GetOptionalString(this RouteData routeData, string valueName)
         {
-            object value;
-            if (routeData.Values.TryGetValue(valueName, out value))
+            if (routeData.Values.TryGetValue(valueName, out var value))
             {
                 return value as string;
             }
@@ -40,8 +39,7 @@ namespace MvcSiteMapProvider.Web.Routing
         /// <returns>The area name, or an empty string if not found.</returns>
         public static string GetAreaName(this RouteData routeData)
         {
-            object value;
-            if (routeData.DataTokens.TryGetValue("area", out value))
+            if (routeData.DataTokens.TryGetValue("area", out var value))
             {
                 return value as string;
             }

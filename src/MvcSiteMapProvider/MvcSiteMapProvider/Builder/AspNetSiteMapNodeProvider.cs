@@ -53,10 +53,10 @@ namespace MvcSiteMapProvider.Builder
             IAspNetSiteMapProvider siteMapProvider
             )
         {
-            this.IncludeRootNode = includeRootNode;
-            this.ReflectAttributes = reflectAttributes;
-            this.ReflectRouteValues = reflectRouteValues;
-            this.SiteMapProvider = siteMapProvider ?? throw new ArgumentNullException(nameof(siteMapProvider));
+            IncludeRootNode = includeRootNode;
+            ReflectAttributes = reflectAttributes;
+            ReflectRouteValues = reflectRouteValues;
+            SiteMapProvider = siteMapProvider ?? throw new ArgumentNullException(nameof(siteMapProvider));
         }
 
         public IEnumerable<ISiteMapNodeToParentRelation> GetSiteMapNodes(ISiteMapNodeHelper helper)

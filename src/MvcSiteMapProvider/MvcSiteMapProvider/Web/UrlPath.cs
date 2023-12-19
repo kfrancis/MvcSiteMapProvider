@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Web.Mvc;
+using MvcSiteMapProvider.Web.Mvc;
 using System;
 using System.Collections;
 using System.Globalization;
@@ -70,22 +70,22 @@ namespace MvcSiteMapProvider.Web
             {
                 return false;
             }
-            return (length != 1) && (path[1] != '\\') ? path[1] == '/' : true;
+            return length == 1 || path[1] == '\\' || path[1] == '/';
         }
 
         public bool IsRooted(string basepath)
         {
-            return !string.IsNullOrEmpty(basepath) && (basepath[0] != '/') ? basepath[0] == '\\' : true;
+            return string.IsNullOrEmpty(basepath) || basepath[0] == '/' || basepath[0] == '\\';
         }
 
         public bool IsAbsolutePhysicalPath(string path)
         {
-            return (path == null) || (path.Length < 3) ? false : ((path[1] == ':') && IsDirectorySeparatorChar(path[2])) || IsUncSharePath(path);
+            return path?.Length >= 3 && (((path[1] == ':') && IsDirectorySeparatorChar(path[2])) || IsUncSharePath(path));
         }
 
         private bool IsDirectorySeparatorChar(char ch)
         {
-            return ch != '\\' ? ch == '/' : true;
+            return ch == '\\' || ch == '/';
         }
 
         private bool IsUncSharePath(string path)
@@ -208,7 +208,7 @@ namespace MvcSiteMapProvider.Web
                 return false;
             }
             var num2 = virtualPath.IndexOf('/');
-            return num2 != -1 ? index < num2 : true;
+            return num2 == -1 || index < num2;
         }
 
         private string Reduce(string path)

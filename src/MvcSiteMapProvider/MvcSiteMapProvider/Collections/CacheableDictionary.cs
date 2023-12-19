@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Caching;
+using MvcSiteMapProvider.Caching;
 using System;
 using System.Collections.Generic;
 
@@ -203,16 +203,16 @@ namespace MvcSiteMapProvider.Collections
                 if (add) throw new ArgumentException(Resources.Messages.DictionaryAlreadyContainsKey);
                 if (Equals(item, value)) return;
                 WriteOperationDictionary[key] = value;
-                #if !NET35
+#if !NET35
                 OnCollectionChanged(NotifyCollectionChangedAction.Replace, new KeyValuePair<TKey, TValue>(key, value), new KeyValuePair<TKey, TValue>(key, item));
-                #endif
+#endif
             }
             else
             {
                 WriteOperationDictionary[key] = value;
-                #if !NET35
+#if !NET35
                 OnCollectionChanged(NotifyCollectionChangedAction.Add, new KeyValuePair<TKey, TValue>(key, value));
-                #endif
+#endif
             }
         }
     }

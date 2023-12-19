@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Web.Mvc;
+using MvcSiteMapProvider.Web.Mvc;
 using System;
 using System.Web;
 
@@ -14,16 +14,16 @@ namespace MvcSiteMapProvider.Caching
             IMvcContextFactory mvcContextFactory
             )
         {
-            this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
+            _mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
         }
 
-        private readonly IMvcContextFactory mvcContextFactory;
+        private readonly IMvcContextFactory _mvcContextFactory;
 
         protected HttpContextBase Context
         {
             get
             {
-                return mvcContextFactory.CreateHttpContext();
+                return _mvcContextFactory.CreateHttpContext();
             }
         }
 

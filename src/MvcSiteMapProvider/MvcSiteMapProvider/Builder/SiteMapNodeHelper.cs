@@ -1,8 +1,8 @@
-﻿using MvcSiteMapProvider.DI;
-using MvcSiteMapProvider.Globalization;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using MvcSiteMapProvider.DI;
+using MvcSiteMapProvider.Globalization;
 
 namespace MvcSiteMapProvider.Builder
 {
@@ -13,17 +13,10 @@ namespace MvcSiteMapProvider.Builder
     public class SiteMapNodeHelper
         : ISiteMapNodeHelper
     {
-        protected readonly ICultureContext cultureContext;
-
-        protected readonly ICultureContextFactory cultureContextFactory;
-
-        protected readonly IDynamicSiteMapNodeBuilderFactory dynamicSiteMapNodeBuilderFactory;
-
-        protected readonly IReservedAttributeNameProvider reservedAttributeNameProvider;
-
-        protected readonly ISiteMap siteMap;
-
-        protected readonly ISiteMapNodeCreatorFactory siteMapNodeCreatorFactory;
+        private readonly ICultureContextFactory _cultureContextFactory;
+        private readonly IDynamicSiteMapNodeBuilderFactory _dynamicSiteMapNodeBuilderFactory;
+        private readonly ISiteMap _siteMap;
+        private readonly ISiteMapNodeCreatorFactory _siteMapNodeCreatorFactory;
 
         public SiteMapNodeHelper(
                                                             ISiteMap siteMap,
@@ -34,37 +27,31 @@ namespace MvcSiteMapProvider.Builder
             ICultureContextFactory cultureContextFactory
             )
         {
-            this.siteMap = siteMap ?? throw new ArgumentNullException(nameof(siteMap));
-            this.cultureContext = cultureContext ?? throw new ArgumentNullException(nameof(cultureContext));
-            this.siteMapNodeCreatorFactory = siteMapNodeCreatorFactory ?? throw new ArgumentNullException(nameof(siteMapNodeCreatorFactory));
-            this.dynamicSiteMapNodeBuilderFactory = dynamicSiteMapNodeBuilderFactory ?? throw new ArgumentNullException(nameof(dynamicSiteMapNodeBuilderFactory));
-            this.reservedAttributeNameProvider = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
-            this.cultureContextFactory = cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
+            _siteMap = siteMap ?? throw new ArgumentNullException(nameof(siteMap));
+            CultureContext = cultureContext ?? throw new ArgumentNullException(nameof(cultureContext));
+            _siteMapNodeCreatorFactory = siteMapNodeCreatorFactory ?? throw new ArgumentNullException(nameof(siteMapNodeCreatorFactory));
+            _dynamicSiteMapNodeBuilderFactory = dynamicSiteMapNodeBuilderFactory ?? throw new ArgumentNullException(nameof(dynamicSiteMapNodeBuilderFactory));
+            ReservedAttributeNames = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
+            _cultureContextFactory = cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
         }
 
-        public ICultureContext CultureContext
-        {
-            get { return cultureContext; }
-        }
+        public ICultureContext CultureContext { get; }
 
-        public IReservedAttributeNameProvider ReservedAttributeNames
-        {
-            get { return reservedAttributeNameProvider; }
-        }
+        public IReservedAttributeNameProvider ReservedAttributeNames { get; }
 
         public string SiteMapCacheKey
         {
-            get { return siteMap.CacheKey; }
+            get { return _siteMap.CacheKey; }
         }
 
         public ICultureContext CreateCultureContext(string cultureName, string uiCultureName)
         {
-            return cultureContextFactory.Create(cultureName, uiCultureName);
+            return _cultureContextFactory.Create(cultureName, uiCultureName);
         }
 
         public ICultureContext CreateCultureContext(CultureInfo culture, CultureInfo uiCulture)
         {
-            return cultureContextFactory.Create(culture, uiCulture);
+            return _cultureContextFactory.Create(culture, uiCulture);
         }
 
         public IEnumerable<ISiteMapNodeToParentRelation> CreateDynamicNodes(ISiteMapNodeToParentRelation node)
@@ -74,13 +61,13 @@ namespace MvcSiteMapProvider.Builder
 
         public IEnumerable<ISiteMapNodeToParentRelation> CreateDynamicNodes(ISiteMapNodeToParentRelation node, string defaultParentKey)
         {
-            var dynamicSiteMapNodeBuilder = dynamicSiteMapNodeBuilderFactory.Create(siteMap, CultureContext);
+            var dynamicSiteMapNodeBuilder = _dynamicSiteMapNodeBuilderFactory.Create(_siteMap, CultureContext);
             return dynamicSiteMapNodeBuilder.BuildDynamicNodes(node.Node, defaultParentKey);
         }
 
         public ICultureContext CreateInvariantCultureContext()
         {
-            return cultureContextFactory.CreateInvariant();
+            return _cultureContextFactory.CreateInvariant();
         }
 
         public ISiteMapNodeToParentRelation CreateNode(string key, string parentKey, string sourceName)
@@ -90,13 +77,13 @@ namespace MvcSiteMapProvider.Builder
 
         public ISiteMapNodeToParentRelation CreateNode(string key, string parentKey, string sourceName, string implicitResourceKey)
         {
-            var siteMapNodeCreator = siteMapNodeCreatorFactory.Create(siteMap);
+            var siteMapNodeCreator = _siteMapNodeCreatorFactory.Create(_siteMap);
             return siteMapNodeCreator.CreateSiteMapNode(key, parentKey, sourceName, implicitResourceKey);
         }
 
         public virtual string CreateNodeKey(string parentKey, string key, string url, string title, string area, string controller, string action, string httpMethod, bool clickable)
         {
-            var siteMapNodeCreator = siteMapNodeCreatorFactory.Create(siteMap);
+            var siteMapNodeCreator = _siteMapNodeCreatorFactory.Create(_siteMap);
             return siteMapNodeCreator.GenerateSiteMapNodeKey(parentKey, key, url, title, area, controller, action, httpMethod, clickable);
         }
     }

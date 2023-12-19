@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Web.Caching;
 
 namespace MvcSiteMapProvider.Caching
@@ -10,7 +10,7 @@ namespace MvcSiteMapProvider.Caching
     public class AspNetFileCacheDependency
         : ICacheDependency
     {
-        protected readonly string fileName;
+        protected readonly string FileName;
 
         public AspNetFileCacheDependency(
                     string fileName
@@ -19,12 +19,12 @@ namespace MvcSiteMapProvider.Caching
             if (string.IsNullOrEmpty(fileName))
                 throw new ArgumentNullException(nameof(fileName));
 
-            this.fileName = fileName;
+            FileName = fileName;
         }
 
         public object Dependency
         {
-            get { return new CacheDependency(fileName); }
+            get { return new CacheDependency(FileName); }
         }
     }
 }

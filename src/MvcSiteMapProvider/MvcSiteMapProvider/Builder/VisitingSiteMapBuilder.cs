@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Visitor;
+using MvcSiteMapProvider.Visitor;
 using System;
 
 namespace MvcSiteMapProvider.Builder
@@ -11,13 +11,13 @@ namespace MvcSiteMapProvider.Builder
     public class VisitingSiteMapBuilder
         : ISiteMapBuilder
     {
-        protected readonly ISiteMapNodeVisitor siteMapNodeVisitor;
+        protected readonly ISiteMapNodeVisitor SiteMapNodeVisitor;
 
         public VisitingSiteMapBuilder(
                     ISiteMapNodeVisitor siteMapNodeVisitor
             )
         {
-            this.siteMapNodeVisitor = siteMapNodeVisitor ?? throw new ArgumentNullException(nameof(siteMapNodeVisitor));
+            SiteMapNodeVisitor = siteMapNodeVisitor ?? throw new ArgumentNullException(nameof(siteMapNodeVisitor));
         }
 
         public virtual ISiteMapNode BuildSiteMap(ISiteMap siteMap, ISiteMapNode rootNode)
@@ -33,7 +33,7 @@ namespace MvcSiteMapProvider.Builder
 
         protected virtual void VisitNodes(ISiteMapNode node)
         {
-            siteMapNodeVisitor.Execute(node);
+            SiteMapNodeVisitor.Execute(node);
 
             if (node.HasChildNodes)
             {

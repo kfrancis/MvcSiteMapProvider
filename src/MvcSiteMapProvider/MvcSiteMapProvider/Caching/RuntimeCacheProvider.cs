@@ -1,4 +1,4 @@
-﻿#if !NET35
+#if !NET35
 using System;
 using System.Collections.Generic;
 using System.Runtime.Caching;
@@ -13,13 +13,13 @@ namespace MvcSiteMapProvider.Caching
     public class RuntimeCacheProvider<T>
         : ICacheProvider<T>
     {
-        private readonly ObjectCache cache;
+        private readonly ObjectCache _cache;
 
         public RuntimeCacheProvider(
                     ObjectCache cache
             )
         {
-            this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         }
 
         public event EventHandler<MicroCacheItemRemovedEventArgs<T>> ItemRemoved;
@@ -57,22 +57,22 @@ namespace MvcSiteMapProvider.Caching
             // Setup callback
             policy.RemovedCallback = CacheItemRemoved;
 
-            cache.Add(key, item, policy);
+            _cache.Add(key, item, policy);
         }
 
         public bool Contains(string key)
         {
-            return cache.Contains(key);
+            return _cache.Contains(key);
         }
 
         public LazyLock Get(string key)
         {
-            return (LazyLock)cache.Get(key);
+            return (LazyLock)_cache.Get(key);
         }
 
         public void Remove(string key)
         {
-            cache.Remove(key);
+            _cache.Remove(key);
         }
 
         public bool TryGetValue(string key, out LazyLock value)

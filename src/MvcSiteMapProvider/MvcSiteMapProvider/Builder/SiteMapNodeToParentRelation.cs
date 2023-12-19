@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace MvcSiteMapProvider.Builder
 {
@@ -9,11 +9,9 @@ namespace MvcSiteMapProvider.Builder
     public class SiteMapNodeToParentRelation
         : ISiteMapNodeToParentRelation
     {
-        protected readonly ISiteMapNode node;
-
-        protected readonly string parentKey;
-
-        protected readonly string sourceName;
+        private readonly ISiteMapNode _node;
+        private readonly string _parentKey;
+        private readonly string _sourceName;
 
         public SiteMapNodeToParentRelation(
                                     string parentKey,
@@ -21,24 +19,24 @@ namespace MvcSiteMapProvider.Builder
             string sourceName
             )
         {
-            this.parentKey = parentKey;
-            this.node = node ?? throw new ArgumentNullException(nameof(node));
-            this.sourceName = sourceName;
+            _parentKey = parentKey;
+            _node = node ?? throw new ArgumentNullException(nameof(node));
+            _sourceName = sourceName;
         }
 
         public virtual ISiteMapNode Node
         {
-            get { return node; }
+            get { return _node; }
         }
 
         public virtual string ParentKey
         {
-            get { return parentKey; }
+            get { return _parentKey; }
         }
 
         public virtual string SourceName
         {
-            get { return sourceName; }
+            get { return _sourceName; }
         }
     }
 }

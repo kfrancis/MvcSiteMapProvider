@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Web.Mvc;
+using MvcSiteMapProvider.Web.Mvc;
 using System;
 using System.Text;
 
@@ -11,15 +11,16 @@ namespace MvcSiteMapProvider.Caching
     public class SiteMapCacheKeyGenerator
         : ISiteMapCacheKeyGenerator
     {
-        protected readonly IMvcContextFactory mvcContextFactory;
+        protected readonly IMvcContextFactory MvcContextFactory;
 
         public SiteMapCacheKeyGenerator(
                     IMvcContextFactory mvcContextFactory
             )
         {
-            this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
+            MvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
         }
-        public virtual string GenerateKey()
+
+        public virtual string GenerateKey()
         {
             var builder = new StringBuilder();
             builder.Append("sitemap://");
@@ -31,7 +32,7 @@ namespace MvcSiteMapProvider.Caching
 
         protected virtual string GetHostName()
         {
-            var context = mvcContextFactory.CreateHttpContext();
+            var context = MvcContextFactory.CreateHttpContext();
             var request = context.Request;
 
             // In a cloud or web farm environment, use the HTTP_HOST

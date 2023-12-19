@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Caching;
+using MvcSiteMapProvider.Caching;
 using MvcSiteMapProvider.DI;
 using System;
 using System.Linq;
@@ -13,13 +13,13 @@ namespace MvcSiteMapProvider.Builder
     public class SiteMapBuilderSetStrategy
         : ISiteMapBuilderSetStrategy
     {
-        protected readonly ISiteMapBuilderSet[] siteMapBuilderSets;
+        protected readonly ISiteMapBuilderSet[] SiteMapBuilderSets;
 
         public SiteMapBuilderSetStrategy(
                     ISiteMapBuilderSet[] siteMapBuilderSets
             )
         {
-            this.siteMapBuilderSets = siteMapBuilderSets ?? throw new ArgumentNullException(nameof(siteMapBuilderSets));
+            SiteMapBuilderSets = siteMapBuilderSets ?? throw new ArgumentNullException(nameof(siteMapBuilderSets));
         }
 
         public virtual ISiteMapBuilder GetBuilder(string builderSetName)
@@ -30,8 +30,7 @@ namespace MvcSiteMapProvider.Builder
 
         public virtual ISiteMapBuilderSet GetBuilderSet(string builderSetName)
         {
-            var builderSet = siteMapBuilderSets.FirstOrDefault(x => x.AppliesTo(builderSetName)) ?? throw new MvcSiteMapException(string.Format(Resources.Messages.NamedBuilderSetNotFound, builderSetName));
-            return builderSet;
+            return Array.Find(SiteMapBuilderSets, x => x.AppliesTo(builderSetName)) ?? throw new MvcSiteMapException(string.Format(Resources.Messages.NamedBuilderSetNotFound, builderSetName));
         }
 
         public virtual ICacheDetails GetCacheDetails(string builderSetName)

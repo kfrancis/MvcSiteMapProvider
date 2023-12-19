@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -16,32 +16,30 @@ namespace MvcSiteMapProvider.Caching
     public class MicroCache<T>
         : IMicroCache<T>
     {
-        protected readonly ICacheProvider<T> cacheProvider;
+        protected readonly ICacheProvider<T> CacheProvider;
 
-        private readonly ReaderWriterLockSlim synclock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+        private readonly ReaderWriterLockSlim _synclock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
 
-        public MicroCache(
-                            ICacheProvider<T> cacheProvider
-            )
+        public MicroCache(ICacheProvider<T> cacheProvider)
         {
-            this.cacheProvider = cacheProvider ?? throw new ArgumentNullException(nameof(cacheProvider));
+            CacheProvider = cacheProvider ?? throw new ArgumentNullException(nameof(cacheProvider));
 
             // Attach our event so we can receive notifications when objects are removed
-            this.cacheProvider.ItemRemoved += cacheProvider_ItemRemoved;
+            CacheProvider.ItemRemoved += cacheProvider_ItemRemoved;
         }
 
         public event EventHandler<MicroCacheItemRemovedEventArgs<T>> ItemRemoved;
 
         public bool Contains(string key)
         {
-            synclock.EnterReadLock();
+            _synclock.EnterReadLock();
             try
             {
-                return cacheProvider.Contains(key);
+                return CacheProvider.Contains(key);
             }
             finally
             {
-                synclock.ExitReadLock();
+                _synclock.ExitReadLock();
             }
         }
 
@@ -50,31 +48,31 @@ namespace MvcSiteMapProvider.Caching
             LazyLock lazy;
             bool success;
 
-            synclock.EnterReadLock();
+            _synclock.EnterReadLock();
             try
             {
-                success = cacheProvider.TryGetValue(key, out lazy);
+                success = CacheProvider.TryGetValue(key, out lazy);
             }
             finally
             {
-                synclock.ExitReadLock();
+                _synclock.ExitReadLock();
             }
 
             if (!success)
             {
-                synclock.EnterWriteLock();
+                _synclock.EnterWriteLock();
                 try
                 {
-                    if (!cacheProvider.TryGetValue(key, out lazy))
+                    if (!CacheProvider.TryGetValue(key, out lazy))
                     {
                         lazy = new LazyLock();
                         var cacheDetails = getCacheDetailsFunction();
-                        cacheProvider.Add(key, lazy, cacheDetails);
+                        CacheProvider.Add(key, lazy, cacheDetails);
                     }
                 }
                 finally
                 {
-                    synclock.ExitWriteLock();
+                    _synclock.ExitWriteLock();
                 }
             }
 
@@ -83,14 +81,14 @@ namespace MvcSiteMapProvider.Caching
 
         public void Remove(string key)
         {
-            synclock.EnterWriteLock();
+            _synclock.EnterWriteLock();
             try
             {
-                cacheProvider.Remove(key);
+                CacheProvider.Remove(key);
             }
             finally
             {
-                synclock.ExitWriteLock();
+                _synclock.ExitWriteLock();
             }
         }
 

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MvcSiteMapProvider.Builder
@@ -30,7 +30,7 @@ namespace MvcSiteMapProvider.Builder
                     if (parentNode != null)
                     {
                         AddAndTrackNode(siteMap, node, parentNode, sourceNodes, nodesAlreadyAdded);
-                        nodesAddedThisIteration += 1;
+                        nodesAddedThisIteration++;
 
                         // Add the rest of the tree branch below the current node
                         AddDescendantNodes(siteMap, node.Node, sourceNodes, sourceNodesByParent, nodesAlreadyAdded);

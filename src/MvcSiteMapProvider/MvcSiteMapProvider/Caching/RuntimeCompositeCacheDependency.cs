@@ -1,4 +1,4 @@
-﻿#if !NET35
+#if !NET35
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,23 +13,23 @@ namespace MvcSiteMapProvider.Caching
     public class RuntimeCompositeCacheDependency
         : ICacheDependency
     {
-        protected readonly ICacheDependency[] cacheDependencies;
+        protected readonly ICacheDependency[] CacheDependencies;
 
         public RuntimeCompositeCacheDependency(
                     params ICacheDependency[] cacheDependencies
             )
         {
-            this.cacheDependencies = cacheDependencies ?? throw new ArgumentNullException(nameof(cacheDependencies));
+            CacheDependencies = cacheDependencies ?? throw new ArgumentNullException(nameof(cacheDependencies));
         }
 
         public object Dependency
         {
             get
             {
-                if (cacheDependencies.Length > 0)
+                if (CacheDependencies.Length > 0)
                 {
                     var list = new List<ChangeMonitor>();
-                    foreach (var item in cacheDependencies)
+                    foreach (var item in CacheDependencies)
                     {
                         var changeMonitorList = (IList<ChangeMonitor>)item.Dependency;
                         if (changeMonitorList != null)

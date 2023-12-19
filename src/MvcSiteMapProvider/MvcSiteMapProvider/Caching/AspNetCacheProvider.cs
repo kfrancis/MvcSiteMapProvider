@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Web.Mvc;
+using MvcSiteMapProvider.Web.Mvc;
 using System;
 using System.Web;
 using System.Web.Caching;
@@ -13,13 +13,13 @@ namespace MvcSiteMapProvider.Caching
     public class AspNetCacheProvider<T>
         : ICacheProvider<T>
     {
-        private readonly IMvcContextFactory mvcContextFactory;
+        private readonly IMvcContextFactory _mvcContextFactory;
 
         public AspNetCacheProvider(
                     IMvcContextFactory mvcContextFactory
             )
         {
-            this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
+            _mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
         }
 
         public event EventHandler<MicroCacheItemRemovedEventArgs<T>> ItemRemoved;
@@ -28,7 +28,7 @@ namespace MvcSiteMapProvider.Caching
         {
             get
             {
-                return mvcContextFactory.CreateHttpContext();
+                return _mvcContextFactory.CreateHttpContext();
             }
         }
 
