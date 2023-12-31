@@ -192,15 +192,25 @@ namespace MvcSiteMapProvider.Web.Mvc
             return null;
         }
 
+        private static List<Type> s_cachedControllerTypes;
+        private static readonly object s_lock = new object();
+
         /// <summary>
         /// Gets the list of controller types.
         /// </summary>
         /// <returns></returns>
         protected virtual List<Type> GetListOfControllerTypes()
         {
+            if (s_cachedControllerTypes != null)
+            {
+                return s_cachedControllerTypes;
+            }
+
             var controllerTypes = new HashSet<Type>();
             foreach (Assembly assembly in BuildManager.GetReferencedAssemblies())
             {
+                // Optional: Add logic to filter out assemblies unlikely to contain controllers
+
                 Type[] typesInAsm;
                 try
                 {
@@ -213,17 +223,25 @@ namespace MvcSiteMapProvider.Web.Mvc
 
                 foreach (var type in typesInAsm)
                 {
-                    if (type?.IsClass == true && type.IsPublic && !type.IsAbstract)
+                    if (type?.IsClass == true && type.IsPublic && !type.IsAbstract && typeof(IController).IsAssignableFrom(type))
                     {
-                        var typeName = type.Name;
-                        if (typeName.EndsWith("Controller", StringComparison.OrdinalIgnoreCase) && typeof(IController).IsAssignableFrom(type))
+                        if (type.Name.EndsWith("Controller", StringComparison.OrdinalIgnoreCase))
                         {
                             controllerTypes.Add(type);
                         }
                     }
                 }
             }
-            return controllerTypes.ToList();
+
+            lock (s_lock)
+            {
+                if (s_cachedControllerTypes == null)
+                {
+                    s_cachedControllerTypes = controllerTypes.ToList();
+                }
+            }
+
+            return s_cachedControllerTypes;
         }
 
         /// <summary>

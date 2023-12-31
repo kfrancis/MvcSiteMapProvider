@@ -1,4 +1,5 @@
-﻿using MvcSiteMapProvider.Collections.Specialized;
+using Microsoft.Extensions.Caching.Memory;
+using MvcSiteMapProvider.Collections.Specialized;
 using MvcSiteMapProvider.Globalization;
 using MvcSiteMapProvider.Web;
 using MvcSiteMapProvider.Web.Mvc;
@@ -627,6 +628,8 @@ namespace MvcSiteMapProvider
             return MetaRobotsValues.GetMetaRobotsContentString();
         }
 
+        private readonly MemoryCache _routeDataCache = new MemoryCache(new MemoryCacheOptions());
+
         /// <summary>
         /// Gets the route data associated with the current node.
         /// </summary>
@@ -635,7 +638,19 @@ namespace MvcSiteMapProvider
         public override RouteData GetRouteData(HttpContextBase httpContext)
         {
             var routes = mvcContextFactory.GetRoutes();
-            return !string.IsNullOrEmpty(Route) ? routes[Route].GetRouteData(httpContext) : routes.GetRouteData(httpContext);
+            var routeKey = !string.IsNullOrEmpty(Route) ? Route : "GlobalRoute";
+            var cacheKey = $"RouteData_{routeKey}_{httpContext.Request.Url}";
+
+            if (_routeDataCache.TryGetValue(cacheKey, out RouteData cachedRouteData))
+            {
+                return cachedRouteData;
+            }
+
+            var routeData = !string.IsNullOrEmpty(Route) ? routes[Route].GetRouteData(httpContext) : routes.GetRouteData(httpContext);
+
+            _routeDataCache.Set(cacheKey, routeData, TimeSpan.FromMinutes(60)); // Adjust the duration as needed
+
+            return routeData;
         }
 
         /// <summary>

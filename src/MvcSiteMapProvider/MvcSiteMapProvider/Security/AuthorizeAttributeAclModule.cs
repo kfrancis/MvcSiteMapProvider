@@ -1,4 +1,5 @@
-﻿using MvcSiteMapProvider.Web.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+using MvcSiteMapProvider.Web.Mvc;
 using MvcSiteMapProvider.Web.Mvc.Filters;
 using MvcSiteMapProvider.Web.Routing;
 using System;
@@ -87,8 +88,16 @@ namespace MvcSiteMapProvider.Security
             }
         }
 
+        private readonly MemoryCache _routeDataCache = new MemoryCache(new MemoryCacheOptions());
+
         protected virtual RouteData FindRoutesForNode(ISiteMapNode node, HttpContextBase httpContext)
         {
+            var cacheKey = "RouteData_" + node.Key;
+            if (_routeDataCache.TryGetValue(cacheKey, out RouteData cachedRouteData))
+            {
+                return cachedRouteData;
+            }
+
             RouteData routeData = null;
 
             // Create a Uri for the current node. If we have an absolute URL,
@@ -105,6 +114,9 @@ namespace MvcSiteMapProvider.Security
                 // Find routes for the sitemap node's URL using the new HTTP context
                 routeData = node.GetRouteData(nodeHttpContext);
             }
+
+            // Cache the route data
+            _routeDataCache.Set(cacheKey, routeData, TimeSpan.FromMinutes(60)); // Adjust the duration as needed
 
             return routeData;
         }
