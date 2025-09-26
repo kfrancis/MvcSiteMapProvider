@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace MvcSiteMapProvider.Web.UrlResolver
 {
     /// <summary>
-    /// Tracks all of the registered instances of <see cref="T:MvcSiteMapProvider.Web.UrlResolver.ISiteMapNodeUrlResolver"/> and 
+    /// Tracks all the registered instances of <see cref="T:MvcSiteMapProvider.Web.UrlResolver.ISiteMapNodeUrlResolver"/> and 
     /// allows the caller to get a specific named instance of <see cref="T:MvcSiteMapProvider.Web.UrlResolver.ISiteMapNodeUrlResolver"/> at runtime.
     /// </summary>
     public class SiteMapNodeUrlResolverStrategy

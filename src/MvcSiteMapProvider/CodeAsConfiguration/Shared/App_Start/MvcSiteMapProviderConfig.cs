@@ -1,4 +1,3 @@
-﻿using System;
 using System.Web.Hosting;
 using System.Web.Routing;
 using MvcSiteMapProvider.Web.Mvc;
@@ -15,7 +14,7 @@ internal class MvcSiteMapProviderConfig
 
         // Check all configured .sitemap files to ensure they follow the XSD for MvcSiteMapProvider
         var validator = container.GetInstance<ISiteMapXmlValidator>();
-        validator.ValidateXml(HostingEnvironment.MapPath("~/Mvc.sitemap"));
+        validator.ValidateXml(HostingEnvironment.MapPath("~/Mvc.sitemap") ?? string.Empty);
 
         // Register the Sitemaps routes for search engines
         XmlSiteMapController.RegisterRoutes(RouteTable.Routes);

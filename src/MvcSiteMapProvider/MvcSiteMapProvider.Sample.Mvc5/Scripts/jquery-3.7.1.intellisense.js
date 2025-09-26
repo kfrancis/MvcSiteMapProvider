@@ -440,12 +440,12 @@ intellisense.annotate(_object, {
     /// <returns type="Boolean" />
   },
   'empty': function() {
-    /// <summary>Remove all of the callbacks from a list.</summary>
+    /// <summary>Remove all the callbacks from a list.</summary>
     /// <returns type="Callbacks" />
   },
   'fire': function() {
     /// <signature>
-    ///   <summary>Call all of the callbacks with the given arguments</summary>
+    ///   <summary>Call all the callbacks with the given arguments</summary>
     ///   <param name="arguments" type="Anything">The argument or list of arguments to pass back to the callback list.</param>
     ///   <returns type="Callbacks" />
     /// </signature>
@@ -919,7 +919,7 @@ intellisense.annotate(jQuery.fn, {
   },
   'attributeMultiple': function() {
     /// <signature>
-    ///   <summary>Matches elements that match all of the specified attribute filters.</summary>
+    ///   <summary>Matches elements that match all the specified attribute filters.</summary>
     ///   <param name="attributeFilter1" type="String">An attribute filter.</param>
     ///   <param name="attributeFilter2" type="String">Another attribute filter, reducing the selection even more</param>
     ///   <param name="attributeFilterN" type="String">As many more attribute filters as necessary</param>

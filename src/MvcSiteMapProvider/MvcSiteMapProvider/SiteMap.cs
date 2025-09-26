@@ -756,7 +756,7 @@ namespace MvcSiteMapProvider
                 if (!string.IsNullOrEmpty(node.Route))
                 {
                     // This looks a bit weird, but if I set up a node to a general route i.e. /Controller/Action/ID
-                    // I need to check that the values are the same so that it doesn't swallow all of the nodes that also use that same general route
+                    // I need to check that the values are the same so that it doesn't swallow all the nodes that also use that same general route
                     if (routes[node.Route] == route && node.MatchesRoute(values))
                     {
                         return node;

@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Builder;
+using MvcSiteMapProvider.Builder;
 using MvcSiteMapProvider.Caching;
 using MvcSiteMapProvider.DI;
 using MvcSiteMapProvider.Web.Script.Serialization;
@@ -267,7 +267,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
             }
 
             // Locate any orphan keys (with non-empty values) in the current configuration that were not
-            // included in the comparison. We only want to match if all of them were considered.
+            // included in the comparison. We only want to match if all them were considered.
             var remainingList = (from rv in this
                                  where !this.IsEmptyValue(rv.Value)
                                  where !(routeValues.Keys.Any(x => x == rv.Key))

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -22,7 +22,7 @@ namespace DI
         /// must be referenced within this project. Typically, you will just want to use the MvcSiteMapProvider 
         /// assembly unless you decide to use <see cref="CommonConventions"/> throughout your project.</param>
         /// <param name="implementationAssemblies">An array of assemblies to scan for the implementation types. 
-        /// This array should contain all of the assemblies where you have defined types that will be injected 
+        /// This array should contain all the assemblies where you have defined types that will be injected 
         /// into MvcSiteMapProvider.</param>
         /// <param name="excludeTypes">An array of <see cref="System.Type"/> used to manually exclude types if 
         /// you intend to register them manually. Use this parameter if you want to inject your own implementation
@@ -36,42 +36,42 @@ namespace DI
             Type[] excludeTypes,
             string excludeRegEx)
         {
-            List<Type> interfaces = new List<Type>();
+            var interfaces = new List<Type>();
 
             foreach (var assembly in interfaceAssemblies)
                 interfaces.AddRange(GetInterfaces(assembly));
 
             foreach (var interfaceType in interfaces)
             {
-                if (!IsExcludedType(interfaceType, excludeTypes, excludeRegEx))
+                if (IsExcludedType(interfaceType, excludeTypes, excludeRegEx))
                 {
-                    List<Type> implementations = new List<Type>();
-
-                    foreach (var assembly in implementationAssemblies)
-                        implementations.AddRange(GetImplementationsOfInterface(assembly, interfaceType).Where(implementation => !IsExcludedType(implementation, excludeTypes, excludeRegEx)).ToArray());
-
-                    // Prefer the default name ITypeName = TypeName
-                    Type implementationType = implementations.Where(implementation => IsDefaultType(interfaceType, implementation)).FirstOrDefault();
-
-                    if (implementationType == null)
-                    {
-                        // Fall back on ITypeName = ITypeNameAdapter
-                        implementationType = implementations.Where(implementation => IsAdapterType(interfaceType, implementation)).FirstOrDefault();
-                    }
-
-                    if (implementationType != null)
-                    {
-                        System.Diagnostics.Debug.WriteLine("Auto registration of {1} : {0}", interfaceType.Name, implementationType.Name);
-                        registerMethod(interfaceType, implementationType);
-                    }
+                    continue;
                 }
+
+                var implementations = new List<Type>();
+
+                foreach (var assembly in implementationAssemblies)
+                    implementations.AddRange(GetImplementationsOfInterface(assembly, interfaceType).Where(implementation => !IsExcludedType(implementation, excludeTypes, excludeRegEx)).ToArray());
+
+                // Prefer the default name ITypeName = TypeName
+                var implementationType = implementations.FirstOrDefault(implementation => IsDefaultType(interfaceType, implementation)) ??
+                                         // Fall back on ITypeName = ITypeNameAdapter
+                                         implementations.FirstOrDefault(implementation => IsAdapterType(interfaceType, implementation));
+
+                if (implementationType == null)
+                {
+                    continue;
+                }
+
+                System.Diagnostics.Debug.WriteLine("Auto registration of {1} : {0}", interfaceType.Name, implementationType.Name);
+                registerMethod(interfaceType, implementationType);
             }
         }
 
         // For DI containers that allow the use of a multiple registration method calls for individual implementations of a given interface
 
         /// <summary>
-        /// Registers all of the types that implement the passed in interfaceTypes with the DI container so they can be 
+        /// Registers all the types that implement the passed in interfaceTypes with the DI container so they can be 
         /// resolved as an <see cref="IEnumerable{T}"/> of values (where T is the interface type).
         /// 
         /// This overload is for DI containers that allow the use of multiple registration method calls, one for 
@@ -82,7 +82,7 @@ namespace DI
         /// (interfaceType, implementationType) => SomeMethod(interfaceType, implementationType) or similar.</param>
         /// <param name="interfaceTypes">The interfaces to limit the registration to. If empty, no types will be registered.</param>
         /// <param name="implementationAssemblies">An array of assemblies to scan for the implementation types. 
-        /// This array should contain all of the assemblies where you have defined types that will be injected 
+        /// This array should contain all the assemblies where you have defined types that will be injected 
         /// into MvcSiteMapProvider.</param>
         /// <param name="excludeTypes">An array of <see cref="System.Type"/> used to manually exclude types if 
         /// you intend to register them manually. Use this parameter if you want to inject your own implementation
@@ -98,36 +98,38 @@ namespace DI
         {
             foreach (var interfaceType in interfaceTypes)
             {
-                List<Type> implementations = new List<Type>();
+                var implementations = new List<Type>();
 
                 foreach (var assembly in implementationAssemblies)
                     implementations.AddRange(GetImplementationsOfInterface(assembly, interfaceType));
 
                 foreach (var implementationType in implementations)
                 {
-                    if (!IsExcludedType(implementationType, excludeTypes, excludeRegEx))
+                    if (IsExcludedType(implementationType, excludeTypes, excludeRegEx))
                     {
-                        System.Diagnostics.Debug.WriteLine("Auto registration of {1} : {0}", interfaceType.Name, implementationType.Name);
-                        registerMethod(interfaceType, implementationType);
+                        continue;
                     }
+
+                    System.Diagnostics.Debug.WriteLine("Auto registration of {1} : {0}", interfaceType.Name, implementationType.Name);
+                    registerMethod(interfaceType, implementationType);
                 }
             }
         }
 
         /// <summary>
-        /// Registers all of the types that implement the passed in interfaceTypes with the DI container so they can be 
+        /// Registers all the types that implement the passed in interfaceTypes with the DI container so they can be 
         /// resolved as an <see cref="IEnumerable{T}"/> of values (where T is the interface type).
         /// 
         /// This overload is for DI containers that require the use of a multiple registration method call for 
         /// all implementations a given interface.
         /// </summary>
         /// <param name="registerMethod">The method of the DI container used to register an array of implementations, which will be 
-        /// called only one time to register all of the implementations of the type. Should be in the format 
+        /// called only one time to register all the implementations of the type. Should be in the format 
         /// (interfaceType, implementationTypes) => SomeMethod(interfaceType, implementationTypes) or similar, where
         /// implementationTypes is a <see cref="System.Collections.Generic.IEnumerable{System.Type}"/>.</param>
         /// <param name="interfaceTypes">The interfaces to limit the registration to. If empty, no types will be registered.</param>
         /// <param name="implementationAssemblies">An array of assemblies to scan for the implementation types. 
-        /// This array should contain all of the assemblies where you have defined types that will be injected 
+        /// This array should contain all the assemblies where you have defined types that will be injected 
         /// into MvcSiteMapProvider.</param>
         /// <param name="excludeTypes">An array of <see cref="System.Type"/> used to manually exclude types if 
         /// you intend to register them manually. Use this parameter if you want to inject your own implementation
@@ -143,8 +145,8 @@ namespace DI
         {
             foreach (var interfaceType in interfaceTypes)
             {
-                List<Type> implementations = new List<Type>();
-                List<Type> matchingImplementations = new List<Type>();
+                var implementations = new List<Type>();
+                var matchingImplementations = new List<Type>();
 
                 foreach (var assembly in implementationAssemblies)
                     implementations.AddRange(GetImplementationsOfInterface(assembly, interfaceType));
@@ -175,8 +177,7 @@ namespace DI
 
         private static bool IsExcludedType(Type type, string excludeRegEx)
         {
-            if (string.IsNullOrEmpty(excludeRegEx)) return false;
-            return Regex.Match(type.Name, excludeRegEx, RegexOptions.Compiled).Success;
+            return !string.IsNullOrEmpty(excludeRegEx) && Regex.Match(type.Name, excludeRegEx, RegexOptions.Compiled).Success;
         }
 
         private static bool IsExcludedType(Type type)

@@ -5,7 +5,7 @@ using System.Linq;
 namespace MvcSiteMapProvider
 {
     /// <summary>
-    /// Tracks all of the registered instances of <see cref="T:MvcSiteMapProvider.IDynamicNodeProvider"/> and 
+    /// Tracks all the registered instances of <see cref="T:MvcSiteMapProvider.IDynamicNodeProvider"/> and 
     /// allows the caller to get a specific named instance of <see cref="T:MvcSiteMapProvider.IDynamicNodeProvider"/> at runtime.
     /// </summary>
     public class DynamicNodeProviderStrategy

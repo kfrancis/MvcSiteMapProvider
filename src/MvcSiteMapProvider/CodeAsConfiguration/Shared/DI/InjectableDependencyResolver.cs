@@ -1,7 +1,6 @@
 #if !MVC2
 using System;
 using System.Collections.Generic;
-using System.Web.Routing;
 using System.Web.Mvc;
 
 namespace DI
@@ -9,32 +8,26 @@ namespace DI
     internal class InjectableDependencyResolver
         : IDependencyResolver
     {
-        private readonly IDependencyInjectionContainer container;
-        private readonly IDependencyResolver dependencyResolver;
+        private readonly IDependencyInjectionContainer _container;
+        private readonly IDependencyResolver _dependencyResolver;
 
-        public InjectableDependencyResolver(IDependencyInjectionContainer container, IDependencyResolver currentDependencyResolver)
+        public InjectableDependencyResolver(IDependencyInjectionContainer container,
+            IDependencyResolver currentDependencyResolver)
         {
-            if (container == null)
-                throw new ArgumentNullException("container");
-            if (currentDependencyResolver == null)
-                throw new ArgumentNullException("currentDependencyResolver");
-            this.container = container;
-            this.dependencyResolver = currentDependencyResolver;
+            _container = container ?? throw new ArgumentNullException(nameof(container));
+            _dependencyResolver = currentDependencyResolver ??
+                                  throw new ArgumentNullException(nameof(currentDependencyResolver));
         }
 
         public object GetService(Type serviceType)
         {
-            object result = container.TryGetInstance(serviceType);
-            if (result == null)
-            {
-                result = this.dependencyResolver.GetService(serviceType);
-            }
+            var result = _container.TryGetInstance(serviceType) ?? _dependencyResolver.GetService(serviceType);
             return result;
         }
 
         public IEnumerable<object> GetServices(Type serviceType)
         {
-            return container.GetAllInstances(serviceType);
+            return _container.GetAllInstances(serviceType);
         }
     }
 }

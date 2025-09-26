@@ -1,9 +1,9 @@
-﻿using MvcSiteMapProvider.Caching;
+using MvcSiteMapProvider.Caching;
 
 namespace MvcSiteMapProvider.Builder
 {
     /// <summary>
-    /// Contract to provide a concrete implementation that tracks all of the registered instances of 
+    /// Contract to provide a concrete implementation that tracks all the registered instances of 
     /// <see cref="T:MvcSiteMapProvider.Builder.ISiteMapBuilderSet"/> and allows the caller to get a specific 
     /// named instance of this interface at runtime.
     /// </summary>

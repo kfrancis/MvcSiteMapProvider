@@ -1,4 +1,3 @@
-﻿using System;
 using System.Web.Mvc;
 using DI;
 

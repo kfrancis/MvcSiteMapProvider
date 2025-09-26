@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Caching;
+using MvcSiteMapProvider.Caching;
 using MvcSiteMapProvider.DI;
 using System;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Linq;
 namespace MvcSiteMapProvider.Builder
 {
     /// <summary>
-    /// Tracks all of the registered instances of <see cref="T:MvcSiteMapProvider.Builder.ISiteMapBuilderSet"/> and 
+    /// Tracks all the registered instances of <see cref="T:MvcSiteMapProvider.Builder.ISiteMapBuilderSet"/> and 
     /// allows the caller to get a specific named instance of this interface at runtime.
     /// </summary>
     [ExcludeFromAutoRegistration]
