@@ -1,22 +1,22 @@
-﻿using MvcSiteMapProvider.Collections.Specialized;
-using MvcSiteMapProvider.Web.Html.Models;
 using System.Collections.Generic;
 using System.Web.Mvc;
 using System.Web.Mvc.Html;
+using MvcSiteMapProvider.Collections.Specialized;
+using MvcSiteMapProvider.Web.Html.Models;
 
 namespace MvcSiteMapProvider.Web.Html
 {
     /// <summary>
-    /// MvcSiteMapHtmlHelper extension methods
+    ///     MvcSiteMapHtmlHelper extension methods
     /// </summary>
     public static class MetaRobotsHelper
     {
         /// <summary>
-        /// Gets the content attribute value of the meta robots tag for the SiteMap.CurrentNode
+        ///     Gets the content attribute value of the meta robots tag for the SiteMap.CurrentNode
         /// </summary>
         /// <param name="helper">MvcSiteMapHtmlHelper instance</param>
         /// <returns>
-        /// The content attribute value for the meta robots tag of the CurrentNode or the RootNode (if CurrentNode is null)
+        ///     The content attribute value for the meta robots tag of the CurrentNode or the RootNode (if CurrentNode is null)
         /// </returns>
         public static MvcHtmlString MetaRobotsTag(this MvcSiteMapHtmlHelper helper)
         {
@@ -24,11 +24,12 @@ namespace MvcSiteMapProvider.Web.Html
         }
 
         /// <summary>
-        /// Gets the content attribute value of the meta robots tag for the SiteMap.CurrentNode
+        ///     Gets the content attribute value of the meta robots tag for the SiteMap.CurrentNode
         /// </summary>
         /// <param name="helper">MvcSiteMapHtmlHelper instance</param>
+        /// <param name="sourceMetadata">User-defined meta data.</param>
         /// <returns>
-        /// The content attribute value for the meta robots tag of the CurrentNode or the RootNode (if CurrentNode is null)
+        ///     The content attribute value for the meta robots tag of the CurrentNode or the RootNode (if CurrentNode is null)
         /// </returns>
         public static MvcHtmlString MetaRobotsTag(this MvcSiteMapHtmlHelper helper, object sourceMetadata)
         {
@@ -36,24 +37,26 @@ namespace MvcSiteMapProvider.Web.Html
         }
 
         /// <summary>
-        /// Gets the content attribute value of the meta robots tag for the SiteMap.CurrentNode
+        ///     Gets the content attribute value of the meta robots tag for the SiteMap.CurrentNode
         /// </summary>
         /// <param name="helper">MvcSiteMapHtmlHelper instance</param>
+        /// <param name="sourceMetadata">User-defined meta data.</param>
         /// <returns>
-        /// The content attribute value for the meta robots tag of the CurrentNode or the RootNode (if CurrentNode is null)
+        ///     The content attribute value for the meta robots tag of the CurrentNode or the RootNode (if CurrentNode is null)
         /// </returns>
-        public static MvcHtmlString MetaRobotsTag(this MvcSiteMapHtmlHelper helper, SourceMetadataDictionary sourceMetadata)
+        public static MvcHtmlString MetaRobotsTag(this MvcSiteMapHtmlHelper helper,
+            SourceMetadataDictionary sourceMetadata)
         {
             return MetaRobotsTag(helper, null, sourceMetadata);
         }
 
         /// <summary>
-        /// Gets the content attribute value of the meta robots tag for the SiteMap.CurrentNode
+        ///     Gets the content attribute value of the meta robots tag for the SiteMap.CurrentNode
         /// </summary>
         /// <param name="helper">MvcSiteMapHtmlHelper instance</param>
         /// <param name="templateName">Name of the template.</param>
         /// <returns>
-        /// The content attribute value for the meta robots tag of the CurrentNode or the RootNode (if CurrentNode is null)
+        ///     The content attribute value for the meta robots tag of the CurrentNode or the RootNode (if CurrentNode is null)
         /// </returns>
         public static MvcHtmlString MetaRobotsTag(this MvcSiteMapHtmlHelper helper, string templateName)
         {
@@ -61,54 +64,58 @@ namespace MvcSiteMapProvider.Web.Html
         }
 
         /// <summary>
-        /// Gets the content attribute value of the meta robots tag for the SiteMap.CurrentNode
+        ///     Gets the content attribute value of the meta robots tag for the SiteMap.CurrentNode
         /// </summary>
         /// <param name="helper">MvcSiteMapHtmlHelper instance</param>
         /// <param name="templateName">Name of the template.</param>
+        /// <param name="sourceMetadata">User-defined meta data.</param>
         /// <returns>
-        /// The content attribute value for the meta robots tag of the CurrentNode or the RootNode (if CurrentNode is null)
+        ///     The content attribute value for the meta robots tag of the CurrentNode or the RootNode (if CurrentNode is null)
         /// </returns>
-        public static MvcHtmlString MetaRobotsTag(this MvcSiteMapHtmlHelper helper, string templateName, object sourceMetadata)
+        public static MvcHtmlString MetaRobotsTag(this MvcSiteMapHtmlHelper helper, string templateName,
+            object sourceMetadata)
         {
             return MetaRobotsTag(helper, templateName, new SourceMetadataDictionary(sourceMetadata));
         }
 
         /// <summary>
-        /// Gets the content attribute value of the meta robots tag for the SiteMap.CurrentNode
+        ///     Gets the content attribute value of the meta robots tag for the SiteMap.CurrentNode
         /// </summary>
         /// <param name="helper">MvcSiteMapHtmlHelper instance</param>
         /// <param name="templateName">Name of the template.</param>
+        /// <param name="sourceMetadata">User-defined meta data.</param>
         /// <returns>
-        /// The content attribute value for the meta robots tag of the CurrentNode or the RootNode (if CurrentNode is null)
+        ///     The content attribute value for the meta robots tag of the CurrentNode or the RootNode (if CurrentNode is null)
         /// </returns>
-        public static MvcHtmlString MetaRobotsTag(this MvcSiteMapHtmlHelper helper, string templateName, SourceMetadataDictionary sourceMetadata)
+        public static MvcHtmlString MetaRobotsTag(this MvcSiteMapHtmlHelper helper, string templateName,
+            SourceMetadataDictionary sourceMetadata)
         {
-            var model = BuildModel(GetSourceMetadata(sourceMetadata), helper.SiteMap.CurrentNode ?? helper.SiteMap.RootNode);
+            var model = BuildModel(GetSourceMetadata(sourceMetadata),
+                helper.SiteMap.CurrentNode ?? helper.SiteMap.RootNode);
             return helper
                 .CreateHtmlHelperForModel(model)
                 .DisplayFor(m => model, templateName);
         }
 
         /// <summary>
-        /// Builds the model.
+        ///     Builds the model.
         /// </summary>
         /// <param name="startingNode">The starting node.</param>
+        /// <param name="sourceMetadata">User-defined meta data.</param>
         /// <returns>The model.</returns>
-        private static MetaRobotsHelperModel BuildModel(SourceMetadataDictionary sourceMetadata, ISiteMapNode startingNode)
+        private static MetaRobotsHelperModel BuildModel(SourceMetadataDictionary sourceMetadata,
+            ISiteMapNode startingNode)
         {
             // Map to model
-            return new MetaRobotsHelperModel
-            {
-                CurrentNode = new SiteMapNodeModel(startingNode, sourceMetadata)
-            };
+            return new MetaRobotsHelperModel { CurrentNode = new SiteMapNodeModel(startingNode, sourceMetadata) };
         }
 
         /// <summary>
-        /// Gets the source meta data for the current context.
+        ///     Gets the source metadata for the current context.
         /// </summary>
         /// <param name="sourceMetadata">User-defined metadata.</param>
         /// <returns>SourceMetadataDictionary for the current request.</returns>
-        private static SourceMetadataDictionary GetSourceMetadata(IDictionary<string, object> sourceMetadata)
+        private static SourceMetadataDictionary GetSourceMetadata(SourceMetadataDictionary sourceMetadata)
         {
             var result = new SourceMetadataDictionary(sourceMetadata);
             result.Add("HtmlHelper", typeof(MetaRobotsHelper).FullName);

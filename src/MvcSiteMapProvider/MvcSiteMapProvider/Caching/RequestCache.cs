@@ -14,23 +14,14 @@ namespace MvcSiteMapProvider.Caching
             IMvcContextFactory mvcContextFactory
             )
         {
-            if (mvcContextFactory == null)
-                throw new ArgumentNullException("mvcContextFactory");
-
-            this.mvcContextFactory = mvcContextFactory;
+            this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
         }
 
         private readonly IMvcContextFactory mvcContextFactory;
 
-        protected HttpContextBase Context
-        {
-            get 
-            { 
-                return this.mvcContextFactory.CreateHttpContext();
-            }
-        }
+        private HttpContextBase Context => this.mvcContextFactory.CreateHttpContext();
 
-        public virtual T GetValue<T>(string key)
+        public virtual T? GetValue<T>(string key)
         {
             if (this.Context.Items.Contains(key))
             {

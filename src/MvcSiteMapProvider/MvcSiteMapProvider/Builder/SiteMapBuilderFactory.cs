@@ -19,19 +19,10 @@ namespace MvcSiteMapProvider.Builder
             ICultureContextFactory cultureContextFactory
             )
         {
-            if (siteMapNodeVisitor == null)
-                throw new ArgumentNullException("siteMapNodeVisitor");
-            if (siteMapHierarchyBuilder == null)
-                throw new ArgumentNullException("siteMapHierarchyBuilder");
-            if (siteMapNodeHelperFactory == null)
-                throw new ArgumentNullException("siteMapNodeHelperFactory");
-            if (cultureContextFactory == null)
-                throw new ArgumentNullException("cultureContextFactory");
-
-            this.siteMapHierarchyBuilder = siteMapHierarchyBuilder;
-            this.siteMapNodeHelperFactory = siteMapNodeHelperFactory;
-            this.siteMapNodeVisitor = siteMapNodeVisitor;
-            this.cultureContextFactory = cultureContextFactory;
+            this.siteMapHierarchyBuilder = siteMapHierarchyBuilder ?? throw new ArgumentNullException(nameof(siteMapHierarchyBuilder));
+            this.siteMapNodeHelperFactory = siteMapNodeHelperFactory ?? throw new ArgumentNullException(nameof(siteMapNodeHelperFactory));
+            this.siteMapNodeVisitor = siteMapNodeVisitor ?? throw new ArgumentNullException(nameof(siteMapNodeVisitor));
+            this.cultureContextFactory = cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
         }
         protected readonly ISiteMapHierarchyBuilder siteMapHierarchyBuilder;
         protected readonly ISiteMapNodeHelperFactory siteMapNodeHelperFactory;

@@ -16,10 +16,7 @@ namespace MvcSiteMapProvider.Matching
             ) 
             : base(urlPath)
         {
-            if (node == null)
-                throw new ArgumentNullException("node");
-
-            this.node = node;
+            this.node = node ?? throw new ArgumentNullException(nameof(node));
 
             // Host name in absolute URL overrides this one.
             this.hostName = node.HostName;
@@ -42,11 +39,9 @@ namespace MvcSiteMapProvider.Matching
          
         private readonly ISiteMapNode node;
 
-        public override string HostName 
-        {
+        public override string HostName =>
             // The host name of the node can be modified at runtime, so we need to ensure
             // we have the most current value.
-            get { return string.IsNullOrEmpty(node.HostName) ? this.hostName : node.HostName; }
-        }
+            string.IsNullOrEmpty(node.HostName) ? this.hostName : node.HostName;
     }
 }

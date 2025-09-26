@@ -17,7 +17,7 @@ namespace MvcSiteMapProvider.Caching
             )
         {
             if (string.IsNullOrEmpty(fileName))
-                throw new ArgumentNullException("fileName");
+                throw new ArgumentNullException(nameof(fileName));
 
             this.fileName = fileName;
         }
@@ -26,12 +26,12 @@ namespace MvcSiteMapProvider.Caching
 
         #region ICacheDependency Members
 
-        public virtual object Dependency
+        public virtual object? Dependency
         {
             get 
             {
                 var list = new List<ChangeMonitor>();
-                list.Add(new HostFileChangeMonitor(new string[] { fileName }));
+                list.Add(new HostFileChangeMonitor([fileName]));
                 return list; 
             }
         }

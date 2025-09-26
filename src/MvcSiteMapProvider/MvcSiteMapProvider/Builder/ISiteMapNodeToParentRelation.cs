@@ -5,7 +5,7 @@
     /// </summary>
     public interface ISiteMapNodeToParentRelation
     {
-        string ParentKey { get; }
+        string? ParentKey { get; }
         ISiteMapNode Node { get; }
         string SourceName { get; }
     }

@@ -15,20 +15,14 @@ namespace MvcSiteMapProvider.Web.Mvc
             ControllerBuilder controllerBuilder
             ) 
         {
-            if (controllerBuilder == null)
-                throw new ArgumentNullException("controllerBuilder");
-
-            this.controllerBuilder = controllerBuilder;
+            this.controllerBuilder = controllerBuilder ?? throw new ArgumentNullException(nameof(controllerBuilder));
         }
 
         protected readonly ControllerBuilder controllerBuilder;
 
         #region IControllerBuilder Members
 
-        public HashSet<string> DefaultNamespaces
-        {
-            get { return controllerBuilder.DefaultNamespaces; }
-        }
+        public HashSet<string> DefaultNamespaces => controllerBuilder.DefaultNamespaces;
 
         public IControllerFactory GetControllerFactory()
         {

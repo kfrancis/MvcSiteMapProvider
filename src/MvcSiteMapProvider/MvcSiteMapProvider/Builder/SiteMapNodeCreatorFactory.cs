@@ -10,16 +10,9 @@ namespace MvcSiteMapProvider.Builder
             INodeKeyGenerator nodeKeyGenerator,
             ISiteMapNodeToParentRelationFactory siteMapNodeToParentRelationFactory)
         {
-            if (siteMapNodeFactory == null)
-                throw new ArgumentNullException("siteMapNodeFactory");
-            if (nodeKeyGenerator == null)
-                throw new ArgumentNullException("nodeKeyGenerator");
-            if (siteMapNodeToParentRelationFactory == null)
-                throw new ArgumentNullException("siteMapNodeToParentRelationFactory");
-
-            this.siteMapNodeFactory = siteMapNodeFactory;
-            this.nodeKeyGenerator = nodeKeyGenerator;
-            this.siteMapNodeToParentRelationFactory = siteMapNodeToParentRelationFactory;
+            this.siteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
+            this.nodeKeyGenerator = nodeKeyGenerator ?? throw new ArgumentNullException(nameof(nodeKeyGenerator));
+            this.siteMapNodeToParentRelationFactory = siteMapNodeToParentRelationFactory ?? throw new ArgumentNullException(nameof(siteMapNodeToParentRelationFactory));
         }
         protected readonly ISiteMapNodeFactory siteMapNodeFactory;
         protected readonly INodeKeyGenerator nodeKeyGenerator;

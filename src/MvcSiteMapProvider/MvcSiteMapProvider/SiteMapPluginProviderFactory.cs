@@ -16,10 +16,7 @@ namespace MvcSiteMapProvider
             IAclModule aclModule
             )
         {
-            if (aclModule == null)
-                throw new ArgumentNullException("aclModule");
-
-            this.aclModule = aclModule;
+            this.aclModule = aclModule ?? throw new ArgumentNullException(nameof(aclModule));
         }
 
         protected readonly IAclModule aclModule;

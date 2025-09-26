@@ -13,10 +13,7 @@ namespace MvcSiteMapProvider.Web.UrlResolver
     {
         public SiteMapNodeUrlResolverStrategy(ISiteMapNodeUrlResolver[] siteMapUrlResolvers)
         {
-            if (siteMapUrlResolvers == null)
-                throw new ArgumentNullException("siteMapUrlResolvers");
-
-            this.siteMapUrlResolvers = siteMapUrlResolvers;
+            this.siteMapUrlResolvers = siteMapUrlResolvers ?? throw new ArgumentNullException(nameof(siteMapUrlResolvers));
         }
 
         private readonly ISiteMapNodeUrlResolver[] siteMapUrlResolvers;

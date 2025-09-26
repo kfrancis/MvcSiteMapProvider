@@ -16,12 +16,10 @@ namespace MvcSiteMapProvider.Web.Script.Serialization
             IMvcContextFactory mvcContextFactory
             )
         {
-            if (javaScriptSerializer == null)
-                throw new ArgumentNullException("javaScriptSerializer");
             if (mvcContextFactory == null)
-                throw new ArgumentNullException("mvcContextFactory");
+                throw new ArgumentNullException(nameof(mvcContextFactory));
 
-            this.javaScriptSerializer = javaScriptSerializer;
+            this.javaScriptSerializer = javaScriptSerializer ?? throw new ArgumentNullException(nameof(javaScriptSerializer));
             this.requestCache = mvcContextFactory.GetRequestCache();
         }
 

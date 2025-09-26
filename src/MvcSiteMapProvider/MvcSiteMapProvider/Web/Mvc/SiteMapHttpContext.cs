@@ -30,18 +30,12 @@ namespace MvcSiteMapProvider.Web.Mvc
         /// Gets the <see cref="T:System.Web.HttpRequestBase"/> object for the current HTTP request.
         /// </summary>
         /// <returns>The current HTTP request.</returns>
-        public override HttpRequestBase Request
-        {
-            get { return new SiteMapHttpRequest(this.httpContext.Request, this.node); }
-        }
+        public override HttpRequestBase Request => new SiteMapHttpRequest(this.httpContext.Request, this.node);
 
         /// <summary>
         /// Gets the <see cref="System.Web.HttpResponseBase"/> object for the current HTTP response.
         /// </summary>
         /// <returns>The current HTTP response.</returns>
-        public override HttpResponseBase Response
-        {
-            get { return new SiteMapHttpResponse(this.httpContext.Response); }
-        }
+        public override HttpResponseBase Response => new SiteMapHttpResponse(this.httpContext.Response);
     }
 }

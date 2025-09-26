@@ -15,32 +15,26 @@ namespace MvcSiteMapProvider.Caching
             params ICacheDependency[] cacheDependencies
             )
         {
-            if (cacheDependencies == null)
-                throw new ArgumentNullException("cacheDependencies");
-            this.cacheDependencies = cacheDependencies;
+            this.cacheDependencies = cacheDependencies ?? throw new ArgumentNullException(nameof(cacheDependencies));
         }
 
-        protected readonly ICacheDependency[] cacheDependencies;
+        private readonly ICacheDependency[] cacheDependencies;
 
-        #region ICacheDependency Members
-
-        public object Dependency
+        public object? Dependency
         {
             get 
             {
-                if (this.cacheDependencies.Count() > 0)
+                if (!this.cacheDependencies.Any())
+                    return null;
+
+                var list = new AggregateCacheDependency();
+                foreach (var item in this.cacheDependencies)
                 {
-                    var list = new AggregateCacheDependency();
-                    foreach (var item in this.cacheDependencies)
-                    {
-                        list.Add((CacheDependency)item.Dependency);
-                    }
-                    return list;
+                    list.Add((CacheDependency)item.Dependency!);
                 }
-                return null;
+                return list;
             }
         }
 
-        #endregion
     }
 }

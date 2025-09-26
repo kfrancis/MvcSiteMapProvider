@@ -11,7 +11,7 @@ namespace MvcSiteMapProvider
     /// </summary>
     public interface IDynamicNodeProviderStrategy
     {
-        IDynamicNodeProvider GetProvider(string providerName);
+        IDynamicNodeProvider? GetProvider(string providerName);
         IEnumerable<DynamicNode> GetDynamicNodeCollection(string providerName, ISiteMapNode node);
     }
 }

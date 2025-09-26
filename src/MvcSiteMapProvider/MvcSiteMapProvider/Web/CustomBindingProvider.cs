@@ -14,9 +14,7 @@ namespace MvcSiteMapProvider.Web
             IEnumerable<IBinding> bindings
             )
         {
-            if (bindings == null)
-                throw new ArgumentNullException("bindings");
-            this.bindings = bindings;
+            this.bindings = bindings ?? throw new ArgumentNullException(nameof(bindings));
         }
 
         protected readonly IEnumerable<IBinding> bindings;

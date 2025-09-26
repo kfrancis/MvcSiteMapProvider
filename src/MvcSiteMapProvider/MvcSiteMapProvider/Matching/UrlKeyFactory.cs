@@ -14,10 +14,7 @@ namespace MvcSiteMapProvider.Matching
             IUrlPath urlPath
             )
         {
-            if (urlPath == null)
-                throw new ArgumentNullException("urlPath");
-
-            this.urlPath = urlPath;
+            this.urlPath = urlPath ?? throw new ArgumentNullException(nameof(urlPath));
         }
         private readonly IUrlPath urlPath;
 

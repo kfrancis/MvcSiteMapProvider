@@ -17,11 +17,11 @@ namespace MvcSiteMapProvider.Web
         /// <param name="uriParts">An array of strings to combine.</param>
         /// <returns>The combined URL.</returns>
         /// <remarks>Source: http://stackoverflow.com/questions/372865/path-combine-for-urls/6704287#6704287 </remarks>
-        string CombineUrl(params string[] uriParts);
+        string CombineUrl(params string[]? uriParts);
 
         string Combine(string basepath, string relative);
-        bool IsAbsolutePhysicalPath(string path);
-        bool IsAppRelativePath(string path);
+        bool IsAbsolutePhysicalPath(string? path);
+        bool IsAppRelativePath(string? path);
         bool IsRooted(string basepath);
         string MakeVirtualPathAppAbsolute(string virtualPath);
         string MakeVirtualPathAppAbsolute(string virtualPath, string applicationPath);

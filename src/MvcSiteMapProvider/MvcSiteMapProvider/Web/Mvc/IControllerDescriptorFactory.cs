@@ -9,6 +9,6 @@ namespace MvcSiteMapProvider.Web.Mvc
     /// </summary>
     public interface IControllerDescriptorFactory
     {
-        ControllerDescriptor Create(Type controllerType);
+        ControllerDescriptor? Create(Type controllerType);
     }
 }

@@ -19,15 +19,15 @@ namespace MvcSiteMapProvider.Globalization
             )
         {
             if (culture == null)
-                throw new ArgumentNullException("culture");
+                throw new ArgumentNullException(nameof(culture));
             if (uiCulture == null)
-                throw new ArgumentNullException("uiCulture");
+                throw new ArgumentNullException(nameof(uiCulture));
 
             this.currentThread = Thread.CurrentThread;
 
             // Record the current culture settings so they can be restored later.
-            this.originalCulture = this.currentThread.CurrentCulture;
-            this.originalUICulture = this.currentThread.CurrentUICulture;
+            this.OriginalCulture = this.currentThread.CurrentCulture;
+            this.OriginalUICulture = this.currentThread.CurrentUICulture;
 
             // Set both the culture and UI culture for this context.
             this.currentThread.CurrentCulture = culture;
@@ -35,24 +35,16 @@ namespace MvcSiteMapProvider.Globalization
         }
 
         private readonly Thread currentThread;
-        private readonly CultureInfo originalCulture;
-        private readonly CultureInfo originalUICulture;
 
-        public CultureInfo OriginalCulture
-        {
-            get { return this.originalCulture; }
-        }
+        public CultureInfo OriginalCulture { get; }
 
-        public CultureInfo OriginalUICulture
-        {
-            get { return this.originalUICulture; }
-        }
+        public CultureInfo OriginalUICulture { get; }
 
         public void Dispose()
         {
             // Restore the culture to the way it was before the constructor was called.
-            this.currentThread.CurrentCulture = this.originalCulture;
-            this.currentThread.CurrentUICulture = this.originalUICulture;
+            this.currentThread.CurrentCulture = this.OriginalCulture;
+            this.currentThread.CurrentUICulture = this.OriginalUICulture;
         }
     }
 }

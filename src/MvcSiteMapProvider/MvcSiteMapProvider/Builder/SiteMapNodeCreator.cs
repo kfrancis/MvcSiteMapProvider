@@ -16,19 +16,10 @@ namespace MvcSiteMapProvider.Builder
             INodeKeyGenerator nodeKeyGenerator,
             ISiteMapNodeToParentRelationFactory siteMapNodeToParentRelationFactory)
         {
-            if (siteMap == null)
-                throw new ArgumentNullException("siteMap");
-            if (siteMapNodeFactory == null)
-                throw new ArgumentNullException("siteMapNodeFactory");
-            if (nodeKeyGenerator == null)
-                throw new ArgumentNullException("nodeKeyGenerator");
-            if (siteMapNodeToParentRelationFactory == null)
-                throw new ArgumentNullException("siteMapNodeToParentRelationFactory");
-
-            this.siteMap = siteMap;
-            this.siteMapNodeFactory = siteMapNodeFactory;
-            this.nodeKeyGenerator = nodeKeyGenerator;
-            this.siteMapNodeToParentRelationFactory = siteMapNodeToParentRelationFactory;
+            this.siteMap = siteMap ?? throw new ArgumentNullException(nameof(siteMap));
+            this.siteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
+            this.nodeKeyGenerator = nodeKeyGenerator ?? throw new ArgumentNullException(nameof(nodeKeyGenerator));
+            this.siteMapNodeToParentRelationFactory = siteMapNodeToParentRelationFactory ?? throw new ArgumentNullException(nameof(siteMapNodeToParentRelationFactory));
         }
         protected readonly ISiteMap siteMap;
         protected readonly ISiteMapNodeFactory siteMapNodeFactory;
@@ -37,7 +28,7 @@ namespace MvcSiteMapProvider.Builder
 
         #region ISiteMapNodeService Members
 
-        public ISiteMapNodeToParentRelation CreateSiteMapNode(string key, string parentKey, string sourceName, string implicitResourceKey)
+        public ISiteMapNodeToParentRelation CreateSiteMapNode(string key, string? parentKey, string sourceName, string? implicitResourceKey)
         {
             var node = this.siteMapNodeFactory.Create(this.siteMap, key, implicitResourceKey);
             return this.siteMapNodeToParentRelationFactory.Create(parentKey, node, sourceName);

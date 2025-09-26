@@ -12,9 +12,7 @@ namespace MvcSiteMapProvider.Web
     {
         public CompositeBindingProvider(params IBindingProvider[] bindingProviders)
         {
-            if (bindingProviders == null)
-                throw new ArgumentNullException("bindingProviders");
-            this.bindingProviders = bindingProviders;
+            this.bindingProviders = bindingProviders ?? throw new ArgumentNullException(nameof(bindingProviders));
         }
         protected readonly IEnumerable<IBindingProvider> bindingProviders;
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,17 +13,14 @@ namespace MvcSiteMapProvider
     {
         public DynamicNodeProviderStrategy(IDynamicNodeProvider[] dynamicNodeProviders)
         {
-            if (dynamicNodeProviders == null)
-                throw new ArgumentNullException("dynamicNodeProviders");
-
-            this.dynamicNodeProviders = dynamicNodeProviders;
+            this.dynamicNodeProviders = dynamicNodeProviders ?? throw new ArgumentNullException(nameof(dynamicNodeProviders));
         }
 
         private readonly IDynamicNodeProvider[] dynamicNodeProviders;
 
         #region IDynamicNodeProviderStrategy Members
 
-        public IDynamicNodeProvider GetProvider(string providerName)
+        public IDynamicNodeProvider? GetProvider(string providerName)
         {
             var provider = this.dynamicNodeProviders.FirstOrDefault(x => x.AppliesTo(providerName));
             if (provider == null && !string.IsNullOrEmpty(providerName))

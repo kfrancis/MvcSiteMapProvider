@@ -19,9 +19,9 @@ namespace MvcSiteMapProvider.Web
             )
         {
             if (string.IsNullOrEmpty(hostName))
-                throw new ArgumentNullException("hostName");
+                throw new ArgumentNullException(nameof(hostName));
             if (string.IsNullOrEmpty(protocol))
-                throw new ArgumentNullException("protocol");
+                throw new ArgumentNullException(nameof(protocol));
 
             this.HostName = hostName;
             this.Protocol = protocol;

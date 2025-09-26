@@ -15,7 +15,7 @@ namespace MvcSiteMapProvider.Builder
         /// Gets or sets the site map node attribute.
         /// </summary>
         /// <value>The site map node attribute.</value>
-        public IMvcSiteMapNodeAttribute SiteMapNodeAttribute { get; set; }
+        public IMvcSiteMapNodeAttribute? SiteMapNodeAttribute { get; set; }
 
         #endregion
 
@@ -23,12 +23,12 @@ namespace MvcSiteMapProvider.Builder
         /// Gets or sets the type of the controller.
         /// </summary>
         /// <value>The type of the controller.</value>
-        public Type ControllerType { get; set; }
+        public Type? ControllerType { get; set; }
 
         /// <summary>
         /// Gets or sets the action method info.
         /// </summary>
         /// <value>The action method info.</value>
-        public MethodInfo ActionMethodInfo { get; set; }
+        public MethodInfo? ActionMethodInfo { get; set; }
     }
 }

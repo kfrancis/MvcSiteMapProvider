@@ -1,10 +1,12 @@
-﻿using MvcSiteMapProvider.Loader;
 using System;
+using MvcSiteMapProvider.Loader;
+using MvcSiteMapProvider.Resources;
 
 namespace MvcSiteMapProvider
 {
     /// <summary>
-    /// This class is the static entry point where the presentation layer can request a sitemap by calling Current or passing a siteMapCacheKey.
+    ///     This class is the static entry point where the presentation layer can request a sitemap by calling Current or
+    ///     passing a siteMapCacheKey.
     /// </summary>
     public class SiteMaps
     {
@@ -14,26 +16,24 @@ namespace MvcSiteMapProvider
         {
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException("value");
                 if (loader != null)
-                    throw new MvcSiteMapException(Resources.Messages.SiteMapLoaderAlreadySet);
-                loader = value;
+                {
+                    throw new MvcSiteMapException(Messages.SiteMapLoaderAlreadySet);
+                }
+
+                loader = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
-        public static ISiteMap Current
-        {
-            get { return GetSiteMap(); }
-        }
+        public static ISiteMap? Current => GetSiteMap();
 
-        public static ISiteMap GetSiteMap(string siteMapCacheKey)
+        public static ISiteMap? GetSiteMap(string siteMapCacheKey)
         {
             ThrowIfLoaderNotInitialized();
             return loader.GetSiteMap(siteMapCacheKey);
         }
 
-        public static ISiteMap GetSiteMap()
+        private static ISiteMap? GetSiteMap()
         {
             ThrowIfLoaderNotInitialized();
             return loader.GetSiteMap();
@@ -55,7 +55,7 @@ namespace MvcSiteMapProvider
         {
             if (loader == null)
             {
-                throw new MvcSiteMapException(Resources.Messages.SiteMapLoaderNotInitialized);
+                throw new MvcSiteMapException(Messages.SiteMapLoaderNotInitialized);
             }
         }
     }

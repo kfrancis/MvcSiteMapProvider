@@ -14,7 +14,7 @@ namespace MvcSiteMapProvider.Web.Html.Models
         /// </summary>
         public SiteMapPathHelperModel()
         {
-            Nodes = new List<SiteMapNodeModel>();
+            Nodes = [];
         }
 
         /// <summary>

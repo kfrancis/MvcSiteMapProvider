@@ -20,15 +20,10 @@ namespace MvcSiteMapProvider.Builder
             ISiteMapXmlNameProvider xmlNameProvider
             )
         {
-            if (xmlSource == null)
-                throw new ArgumentNullException("xmlSource");
-            if (xmlNameProvider == null)
-                throw new ArgumentNullException("xmlNameProvider");
-
             this.includeRootNode = includeRootNode;
             this.useNestedDynamicNodeRecursion = useNestedDynamicNodeRecursion;
-            this.xmlSource = xmlSource;
-            this.xmlNameProvider = xmlNameProvider;
+            this.xmlSource = xmlSource ?? throw new ArgumentNullException(nameof(xmlSource));
+            this.xmlNameProvider = xmlNameProvider ?? throw new ArgumentNullException(nameof(xmlNameProvider));
         }
         protected readonly bool includeRootNode;
         protected readonly bool useNestedDynamicNodeRecursion;
@@ -112,10 +107,10 @@ namespace MvcSiteMapProvider.Builder
         protected virtual IList<ISiteMapNodeToParentRelation> ProcessXmlNodes(ISiteMapNode parentNode, XElement parentElement, NodesToProcess processFlags, ISiteMapNodeHelper helper)
         {
             var result = new List<ISiteMapNodeToParentRelation>();
-            bool processStandardNodes = (processFlags & NodesToProcess.StandardNodes) == NodesToProcess.StandardNodes;
-            bool processDynamicNodes = (processFlags & NodesToProcess.DynamicNodes) == NodesToProcess.DynamicNodes;
+            var processStandardNodes = (processFlags & NodesToProcess.StandardNodes) == NodesToProcess.StandardNodes;
+            var processDynamicNodes = (processFlags & NodesToProcess.DynamicNodes) == NodesToProcess.DynamicNodes;
 
-            foreach (XElement node in parentElement.Elements())
+            foreach (var node in parentElement.Elements())
             {
                 if (node.Name != xmlNameProvider.NodeName)
                 {
@@ -179,7 +174,7 @@ namespace MvcSiteMapProvider.Builder
         /// <param name="parentNode">The parent ISiteMapNode</param>
         /// <param name="helper">The node helper.</param>
         /// <returns>An MvcSiteMapNode which represents the XMLElement.</returns>
-        protected virtual ISiteMapNodeToParentRelation GetSiteMapNodeFromXmlElement(XElement node, ISiteMapNode parentNode, ISiteMapNodeHelper helper)
+        protected virtual ISiteMapNodeToParentRelation GetSiteMapNodeFromXmlElement(XElement node, ISiteMapNode? parentNode, ISiteMapNodeHelper helper)
         {
             // Get data required to generate the node instance
 
@@ -196,7 +191,7 @@ namespace MvcSiteMapProvider.Builder
             var implicitResourceKey = node.GetAttributeValue("resourceKey");
 
             // Generate key for node
-            string key = helper.CreateNodeKey(
+            var key = helper.CreateNodeKey(
                 parentKey,
                 explicitKey,
                 url,
@@ -215,7 +210,7 @@ namespace MvcSiteMapProvider.Builder
             siteMapNode.Title = title;
             siteMapNode.Description = node.GetAttributeValue("description");
             siteMapNode.Attributes.AddRange(node, false);
-            siteMapNode.Roles.AddRange(node.GetAttributeValue("roles"), new[] { ',', ';' });
+            siteMapNode.Roles.AddRange(node.GetAttributeValue("roles"), [',', ';']);
             siteMapNode.Clickable = clickable;
             siteMapNode.VisibilityProvider = node.GetAttributeValue("visibilityProvider");
             siteMapNode.DynamicNodeProvider = node.GetAttributeValue("dynamicNodeProvider");
@@ -233,7 +228,7 @@ namespace MvcSiteMapProvider.Builder
             siteMapNode.CanonicalUrl = node.GetAttributeValue("canonicalUrl");
             siteMapNode.CanonicalUrlProtocol = node.GetAttributeValue("canonicalUrlProtocol");
             siteMapNode.CanonicalUrlHostName = node.GetAttributeValue("canonicalUrlHostName");
-            siteMapNode.MetaRobotsValues.AddRange(node.GetAttributeValue("metaRobotsValues"), new[] { ' ' });
+            siteMapNode.MetaRobotsValues.AddRange(node.GetAttributeValue("metaRobotsValues"), [' ']);
             siteMapNode.ChangeFrequency = (ChangeFrequency)Enum.Parse(typeof(ChangeFrequency), node.GetAttributeValueOrFallback("changeFrequency", "Undefined"));
             siteMapNode.UpdatePriority = (UpdatePriority)Enum.Parse(typeof(UpdatePriority), node.GetAttributeValueOrFallback("updatePriority", "Undefined"));
             siteMapNode.LastModifiedDate = DateTime.Parse(node.GetAttributeValueOrFallback("lastModifiedDate", DateTime.MinValue.ToString()));
@@ -242,7 +237,8 @@ namespace MvcSiteMapProvider.Builder
             // Handle route details
             siteMapNode.Route = node.GetAttributeValue("route");
             siteMapNode.RouteValues.AddRange(node, false);
-            siteMapNode.PreservedRouteParameters.AddRange(node.GetAttributeValue("preservedRouteParameters"), new[] { ',', ';' });
+            siteMapNode.PreservedRouteParameters.AddRange(node.GetAttributeValue("preservedRouteParameters"), [',', ';'
+            ]);
             siteMapNode.UrlResolver = node.GetAttributeValue("urlResolver");
             
             // Area and controller may need inheriting from the parent node, so set (or reset) them explicitly
@@ -251,15 +247,15 @@ namespace MvcSiteMapProvider.Builder
             siteMapNode.Action = action;
 
             // Add inherited route values to sitemap node
-            foreach (var inheritedRouteParameter in node.GetAttributeValue("inheritedRouteParameters").Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var inheritedRouteParameter in node.GetAttributeValue("inheritedRouteParameters").Split([',', ';'], StringSplitOptions.RemoveEmptyEntries))
             {
                 var item = inheritedRouteParameter.Trim();
                 if (node.Attribute(item) != null)
                     throw new MvcSiteMapException(string.Format(Resources.Messages.SiteMapNodeSameKeyInRouteValueAndInheritedRouteParameter, key, title, item));
 
-                if (parentNode.RouteValues.ContainsKey(item))
+                if (parentNode != null && parentNode.RouteValues.TryGetValue(item, out var value))
                 {
-                    siteMapNode.RouteValues.Add(item, parentNode.RouteValues[item]);
+                    siteMapNode.RouteValues.Add(item, value);
                 }
             }
 
@@ -272,7 +268,7 @@ namespace MvcSiteMapProvider.Builder
         /// <param name="node">The siteMapNode element.</param>
         /// <param name="parentNode">The parent node.</param>
         /// <returns>The value provided by either the siteMapNode or parentNode.Area.</returns>
-        protected virtual string InheritAreaIfNotProvided(XElement node, ISiteMapNode parentNode)
+        protected virtual string InheritAreaIfNotProvided(XElement node, ISiteMapNode? parentNode)
         {
             var result = node.GetAttributeValue("area");
             if (node.Attribute("area") == null && parentNode != null)
@@ -289,7 +285,7 @@ namespace MvcSiteMapProvider.Builder
         /// <param name="node">The siteMapNode element.</param>
         /// <param name="parentNode">The parent node.</param>
         /// <returns>The value provided by either the siteMapNode or parentNode.Controller.</returns>
-        protected virtual string InheritControllerIfNotProvided(XElement node, ISiteMapNode parentNode)
+        protected virtual string InheritControllerIfNotProvided(XElement node, ISiteMapNode? parentNode)
         {
             var result = node.GetAttributeValue("controller");
             if (node.Attribute("controller") == null && parentNode != null)

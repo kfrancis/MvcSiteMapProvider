@@ -22,13 +22,13 @@ namespace MvcSiteMapProvider
         {
         }
 
-        public override void AddNode(ISiteMapNode node)
+        public override void AddNode(ISiteMapNode? node)
         {
             this.ThrowIfReadOnly();
             base.AddNode(node);
         }
 
-        public override void AddNode(ISiteMapNode node, ISiteMapNode parentNode)
+        public override void AddNode(ISiteMapNode node, ISiteMapNode? parentNode)
         {
             this.ThrowIfReadOnly();
             base.AddNode(node, parentNode);
@@ -56,9 +56,9 @@ namespace MvcSiteMapProvider
             this.IsReadOnly = true;
         }
 
-        public override string ResourceKey
+        public override string? ResourceKey
         {
-            get { return base.ResourceKey; }
+            get => base.ResourceKey;
             set
             {
                 this.ThrowIfReadOnly();

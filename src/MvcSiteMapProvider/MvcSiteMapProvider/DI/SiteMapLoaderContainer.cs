@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Builder;
+using MvcSiteMapProvider.Builder;
 using MvcSiteMapProvider.Caching;
 using MvcSiteMapProvider.Globalization;
 using MvcSiteMapProvider.Loader;
@@ -59,7 +59,7 @@ namespace MvcSiteMapProvider.DI
             this.siteMapCreator = new SiteMapCreator(this.siteMapCacheKeyToBuilderSetMapper, this.siteMapBuiderSetStrategy, this.siteMapFactory);
         }
 
-        private readonly string absoluteFileName;
+        private readonly string? absoluteFileName; // Nullable: only set when EnableSiteMapFile is true
         private readonly IMvcContextFactory mvcContextFactory;
         private readonly IBindingFactory bindingFactory;
         private readonly IBindingProvider bindingProvider;
@@ -98,7 +98,7 @@ namespace MvcSiteMapProvider.DI
         private ISiteMapBuilderSetStrategy ResolveSiteMapBuilderSetStrategy(ConfigurationSettings settings)
         {
             return new SiteMapBuilderSetStrategy(
-                new ISiteMapBuilderSet[] {
+                [
                     new SiteMapBuilderSet(
                         "default", 
                         settings.SecurityTrimmingEnabled, 
@@ -108,8 +108,8 @@ namespace MvcSiteMapProvider.DI
                         this.ResolveSiteMapBuilder(settings),
                         this.ResolveCacheDetails(settings)
                         )
-                    }
-                );
+                ]
+            );
         }
 
         private ISiteMapBuilder ResolveSiteMapBuilder(ConfigurationSettings settings)
@@ -141,7 +141,7 @@ namespace MvcSiteMapProvider.DI
             return new XmlSiteMapNodeProvider(
                 includeRootNode,
                 useNestedDynamicNodeRecursion,
-                new FileXmlSource(this.absoluteFileName),
+                new FileXmlSource(this.absoluteFileName!), // Suppress nullable warning; guarded by settings.EnableSiteMapFile
                 this.siteMapXmlNameProvider);
         }
 
@@ -197,9 +197,9 @@ namespace MvcSiteMapProvider.DI
             if (settings.EnableSiteMapFile)
             {
 #if NET35
-                return new AspNetFileCacheDependency(absoluteFileName);
+                return new AspNetFileCacheDependency(absoluteFileName!); // guarded by EnableSiteMapFile
 #else
-                return new RuntimeFileCacheDependency(absoluteFileName);
+                return new RuntimeFileCacheDependency(absoluteFileName!); // guarded by EnableSiteMapFile
 #endif
             }
             else

@@ -1,4 +1,4 @@
-﻿namespace MvcSiteMapProvider.Web.Html.Models
+namespace MvcSiteMapProvider.Web.Html.Models
 {
     /// <summary>
     /// CanonicalHelperModel
@@ -9,6 +9,6 @@
         /// Gets or sets the current node.
         /// </summary>
         /// <value>The current node.</value>
-        public SiteMapNodeModel CurrentNode { get; set; }
+        public SiteMapNodeModel? CurrentNode { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace MvcSiteMapProvider.Collections
@@ -12,10 +12,7 @@ namespace MvcSiteMapProvider.Collections
     {
         public LockableList(ISiteMap siteMap)
         {
-            if (siteMap == null)
-                throw new ArgumentNullException("siteMap");
-
-            this.siteMap = siteMap;
+            this.siteMap = siteMap ?? throw new ArgumentNullException(nameof(siteMap));
         }
 
         protected readonly ISiteMap siteMap;
@@ -54,10 +51,7 @@ namespace MvcSiteMapProvider.Collections
             base.InsertRange(index, collection);
         }
 
-        public virtual bool IsReadOnly
-        {
-            get { return this.siteMap.IsReadOnly; }
-        }
+        public virtual bool IsReadOnly => this.siteMap.IsReadOnly;
 
         new public virtual bool Remove(T item)
         {
@@ -127,16 +121,13 @@ namespace MvcSiteMapProvider.Collections
 
 
         // Property access to internal list
-        protected LockableList<T> List
-        {
-            get { return this; }
-        }
+        protected LockableList<T> List => this;
 
         public virtual void CopyTo(IList<T> destination)
         {
             foreach (var item in this.List)
             {
-                if (!item.GetType().IsPointer)
+                if (item != null && !item.GetType().IsPointer)
                 {
                     destination.Add(item);
                 }

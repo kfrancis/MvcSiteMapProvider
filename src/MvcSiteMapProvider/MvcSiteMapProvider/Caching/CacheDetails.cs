@@ -15,15 +15,13 @@ namespace MvcSiteMapProvider.Caching
             )
         {
             if (absoluteCacheExpiration == null)
-                throw new ArgumentNullException("absoluteCacheExpiration");
+                throw new ArgumentNullException(nameof(absoluteCacheExpiration));
             if (slidingCacheExpiration == null)
-                throw new ArgumentNullException("slidingCacheExpiration");
-            if (cacheDependency == null)
-                throw new ArgumentNullException("cacheDependency");
+                throw new ArgumentNullException(nameof(slidingCacheExpiration));
 
             this.absoluteCacheExpiration = absoluteCacheExpiration;
             this.slidingCacheExpiration = slidingCacheExpiration;
-            this.cacheDependency = cacheDependency;
+            this.cacheDependency = cacheDependency ?? throw new ArgumentNullException(nameof(cacheDependency));
         }
 
         protected readonly TimeSpan absoluteCacheExpiration;
@@ -32,20 +30,11 @@ namespace MvcSiteMapProvider.Caching
 
         #region ICacheDetails Members
 
-        public TimeSpan AbsoluteCacheExpiration
-        {
-            get { return this.absoluteCacheExpiration; }
-        }
+        public TimeSpan AbsoluteCacheExpiration => this.absoluteCacheExpiration;
 
-        public TimeSpan SlidingCacheExpiration
-        {
-            get { return this.slidingCacheExpiration; }
-        }
+        public TimeSpan SlidingCacheExpiration => this.slidingCacheExpiration;
 
-        public ICacheDependency CacheDependency
-        {
-            get { return this.cacheDependency; }
-        }
+        public ICacheDependency CacheDependency => this.cacheDependency;
 
         #endregion
     }

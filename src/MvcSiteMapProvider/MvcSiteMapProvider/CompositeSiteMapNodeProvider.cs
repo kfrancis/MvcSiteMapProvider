@@ -13,9 +13,7 @@ namespace MvcSiteMapProvider
     {
         public CompositeSiteMapNodeProvider(params ISiteMapNodeProvider[] siteMapNodeProviders)
         {
-            if (siteMapNodeProviders == null)
-                throw new ArgumentNullException("siteMapNodeProviders");
-            this.siteMapNodeProviders = siteMapNodeProviders;
+            this.siteMapNodeProviders = siteMapNodeProviders ?? throw new ArgumentNullException(nameof(siteMapNodeProviders));
         }
         protected readonly IEnumerable<ISiteMapNodeProvider> siteMapNodeProviders;
 

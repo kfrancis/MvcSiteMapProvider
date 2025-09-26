@@ -165,8 +165,8 @@ namespace MvcSiteMapProvider.Collections.Specialized
         public virtual string GetMetaRobotsContentString()
         {
             if (this.HasDefaultValue) return string.Empty;
-            string result = string.Empty;
-            bool first = true;
+            var result = string.Empty;
+            var first = true;
             foreach (var item in this)
             {
                 if (first)
@@ -190,15 +190,9 @@ namespace MvcSiteMapProvider.Collections.Specialized
             }
         }
 
-        protected virtual bool HasDefaultValue
-        {
-            get
-            {
-                return (this.Count == 2 && this.Contains("index") && this.Contains("follow")) ||
-                    (this.Count == 1 && (this[0].Equals("index") || this[0].Equals("follow")));
-
-            }
-        }
+        protected virtual bool HasDefaultValue =>
+            (this.Count == 2 && this.Contains("index") && this.Contains("follow")) ||
+            (this.Count == 1 && (this[0].Equals("index") || this[0].Equals("follow")));
 
         protected virtual void ValidateValue(string item)
         {

@@ -16,16 +16,9 @@ namespace MvcSiteMapProvider.Loader
             ISiteMapFactory siteMapFactory
             )
         {
-            if (siteMapCacheKeyToBuilderSetMapper == null)
-                throw new ArgumentNullException("siteMapCacheKeyToBuilderSetMapper");
-            if (siteMapBuilderSetStrategy == null)
-                throw new ArgumentNullException("siteMapBuilderSetStrategy");
-            if (siteMapFactory == null)
-                throw new ArgumentNullException("siteMapFactory");
-            
-            this.siteMapCacheKeyToBuilderSetMapper = siteMapCacheKeyToBuilderSetMapper;
-            this.siteMapBuilderSetStrategy = siteMapBuilderSetStrategy;
-            this.siteMapFactory = siteMapFactory;
+            this.siteMapCacheKeyToBuilderSetMapper = siteMapCacheKeyToBuilderSetMapper ?? throw new ArgumentNullException(nameof(siteMapCacheKeyToBuilderSetMapper));
+            this.siteMapBuilderSetStrategy = siteMapBuilderSetStrategy ?? throw new ArgumentNullException(nameof(siteMapBuilderSetStrategy));
+            this.siteMapFactory = siteMapFactory ?? throw new ArgumentNullException(nameof(siteMapFactory));
         }
 
         protected readonly ISiteMapCacheKeyToBuilderSetMapper siteMapCacheKeyToBuilderSetMapper;
@@ -38,7 +31,7 @@ namespace MvcSiteMapProvider.Loader
         {
             if (string.IsNullOrEmpty(siteMapCacheKey))
             {
-                throw new ArgumentNullException("siteMapCacheKey");
+                throw new ArgumentNullException(nameof(siteMapCacheKey));
             }
 
             var builderSet = this.GetBuilderSet(siteMapCacheKey);

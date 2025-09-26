@@ -25,7 +25,8 @@ namespace MvcSiteMapProvider.Builder
         /// <returns>
         /// A key represented as a <see cref="string" /> instance
         /// </returns>
-        public string GenerateKey(string parentKey, string key, string url, string title, string area, string controller, string action, string method, bool clickable)
+        public string GenerateKey(string? parentKey, string key, string? url, string title, string? area,
+            string controller, string action, string method, bool clickable)
         {
             parentKey = string.IsNullOrEmpty(parentKey) ? "" : parentKey;
             url = string.IsNullOrEmpty(url) ? null : url;

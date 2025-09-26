@@ -16,13 +16,8 @@ namespace MvcSiteMapProvider
             IRouteValueDictionaryFactory routeValueDictionaryFactory
             )
         {
-            if (attributeDictionaryFactory == null)
-                throw new ArgumentNullException("attributeDictionaryFactory");
-            if (routeValueDictionaryFactory == null)
-                throw new ArgumentNullException("routeValueDictionaryFactory");
-
-            this.attributeDictionaryFactory = attributeDictionaryFactory;
-            this.routeValueDictionaryFactory = routeValueDictionaryFactory;
+            this.attributeDictionaryFactory = attributeDictionaryFactory ?? throw new ArgumentNullException(nameof(attributeDictionaryFactory));
+            this.routeValueDictionaryFactory = routeValueDictionaryFactory ?? throw new ArgumentNullException(nameof(routeValueDictionaryFactory));
         }
 
         protected readonly IAttributeDictionaryFactory attributeDictionaryFactory;

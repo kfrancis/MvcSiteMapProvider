@@ -20,16 +20,9 @@ namespace MvcSiteMapProvider.Web.Mvc
             IBuildManager buildManager
             )
         {
-            if (areaNamespacesToIgnore == null)
-                throw new ArgumentNullException("areaNamespacesToIgnore");
-            if (controllerBuilder == null)
-                throw new ArgumentNullException("controllerBuilder");
-            if (buildManager == null)
-                throw new ArgumentNullException("buildManager");
-
-            this.areaNamespacesToIgnore = areaNamespacesToIgnore;
-            this.controllerBuilder = controllerBuilder;
-            this.buildManager = buildManager;
+            this.areaNamespacesToIgnore = areaNamespacesToIgnore ?? throw new ArgumentNullException(nameof(areaNamespacesToIgnore));
+            this.controllerBuilder = controllerBuilder ?? throw new ArgumentNullException(nameof(controllerBuilder));
+            this.buildManager = buildManager ?? throw new ArgumentNullException(nameof(buildManager));
         }
 
         protected readonly IEnumerable<string> areaNamespacesToIgnore;

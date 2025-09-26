@@ -21,16 +21,11 @@ namespace MvcSiteMapProvider.Collections
             )
             : base(siteMap)
         {
-            if (cache == null)
-                throw new ArgumentNullException("cache");
-
-            this.cache = cache;
+            this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
         }
 
         protected readonly ICache cache;
         protected readonly Guid instanceId = Guid.NewGuid();
-
-        #region Write Operations
 
         public override void Add(KeyValuePair<TKey, TValue> item)
         {
@@ -57,7 +52,7 @@ namespace MvcSiteMapProvider.Collections
 
         protected override void Insert(TKey key, TValue value, bool add)
         {
-            if (key == null) throw new ArgumentNullException("key");
+            if (key == null) throw new ArgumentNullException(nameof(key));
 
             TValue item;
             if (this.ReadOperationDictionary.TryGetValue(key, out item))
@@ -88,15 +83,11 @@ namespace MvcSiteMapProvider.Collections
             return this.WriteOperationDictionary.Remove(key);
         }
 
-        #endregion
-
         public override TValue this[TKey key]
         {
-            get { return this.ReadOperationDictionary[key]; }
-            set { this.WriteOperationDictionary[key] = value; }
+            get => this.ReadOperationDictionary[key];
+            set => this.WriteOperationDictionary[key] = value;
         }
-
-        #region Read Operations
 
         public override bool Contains(KeyValuePair<TKey, TValue> item)
         {
@@ -113,10 +104,7 @@ namespace MvcSiteMapProvider.Collections
             this.ReadOperationDictionary.CopyTo(array, arrayIndex);
         }
 
-        public override int Count
-        {
-            get { return this.ReadOperationDictionary.Count; }
-        }
+        public override int Count => this.ReadOperationDictionary.Count;
 
         public override bool Equals(object obj)
         {
@@ -133,10 +121,7 @@ namespace MvcSiteMapProvider.Collections
             return this.ReadOperationDictionary.GetHashCode();
         }
 
-        public override ICollection<TKey> Keys
-        {
-            get { return this.ReadOperationDictionary.Keys; }
-        }
+        public override ICollection<TKey> Keys => this.ReadOperationDictionary.Keys;
 
         public override string ToString()
         {
@@ -148,21 +133,12 @@ namespace MvcSiteMapProvider.Collections
             return this.ReadOperationDictionary.TryGetValue(key, out value);
         }
 
-        public override ICollection<TValue> Values
-        {
-            get { return this.ReadOperationDictionary.Values; }
-        }
-
-        #endregion
-
+        public override ICollection<TValue> Values => this.ReadOperationDictionary.Values;
 
         /// <summary>
         /// Override this property and set it to false to disable all caching operations.
         /// </summary>
-        protected virtual bool CachingEnabled
-        {
-            get { return true; }
-        }
+        protected virtual bool CachingEnabled => true;
 
 
         protected virtual string GetCacheKey()
@@ -178,7 +154,7 @@ namespace MvcSiteMapProvider.Collections
         {
             get
             {
-                IDictionary<TKey, TValue> result = null;
+                IDictionary<TKey, TValue>? result = null;
                 if (this.CachingEnabled)
                 {
                     var key = this.GetCacheKey();
@@ -204,7 +180,7 @@ namespace MvcSiteMapProvider.Collections
         {
             get
             {
-                IDictionary<TKey, TValue> result = null;
+                IDictionary<TKey, TValue>? result = null;
                 if (this.IsReadOnly && this.CachingEnabled)
                 {
                     var key = this.GetCacheKey();

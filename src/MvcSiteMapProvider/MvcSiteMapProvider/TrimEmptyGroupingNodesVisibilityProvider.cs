@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MvcSiteMapProvider
@@ -9,7 +9,7 @@ namespace MvcSiteMapProvider
     public class TrimEmptyGroupingNodesVisibilityProvider
         : SiteMapNodeVisibilityProviderBase
     {
-        public override bool IsVisible(ISiteMapNode node, IDictionary<string, object> sourceMetadata)
+        public override bool IsVisible(ISiteMapNode node, IDictionary<string, object?> sourceMetadata)
         {
             // Optimization - return quickly if clickable.
             if (node.Clickable)

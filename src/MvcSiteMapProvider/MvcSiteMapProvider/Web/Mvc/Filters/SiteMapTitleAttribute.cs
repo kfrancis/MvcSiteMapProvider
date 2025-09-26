@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq.Expressions;
 using System.Web.Mvc;
 
@@ -46,8 +46,7 @@ namespace MvcSiteMapProvider.Web.Mvc.Filters
         /// <param name="filterContext">The filter context.</param>
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
-            ViewResult result = filterContext.Result as ViewResult;
-            if (result != null)
+            if (filterContext.Result is ViewResult result)
             {
                 var target = (ResolveTarget(result.ViewData.Model, PropertyName) ??
                               ResolveTarget(result.ViewData, PropertyName)) ??
@@ -55,7 +54,7 @@ namespace MvcSiteMapProvider.Web.Mvc.Filters
 
                 if (target != null)
                 {
-                    ISiteMap siteMap = SiteMaps.GetSiteMap(this.SiteMapCacheKey); 
+                    var siteMap = SiteMaps.GetSiteMap(this.SiteMapCacheKey); 
                     if (siteMap != null && siteMap.CurrentNode != null)
                     {
                         if (Target == AttributeTarget.ParentNode && siteMap.CurrentNode.ParentNode != null)
@@ -79,7 +78,7 @@ namespace MvcSiteMapProvider.Web.Mvc.Filters
         /// <returns>
         /// A target represented as a <see cref="object"/> instance 
         /// </returns>
-        internal static object ResolveTarget(object target, string expression)
+        internal static object? ResolveTarget(object target, string expression)
         {
             if (string.IsNullOrEmpty(expression))
             {
@@ -89,7 +88,7 @@ namespace MvcSiteMapProvider.Web.Mvc.Filters
             try
             {
                 var parameter = Expression.Parameter(target.GetType(), "target");
-                var lambdaExpression = MvcSiteMapProvider.Linq.DynamicExpression.ParseLambda(new[] { parameter }, null, "target." + expression);
+                var lambdaExpression = MvcSiteMapProvider.Linq.DynamicExpression.ParseLambda([parameter], null, "target." + expression);
                 return lambdaExpression.Compile().DynamicInvoke(target);
             }
             catch (Exception)

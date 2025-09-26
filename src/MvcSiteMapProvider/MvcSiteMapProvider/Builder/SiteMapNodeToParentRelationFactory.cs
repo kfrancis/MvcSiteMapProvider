@@ -9,7 +9,7 @@
     {
         #region ISiteMapNodeToParentRelationFactory Members
 
-        public virtual ISiteMapNodeToParentRelation Create(string parentKey, ISiteMapNode node, string sourceName)
+        public virtual ISiteMapNodeToParentRelation Create(string? parentKey, ISiteMapNode node, string sourceName)
         {
             return new SiteMapNodeToParentRelation(parentKey, node, sourceName);
         }

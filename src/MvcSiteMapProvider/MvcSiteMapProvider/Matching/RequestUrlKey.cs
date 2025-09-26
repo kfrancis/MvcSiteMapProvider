@@ -18,7 +18,7 @@ namespace MvcSiteMapProvider.Matching
             : base(urlPath)
         {
             if (string.IsNullOrEmpty(relativeOrAbsoluteUrl))
-                throw new ArgumentNullException("relativeOrAbsoluteUrl");
+                throw new ArgumentNullException(nameof(relativeOrAbsoluteUrl));
 
             // Host name in absolute URL overrides this one.
             this.hostName = hostName;

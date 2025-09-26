@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.IO;
 using System.Reflection;
@@ -22,8 +22,8 @@ namespace MvcSiteMapProvider.Web.Mvc
         {
             if (path.Contains("__MVCSITEMAPPROVIDER") && !path.Contains(".."))
             {
-                string resourceFileName = Path.GetFileName(path);
-                Assembly assembly = typeof(MvcSiteMapProviderViewEngineVirtualFile).Assembly;
+                var resourceFileName = Path.GetFileName(path);
+                var assembly = typeof(MvcSiteMapProviderViewEngineVirtualFile).Assembly;
                 return assembly.GetManifestResourceStream("MvcSiteMapProvider.Web.Html.DisplayTemplates." + resourceFileName) != null;
             }
             return false;
@@ -70,7 +70,7 @@ namespace MvcSiteMapProvider.Web.Mvc
         /// <returns>
         /// A <see cref="T:System.Web.Caching.CacheDependency"/> object for the specified virtual resources.
         /// </returns>
-        public override CacheDependency GetCacheDependency(string virtualPath, IEnumerable virtualPathDependencies, DateTime utcStart)
+        public override CacheDependency? GetCacheDependency(string virtualPath, IEnumerable virtualPathDependencies, DateTime utcStart)
         {
             return null;
         }

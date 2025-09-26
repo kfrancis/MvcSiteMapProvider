@@ -5,6 +5,6 @@
     /// </summary>
     public interface ISiteMapBuilder
     {
-        ISiteMapNode BuildSiteMap(ISiteMap siteMap, ISiteMapNode rootNode);
+        ISiteMapNode? BuildSiteMap(ISiteMap siteMap, ISiteMapNode? rootNode);
     }
 }

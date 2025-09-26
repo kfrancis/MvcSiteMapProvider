@@ -15,10 +15,7 @@ namespace MvcSiteMapProvider.Builder
             ISiteMapNodeVisitor siteMapNodeVisitor
             )
         {
-            if (siteMapNodeVisitor == null)
-                throw new ArgumentNullException("siteMapNodeVisitor");
-
-            this.siteMapNodeVisitor = siteMapNodeVisitor;
+            this.siteMapNodeVisitor = siteMapNodeVisitor ?? throw new ArgumentNullException(nameof(siteMapNodeVisitor));
         }
 
         protected readonly ISiteMapNodeVisitor siteMapNodeVisitor;
@@ -26,11 +23,11 @@ namespace MvcSiteMapProvider.Builder
 
         #region ISiteMapBuilder Members
 
-        public virtual ISiteMapNode BuildSiteMap(ISiteMap siteMap, ISiteMapNode rootNode)
+        public virtual ISiteMapNode? BuildSiteMap(ISiteMap siteMap, ISiteMapNode? rootNode)
         {
             if (rootNode == null)
             {
-                throw new ArgumentNullException("rootNode", Resources.Messages.VisitingSiteMapBuilderRequiresRootNode);
+                throw new ArgumentNullException(nameof(rootNode), Resources.Messages.VisitingSiteMapBuilderRequiresRootNode);
             }
 
             VisitNodes(rootNode);

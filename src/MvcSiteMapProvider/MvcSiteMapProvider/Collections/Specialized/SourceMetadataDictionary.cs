@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,166 +7,129 @@ using System.Linq;
 namespace MvcSiteMapProvider.Collections.Specialized
 {
     /// <summary>
-    /// Specialized dictionary for storing metadata about a specific instance of a MvcSiteMapProvider Html Helper.
+    ///     Specialized dictionary for storing metadata about a specific instance of a MvcSiteMapProvider Html Helper.
     /// </summary>
-    public class SourceMetadataDictionary 
-        : IDictionary<string, object>, ICollection<KeyValuePair<string, object>>, IEnumerable<KeyValuePair<string, object>>, IEnumerable
+    public class SourceMetadataDictionary
+        : IDictionary<string, object?>
     {
-        private Dictionary<string, object> _dictionary;
+        private readonly Dictionary<string, object?> _dictionary;
 
         public SourceMetadataDictionary()
         {
-            this._dictionary = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            _dictionary = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
         }
 
-        public SourceMetadataDictionary(IDictionary<string, object> dictionary)
+        public SourceMetadataDictionary(IDictionary<string, object?> dictionary)
         {
-            this._dictionary = new Dictionary<string, object>(dictionary, StringComparer.OrdinalIgnoreCase);
+            _dictionary = new Dictionary<string, object?>(dictionary, StringComparer.OrdinalIgnoreCase);
         }
 
         public SourceMetadataDictionary(object values)
         {
-            this._dictionary = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-            this.AddValues(values);
+            _dictionary = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+            AddValues(values);
         }
 
-        public void Add(string key, object value)
-        {
-            this._dictionary.Add(key, value);
-        }
+        public Dictionary<string, object?>.KeyCollection Keys => _dictionary.Keys;
 
-        private void AddValues(object values)
+        public Dictionary<string, object?>.ValueCollection Values => _dictionary.Values;
+
+        public void Add(string key, object? value)
         {
-            if (values != null)
-            {
-                foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(values))
-                {
-                    object value = descriptor.GetValue(values);
-                    this.Add(descriptor.Name, value);
-                }
-            }
+            _dictionary.Add(key, value);
         }
 
         public void Clear()
         {
-            this._dictionary.Clear();
+            _dictionary.Clear();
         }
 
         public bool ContainsKey(string key)
         {
-            return this._dictionary.ContainsKey(key);
-        }
-
-        public bool ContainsValue(object value)
-        {
-            return this._dictionary.ContainsValue(value);
-        }
-
-        public Dictionary<string, object>.Enumerator GetEnumerator()
-        {
-            return this._dictionary.GetEnumerator();
+            return _dictionary.ContainsKey(key);
         }
 
         public bool Remove(string key)
         {
-            return this._dictionary.Remove(key);
+            return _dictionary.Remove(key);
         }
 
-        void ICollection<KeyValuePair<string, object>>.Add(KeyValuePair<string, object> item)
+        void ICollection<KeyValuePair<string, object?>>.Add(KeyValuePair<string, object?> item)
         {
-            ((ICollection<KeyValuePair<string, object>>)this._dictionary).Add(item);
+            ((ICollection<KeyValuePair<string, object?>>)_dictionary).Add(item);
         }
 
-        bool ICollection<KeyValuePair<string, object>>.Contains(KeyValuePair<string, object> item)
+        bool ICollection<KeyValuePair<string, object?>>.Contains(KeyValuePair<string, object?> item)
         {
-            return this._dictionary.Contains(item);
+            return _dictionary.Contains(item);
         }
 
-        void ICollection<KeyValuePair<string, object>>.CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
+        void ICollection<KeyValuePair<string, object?>>.CopyTo(KeyValuePair<string, object?>[] array, int arrayIndex)
         {
-            ((ICollection<KeyValuePair<string, object>>)this._dictionary).CopyTo(array, arrayIndex);
+            ((ICollection<KeyValuePair<string, object?>>)_dictionary).CopyTo(array, arrayIndex);
         }
 
-        bool ICollection<KeyValuePair<string, object>>.Remove(KeyValuePair<string, object> item)
+        bool ICollection<KeyValuePair<string, object?>>.Remove(KeyValuePair<string, object?> item)
         {
-            return ((ICollection<KeyValuePair<string, object>>)this._dictionary).Remove(item);
+            return ((ICollection<KeyValuePair<string, object?>>)_dictionary).Remove(item);
         }
 
-        IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
+        IEnumerator<KeyValuePair<string, object?>> IEnumerable<KeyValuePair<string, object?>>.GetEnumerator()
         {
-            return this.GetEnumerator();
+            return GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            return GetEnumerator();
         }
 
-        public bool TryGetValue(string key, out object value)
+        public bool TryGetValue(string key, out object? value)
         {
-            return this._dictionary.TryGetValue(key, out value);
+            return _dictionary.TryGetValue(key, out value);
         }
 
-        public int Count
-        {
-            get
-            {
-                return this._dictionary.Count;
-            }
-        }
+        public int Count => _dictionary.Count;
 
-        public object this[string key]
+        public object? this[string key]
         {
             get
             {
-                object obj2;
-                this.TryGetValue(key, out obj2);
+                TryGetValue(key, out var obj2);
                 return obj2;
             }
-            set
+            set => _dictionary[key] = value;
+        }
+
+        bool ICollection<KeyValuePair<string, object?>>.IsReadOnly =>
+            ((ICollection<KeyValuePair<string, object?>>)_dictionary).IsReadOnly;
+
+        ICollection<string> IDictionary<string, object?>.Keys => _dictionary.Keys;
+
+        ICollection<object?> IDictionary<string, object?>.Values => _dictionary.Values;
+
+        private void AddValues(object? values)
+        {
+            if (values == null)
             {
-                this._dictionary[key] = value;
+                return;
+            }
+
+            foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(values))
+            {
+                var value = descriptor.GetValue(values);
+                Add(descriptor.Name, value);
             }
         }
 
-        public Dictionary<string, object>.KeyCollection Keys
+        public bool ContainsValue(object value)
         {
-            get
-            {
-                return this._dictionary.Keys;
-            }
+            return _dictionary.ContainsValue(value);
         }
 
-        bool ICollection<KeyValuePair<string, object>>.IsReadOnly
+        private Dictionary<string, object?>.Enumerator GetEnumerator()
         {
-            get
-            {
-                return ((ICollection<KeyValuePair<string, object>>)this._dictionary).IsReadOnly;
-            }
-        }
-
-        ICollection<string> IDictionary<string, object>.Keys
-        {
-            get
-            {
-                return this._dictionary.Keys;
-            }
-        }
-
-        ICollection<object> IDictionary<string, object>.Values
-        {
-            get
-            {
-                return this._dictionary.Values;
-            }
-        }
-
-        public Dictionary<string, object>.ValueCollection Values
-        {
-            get
-            {
-                return this._dictionary.Values;
-            }
+            return _dictionary.GetEnumerator();
         }
     }
 }

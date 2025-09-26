@@ -12,9 +12,7 @@ namespace MvcSiteMapProvider.Visitor
     {
         public CompositeSiteMapNodeVisitor(params ISiteMapNodeVisitor[] siteMapNodeVisitors)
         {
-            if (siteMapNodeVisitors == null)
-                throw new ArgumentNullException("siteMapNodeVisitors");
-            this.siteMapNodeVisitors = siteMapNodeVisitors;
+            this.siteMapNodeVisitors = siteMapNodeVisitors ?? throw new ArgumentNullException(nameof(siteMapNodeVisitors));
         }
 
         protected readonly IEnumerable<ISiteMapNodeVisitor> siteMapNodeVisitors;
@@ -22,7 +20,7 @@ namespace MvcSiteMapProvider.Visitor
 
         #region ISiteMapNodeVisitor Members
 
-        public void Execute(ISiteMapNode node)
+        public void Execute(ISiteMapNode? node)
         {
             foreach (var visitor in this.siteMapNodeVisitors)
             {

@@ -17,9 +17,7 @@ namespace MvcSiteMapProvider.Builder
             ISiteMapBuilderSet[] siteMapBuilderSets
             )
         {
-            if (siteMapBuilderSets == null)
-                throw new ArgumentNullException("siteMapBuilderSets");
-            this.siteMapBuilderSets = siteMapBuilderSets;
+            this.siteMapBuilderSets = siteMapBuilderSets ?? throw new ArgumentNullException(nameof(siteMapBuilderSets));
         }
 
         protected readonly ISiteMapBuilderSet[] siteMapBuilderSets;

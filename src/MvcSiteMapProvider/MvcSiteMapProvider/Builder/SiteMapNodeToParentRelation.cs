@@ -10,39 +10,24 @@ namespace MvcSiteMapProvider.Builder
         : ISiteMapNodeToParentRelation
     {
         public SiteMapNodeToParentRelation(
-            string parentKey,
+            string? parentKey,
             ISiteMapNode node,
             string sourceName
             )
         {
-            if (node == null)
-                throw new ArgumentNullException("node");
-
             this.parentKey = parentKey;
-            this.node = node;
+            this.node = node ?? throw new ArgumentNullException(nameof(node));
             this.sourceName = sourceName;
         }
-        protected readonly string parentKey;
-        protected readonly ISiteMapNode node;
-        protected readonly string sourceName;
+        private readonly string? parentKey;
+        private readonly ISiteMapNode node;
+        private readonly string sourceName;
 
-        #region ISiteMapNodeToParentRelation Members
+        public virtual string? ParentKey => this.parentKey;
 
-        public virtual string ParentKey
-        {
-            get { return this.parentKey; }
-        }
+        public virtual ISiteMapNode Node => this.node;
 
-        public virtual ISiteMapNode Node
-        {
-            get { return this.node; }
-        }
+        public virtual string SourceName => this.sourceName;
 
-        public virtual string SourceName
-        {
-            get { return this.sourceName; }
-        }
-
-        #endregion
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Caching;
 
@@ -12,13 +12,11 @@ namespace MvcSiteMapProvider.Caching
     {
         public RuntimeCacheProvider(ObjectCache cache)
         {
-            if (cache == null)
-                throw new ArgumentNullException("cache");
-            this.cache = cache;
+            this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
         }
         private readonly ObjectCache cache;
 
-        public event EventHandler<MicroCacheItemRemovedEventArgs<T>> ItemRemoved;
+        public event EventHandler<MicroCacheItemRemovedEventArgs<T?>>? ItemRemoved;
 
         public bool Contains(string key)
         {
@@ -38,10 +36,12 @@ namespace MvcSiteMapProvider.Caching
 
         public void Add(string key, LazyLock item, ICacheDetails cacheDetails)
         {
-            var policy = new CacheItemPolicy();
+            var policy = new CacheItemPolicy
+            {
+                // Timeout
+                Priority = CacheItemPriority.NotRemovable
+            };
 
-            // Timeout
-            policy.Priority = CacheItemPriority.NotRemovable;
             if (IsTimespanSet(cacheDetails.AbsoluteCacheExpiration))
             {
                 policy.AbsoluteExpiration = DateTimeOffset.Now.Add(cacheDetails.AbsoluteCacheExpiration);
@@ -52,8 +52,7 @@ namespace MvcSiteMapProvider.Caching
             }
 
             // Dependencies
-            var dependencies = (IList<ChangeMonitor>)cacheDetails.CacheDependency.Dependency;
-            if (dependencies != null)
+            if (cacheDetails.CacheDependency.Dependency is IList<ChangeMonitor> dependencies)
             {
                 foreach (var dependency in dependencies)
                 {
@@ -80,17 +79,14 @@ namespace MvcSiteMapProvider.Caching
         protected virtual void CacheItemRemoved(CacheEntryRemovedArguments arguments)
         {
             var item = arguments.CacheItem;
-            var args = new MicroCacheItemRemovedEventArgs<T>(item.Key, ((LazyLock)item.Value).Get<T>(null));
+            var args = new MicroCacheItemRemovedEventArgs<T?>(item.Key, ((LazyLock)item.Value).Get<T>(null));
             OnCacheItemRemoved(args);
         }
 
-        protected virtual void OnCacheItemRemoved(MicroCacheItemRemovedEventArgs<T> e)
+        protected virtual void OnCacheItemRemoved(MicroCacheItemRemovedEventArgs<T?> e)
         {
             var handler = ItemRemoved;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+            handler?.Invoke(this, e);
         }
     }
 }

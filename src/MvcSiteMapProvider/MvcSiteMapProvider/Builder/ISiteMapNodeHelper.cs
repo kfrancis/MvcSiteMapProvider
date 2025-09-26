@@ -41,7 +41,7 @@ namespace MvcSiteMapProvider.Builder
         /// <param name="sourceName">A string description of the provider. This value is shown in exception messages related to the node configuration.</param>
         /// <param name="implicitResourceKey">The implicit resource key for localization of the node's properties.</param>
         /// <returns>An <see cref="T:MvcSiteMapProvider.Builder.ISiteMapNodeToParentRelation"/> instance.</returns>
-        ISiteMapNodeToParentRelation CreateNode(string key, string parentKey, string sourceName, string implicitResourceKey);
+        ISiteMapNodeToParentRelation CreateNode(string key, string? parentKey, string sourceName, string implicitResourceKey);
 
         /// <summary>
         /// Processes the dynamic nodes and builds them into a list of <see cref="T:MvcSiteMapNodeProvider.Builder.ISiteMapNodeToParentRelation"/> instances
@@ -69,7 +69,7 @@ namespace MvcSiteMapProvider.Builder
         /// <summary>
         /// The SiteMapCacheKey for the current SiteMap instance.
         /// </summary>
-        string SiteMapCacheKey { get; }
+        string? SiteMapCacheKey { get; }
 
         /// <summary>
         /// The current culture context. This object keeps track of the original 

@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.DI;
+using MvcSiteMapProvider.DI;
 using MvcSiteMapProvider.Globalization;
 using System;
 using System.Collections.Generic;
@@ -22,25 +22,12 @@ namespace MvcSiteMapProvider.Builder
             ICultureContextFactory cultureContextFactory
             )
         {
-            if (siteMap == null)
-                throw new ArgumentNullException("siteMap");
-            if (cultureContext == null)
-                throw new ArgumentNullException("cultureContext");
-            if (siteMapNodeCreatorFactory == null)
-                throw new ArgumentNullException("siteMapNodeCreatorFactory");
-            if (dynamicSiteMapNodeBuilderFactory == null)
-                throw new ArgumentNullException("dynamicSiteMapNodeBuilderFactory");
-            if (reservedAttributeNameProvider == null)
-                throw new ArgumentNullException("reservedAttributeNameProvider");
-            if (cultureContextFactory == null)
-                throw new ArgumentNullException("cultureContextFactory");
-
-            this.siteMap = siteMap;
-            this.cultureContext = cultureContext;
-            this.siteMapNodeCreatorFactory = siteMapNodeCreatorFactory;
-            this.dynamicSiteMapNodeBuilderFactory = dynamicSiteMapNodeBuilderFactory;
-            this.reservedAttributeNameProvider = reservedAttributeNameProvider;
-            this.cultureContextFactory = cultureContextFactory;
+            this.siteMap = siteMap ?? throw new ArgumentNullException(nameof(siteMap));
+            this.cultureContext = cultureContext ?? throw new ArgumentNullException(nameof(cultureContext));
+            this.siteMapNodeCreatorFactory = siteMapNodeCreatorFactory ?? throw new ArgumentNullException(nameof(siteMapNodeCreatorFactory));
+            this.dynamicSiteMapNodeBuilderFactory = dynamicSiteMapNodeBuilderFactory ?? throw new ArgumentNullException(nameof(dynamicSiteMapNodeBuilderFactory));
+            this.reservedAttributeNameProvider = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
+            this.cultureContextFactory = cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
         }
 
         protected readonly ISiteMap siteMap;
@@ -63,7 +50,8 @@ namespace MvcSiteMapProvider.Builder
             return this.CreateNode(key, parentKey, sourceName, null);
         }
 
-        public ISiteMapNodeToParentRelation CreateNode(string key, string parentKey, string sourceName, string implicitResourceKey)
+        public ISiteMapNodeToParentRelation CreateNode(string key, string? parentKey, string sourceName,
+            string? implicitResourceKey)
         {
             var siteMapNodeCreator = this.siteMapNodeCreatorFactory.Create(this.siteMap);
             return siteMapNodeCreator.CreateSiteMapNode(key, parentKey, sourceName, implicitResourceKey);
@@ -74,26 +62,17 @@ namespace MvcSiteMapProvider.Builder
             return this.CreateDynamicNodes(node, node.ParentKey);
         }
 
-        public IEnumerable<ISiteMapNodeToParentRelation> CreateDynamicNodes(ISiteMapNodeToParentRelation node, string defaultParentKey)
+        public IEnumerable<ISiteMapNodeToParentRelation> CreateDynamicNodes(ISiteMapNodeToParentRelation node, string? defaultParentKey)
         {
             var dynamicSiteMapNodeBuilder = this.dynamicSiteMapNodeBuilderFactory.Create(this.siteMap, this.CultureContext);
             return dynamicSiteMapNodeBuilder.BuildDynamicNodes(node.Node, defaultParentKey);
         }
 
-        public IReservedAttributeNameProvider ReservedAttributeNames
-        {
-            get { return this.reservedAttributeNameProvider; }
-        }
+        public IReservedAttributeNameProvider ReservedAttributeNames => this.reservedAttributeNameProvider;
 
-        public string SiteMapCacheKey
-        {
-            get { return this.siteMap.CacheKey; }
-        }
+        public string? SiteMapCacheKey => this.siteMap.CacheKey;
 
-        public ICultureContext CultureContext
-        {
-            get { return this.cultureContext; }
-        }
+        public ICultureContext CultureContext => this.cultureContext;
 
         public ICultureContext CreateCultureContext(string cultureName, string uiCultureName)
         {

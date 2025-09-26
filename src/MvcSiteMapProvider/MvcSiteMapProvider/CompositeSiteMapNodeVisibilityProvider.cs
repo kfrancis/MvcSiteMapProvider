@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.DI;
+using MvcSiteMapProvider.DI;
 using System;
 using System.Collections.Generic;
 
@@ -15,22 +15,20 @@ namespace MvcSiteMapProvider
         public CompositeSiteMapNodeVisibilityProvider(string instanceName, params ISiteMapNodeVisibilityProvider[] siteMapNodeVisibilityProviders)
         {
             if (string.IsNullOrEmpty(instanceName))
-                throw new ArgumentNullException("instanceName");
-            if (siteMapNodeVisibilityProviders == null)
-                throw new ArgumentNullException("siteMapNodeVisibilityProviders");
+                throw new ArgumentNullException(nameof(instanceName));
 
             this.instanceName = instanceName;
-            this.siteMapNodeVisibilityProviders = siteMapNodeVisibilityProviders;
+            this.siteMapNodeVisibilityProviders = siteMapNodeVisibilityProviders ?? throw new ArgumentNullException(nameof(siteMapNodeVisibilityProviders));
         }
         private readonly string instanceName;
         private readonly ISiteMapNodeVisibilityProvider[] siteMapNodeVisibilityProviders;
 
         #region ISiteMapNodeVisibilityProvider Members
 
-        public bool IsVisible(ISiteMapNode node, IDictionary<string, object> sourceMetadata)
+        public bool IsVisible(ISiteMapNode node, IDictionary<string, object?> sourceMetadata)
         {
             // Result is always true unless the first provider that returns false is encountered.
-            bool result = true;
+            var result = true;
             foreach (var visibilityProvider in this.siteMapNodeVisibilityProviders)
             {
                 result = visibilityProvider.IsVisible(node, sourceMetadata);

@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Web.Mvc;
+using MvcSiteMapProvider.Web.Mvc;
 using System;
 using System.Collections.Specialized;
 
@@ -14,9 +14,7 @@ namespace MvcSiteMapProvider.Globalization
             IMvcContextFactory mvcContextFactory
             )
         {
-            if (mvcContextFactory == null)
-                throw new ArgumentNullException("mvcContextFactory");
-            this.mvcContextFactory = mvcContextFactory;
+            this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
         }
 
         protected readonly IMvcContextFactory mvcContextFactory;
@@ -35,31 +33,31 @@ namespace MvcSiteMapProvider.Globalization
         {
             if (enableLocalization)
             {
-                string resourceString = this.GetImplicitResourceString(attributeName, implicitResourceKey, classKey);
-                if (resourceString != null)
+                var resourceString = this.GetImplicitResourceString(attributeName, implicitResourceKey, classKey);
+                if (!string.IsNullOrEmpty(resourceString))
                 {
-                    return resourceString;
+                    return resourceString!;
                 }
                 resourceString = this.GetExplicitResourceString(attributeName, value, true, explicitResourceKeys);
-                if (resourceString != null)
+                if (!string.IsNullOrEmpty(resourceString))
                 {
-                    return resourceString;
+                    return resourceString!;
                 }
             }
-            if (value != null)
+            if (!string.IsNullOrEmpty(value))
             {
                 return value;
             }
             return string.Empty;
         }
 
-        protected virtual string GetImplicitResourceString(string attributeName, string implicitResourceKey, string classKey)
+        protected virtual string? GetImplicitResourceString(string attributeName, string implicitResourceKey, string classKey)
         {
             if (attributeName == null)
             {
-                throw new ArgumentNullException("attributeName");
+                throw new ArgumentNullException(nameof(attributeName));
             }
-            string globalResourceObject = null;
+            string? globalResourceObject = null;
             if (!string.IsNullOrEmpty(implicitResourceKey))
             {
                 var httpContext = mvcContextFactory.CreateHttpContext();
@@ -74,17 +72,17 @@ namespace MvcSiteMapProvider.Globalization
             return globalResourceObject;
         }
 
-        protected virtual string GetExplicitResourceString(string attributeName, string defaultValue, bool throwIfNotFound, NameValueCollection explicitResourceKeys)
+        protected virtual string? GetExplicitResourceString(string attributeName, string defaultValue, bool throwIfNotFound, NameValueCollection explicitResourceKeys)
         {
             if (attributeName == null)
             {
-                throw new ArgumentNullException("attributeName");
+                throw new ArgumentNullException(nameof(attributeName));
             }
-            string globalResourceObject = null;
+            string? globalResourceObject = null;
             if (explicitResourceKeys != null)
             {
-                string[] values = explicitResourceKeys.GetValues(attributeName);
-                if ((values == null) || (values.Length <= 1))
+                var values = explicitResourceKeys.GetValues(attributeName);
+                if (values == null || values.Length <= 1)
                 {
                     return globalResourceObject;
                 }
@@ -95,7 +93,7 @@ namespace MvcSiteMapProvider.Globalization
                 }
                 catch (System.Resources.MissingManifestResourceException)
                 {
-                    if (defaultValue != null)
+                    if (!string.IsNullOrEmpty(defaultValue))
                     {
                         return defaultValue;
                     }

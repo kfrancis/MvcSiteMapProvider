@@ -10,29 +10,25 @@ namespace MvcSiteMapProvider.Builder
         : ISiteMapBuilderSet
     {
         public SiteMapBuilderSet(
-           string instanceName,
+           string? instanceName,
            bool securityTrimmingEnabled,
            bool enableLocalization,
            bool visibilityAffectsDescendants,
            bool useTitleIfDescriptionNotProvided,
-           ISiteMapBuilder siteMapBuilder,
-           ICacheDetails cacheDetails
+           ISiteMapBuilder? siteMapBuilder,
+           ICacheDetails? cacheDetails
            )
         {
             if (string.IsNullOrEmpty(instanceName))
-                throw new ArgumentNullException("instanceName");
-            if (siteMapBuilder == null)
-                throw new ArgumentNullException("siteMapBuilder");
-            if (cacheDetails == null)
-                throw new ArgumentNullException("cacheDetails");
+                throw new ArgumentNullException(nameof(instanceName));
 
-            this.instanceName = instanceName;
-            this.securityTrimmingEnabled = securityTrimmingEnabled;
-            this.enableLocalization = enableLocalization;
-            this.visibilityAffectsDescendants = visibilityAffectsDescendants;
-            this.useTitleIfDescriptionNotProvided = useTitleIfDescriptionNotProvided;
-            this.siteMapBuilder = siteMapBuilder;
-            this.cacheDetails = cacheDetails;
+            this.instanceName = instanceName!;
+            this.SecurityTrimmingEnabled = securityTrimmingEnabled;
+            this.EnableLocalization = enableLocalization;
+            this.VisibilityAffectsDescendants = visibilityAffectsDescendants;
+            this.UseTitleIfDescriptionNotProvided = useTitleIfDescriptionNotProvided;
+            this.Builder = siteMapBuilder ?? throw new ArgumentNullException(nameof(siteMapBuilder));
+            this.CacheDetails = cacheDetails ?? throw new ArgumentNullException(nameof(cacheDetails));
         }
 
         /// <summary>
@@ -60,53 +56,26 @@ namespace MvcSiteMapProvider.Builder
         { 
         }
 
-        protected readonly string instanceName;
-        protected readonly bool securityTrimmingEnabled;
-        protected readonly bool enableLocalization;
-        protected readonly bool visibilityAffectsDescendants;
-        protected readonly bool useTitleIfDescriptionNotProvided;
-        protected readonly ISiteMapBuilder siteMapBuilder;
-        protected readonly ICacheDetails cacheDetails;
+        private readonly string instanceName;
 
-        #region ISiteMapBuilderSet Members
+        public virtual ISiteMapBuilder Builder { get; }
 
-        public virtual ISiteMapBuilder Builder
-        {
-            get { return this.siteMapBuilder; }
-        }
+        public virtual ICacheDetails CacheDetails { get; }
 
-        public virtual ICacheDetails CacheDetails
-        {
-            get { return this.cacheDetails; }
-        }
+        public virtual string? SiteMapCacheKey { get; set; }
 
-        public virtual string SiteMapCacheKey { get; set; }
+        public virtual bool SecurityTrimmingEnabled { get; }
 
-        public virtual bool SecurityTrimmingEnabled
-        {
-            get { return this.securityTrimmingEnabled; }
-        }
+        public virtual bool EnableLocalization { get; }
 
-        public virtual bool EnableLocalization
-        {
-            get { return this.enableLocalization; }
-        }
+        public virtual bool VisibilityAffectsDescendants { get; }
 
-        public virtual bool VisibilityAffectsDescendants
-        {
-            get { return this.visibilityAffectsDescendants; }
-        }
-
-        public virtual bool UseTitleIfDescriptionNotProvided
-        {
-            get { return this.useTitleIfDescriptionNotProvided; }
-        }
+        public virtual bool UseTitleIfDescriptionNotProvided { get; }
 
         public virtual bool AppliesTo(string builderSetName)
         {
             return this.instanceName.Equals(builderSetName, StringComparison.Ordinal);
         }
 
-        #endregion
     }
 }

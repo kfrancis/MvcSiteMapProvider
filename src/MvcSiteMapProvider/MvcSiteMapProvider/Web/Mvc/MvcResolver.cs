@@ -16,13 +16,8 @@ namespace MvcSiteMapProvider.Web.Mvc
             IActionMethodParameterResolver actionMethodParameterResolver
             )
         {
-            if (controllerTypeResolver == null)
-                throw new ArgumentNullException("controllerTypeResolver");
-            if (actionMethodParameterResolver == null)
-                throw new ArgumentNullException("actionMethodParameterResolver");
-
-            this.controllerTypeResolver = controllerTypeResolver;
-            this.actionMethodParameterResolver = actionMethodParameterResolver;
+            this.controllerTypeResolver = controllerTypeResolver ?? throw new ArgumentNullException(nameof(controllerTypeResolver));
+            this.actionMethodParameterResolver = actionMethodParameterResolver ?? throw new ArgumentNullException(nameof(actionMethodParameterResolver));
         }
 
         protected readonly IControllerTypeResolver controllerTypeResolver;

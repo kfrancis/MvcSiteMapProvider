@@ -1,4 +1,4 @@
-﻿namespace MvcSiteMapProvider.Visitor
+namespace MvcSiteMapProvider.Visitor
 {
     /// <summary>
     /// Specialized <see cref="T:MvcSiteMapProvider.Visitor.ISiteMapNodeVisitor"/> class for resolving URLs
@@ -9,9 +9,12 @@
     {
         #region ISiteMapNodeVisitor Members
 
-        public void Execute(ISiteMapNode node)
+        public void Execute(ISiteMapNode? node)
         {
-            node.ResolveUrl();
+            if (node != null)
+            {
+                node.ResolveUrl();
+            }
         }
 
         #endregion

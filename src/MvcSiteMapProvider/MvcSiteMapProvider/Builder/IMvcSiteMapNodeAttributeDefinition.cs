@@ -9,6 +9,6 @@
         /// Gets or sets the site map node attribute.
         /// </summary>
         /// <value>The site map node attribute.</value>
-        IMvcSiteMapNodeAttribute SiteMapNodeAttribute { get; set; }
+        IMvcSiteMapNodeAttribute? SiteMapNodeAttribute { get; set; }
     }
 }

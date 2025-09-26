@@ -5,7 +5,6 @@
     /// </summary>
     public interface ISiteMapNodeCreator
     {
-
         /// <summary>
         /// Creates an instance of <see cref="T:MvcSiteMapProvider.Builder.ISiteMapNodeToParentRelation"/>.
         /// </summary>
@@ -14,7 +13,8 @@
         /// <param name="sourceName">A string description of the provider. This value is shown in exception messages related to the node configuration.</param>
         /// <param name="implicitResourceKey">The implicit resource key for localization of the node's properties.</param>
         /// <returns>An <see cref="T:MvcSiteMapProvider.Builder.ISiteMapNodeToParentRelation"/> instance.</returns>
-        ISiteMapNodeToParentRelation CreateSiteMapNode(string key, string parentKey, string sourceName, string implicitResourceKey);
+        ISiteMapNodeToParentRelation CreateSiteMapNode(string key, string? parentKey, string sourceName,
+            string? implicitResourceKey);
 
         /// <summary>
         /// Creates an instance of <see cref="T:MvcSiteMapProvider.Builder.ISiteMapNodeToParentRelation"/>.

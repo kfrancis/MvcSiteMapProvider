@@ -17,23 +17,15 @@ namespace MvcSiteMapProvider.Caching
             IMvcContextFactory mvcContextFactory
             )
         {
-            if (mvcContextFactory == null)
-                throw new ArgumentNullException("mvcContextFactory");
-            this.mvcContextFactory = mvcContextFactory;
+            this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
         }
         private readonly IMvcContextFactory mvcContextFactory;
 
-        protected HttpContextBase Context
-        {
-            get
-            {
-                return this.mvcContextFactory.CreateHttpContext();
-            }
-        }
+        private HttpContextBase Context => this.mvcContextFactory.CreateHttpContext();
 
         #region ICacheProvider<T> Members
 
-        public event EventHandler<MicroCacheItemRemovedEventArgs<T>> ItemRemoved;
+        public event EventHandler<MicroCacheItemRemovedEventArgs<T?>>? ItemRemoved;
 
         public bool Contains(string key)
         {
@@ -57,8 +49,8 @@ namespace MvcSiteMapProvider.Caching
 
         public void Add(string key, LazyLock item, ICacheDetails cacheDetails)
         {
-            DateTime absolute = System.Web.Caching.Cache.NoAbsoluteExpiration;
-            TimeSpan sliding = System.Web.Caching.Cache.NoSlidingExpiration;
+            var absolute = System.Web.Caching.Cache.NoAbsoluteExpiration;
+            var sliding = System.Web.Caching.Cache.NoSlidingExpiration;
             if (IsTimespanSet(cacheDetails.AbsoluteCacheExpiration))
             {
                 absolute = DateTime.UtcNow.Add(cacheDetails.AbsoluteCacheExpiration);
@@ -67,6 +59,10 @@ namespace MvcSiteMapProvider.Caching
             {
                 sliding = cacheDetails.SlidingCacheExpiration;
             }
+
+            if (cacheDetails.CacheDependency.Dependency == null)
+                return;
+
             var dependency = (CacheDependency)cacheDetails.CacheDependency.Dependency;
 
             Context.Cache.Insert(key, item, dependency, absolute, sliding, CacheItemPriority.NotRemovable, this.OnItemRemoved);
@@ -79,7 +75,7 @@ namespace MvcSiteMapProvider.Caching
 
         #endregion
 
-        private bool IsTimespanSet(TimeSpan timeSpan)
+        private static bool IsTimespanSet(TimeSpan timeSpan)
         {
             return (!timeSpan.Equals(TimeSpan.MinValue));
         }
@@ -92,15 +88,16 @@ namespace MvcSiteMapProvider.Caching
         /// <param name="reason">Reason the cached item was removed.</param>
         protected virtual void OnItemRemoved(string key, object item, CacheItemRemovedReason reason)
         {
-            var args = new MicroCacheItemRemovedEventArgs<T>(key, ((LazyLock)item).Get<T>(null));
+            var args = new MicroCacheItemRemovedEventArgs<T?>(key, ((LazyLock)item).Get<T>(null));
             OnCacheItemRemoved(args);
         }
 
-        protected virtual void OnCacheItemRemoved(MicroCacheItemRemovedEventArgs<T> e)
+        protected virtual void OnCacheItemRemoved(MicroCacheItemRemovedEventArgs<T?>? e)
         {
             if (this.ItemRemoved != null)
             {
-                ItemRemoved(this, e);
+                if (e != null)
+                    ItemRemoved(this, e);
             }
         }
     }

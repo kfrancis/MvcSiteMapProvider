@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="src/MvcSiteMapProvider/CodeAsConfiguration/Ninject/Ninject.csproj" Id="4ec1aaed-4179-4adc-96bc-18cccf429b65" />
+  <Project Path="src/MvcSiteMapProvider/CodeAsConfiguration/Shared/Shared.csproj" Id="7c763b28-50b2-4201-9bd0-659fc155e5f3" />
+  <Project Path="src/MvcSiteMapProvider/CodeAsConfiguration/SimpleInjector/SimpleInjector.csproj" Id="029ea3f0-37fa-4a67-ad8e-075226fbc950" />
+  <Project Path="src/MvcSiteMapProvider/MvcSiteMapProvider.Sample.Mvc5/MvcSiteMapProvider.Sample.Mvc5.csproj" Id="025d53cf-2ffb-435a-8caf-0ee09f579194" />
+  <Project Path="src/MvcSiteMapProvider/MvcSiteMapProvider.Tests/MvcSiteMapProvider.Tests.csproj" Id="406fdbf5-bd07-4bcd-8801-bdc3f22e152f" />
+  <Project Path="src/MvcSiteMapProvider/MvcSiteMapProvider/MvcSiteMapProvider.csproj" Id="8625fb9c-be71-41ef-993d-3c05ea11def4" />
+</Solution>

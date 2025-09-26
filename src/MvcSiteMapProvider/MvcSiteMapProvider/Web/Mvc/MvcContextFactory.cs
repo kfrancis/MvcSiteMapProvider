@@ -32,9 +32,9 @@ namespace MvcSiteMapProvider.Web.Mvc
         public virtual HttpContextBase CreateHttpContext(ISiteMapNode node, Uri uri, TextWriter writer)
         {
             if (uri == null)
-                throw new ArgumentNullException("uri");
+                throw new ArgumentNullException(nameof(uri));
             if (writer == null)
-                throw new ArgumentNullException("writer");
+                throw new ArgumentNullException(nameof(writer));
 
             var request = new HttpRequest(
                 filename: string.Empty, 
@@ -77,9 +77,9 @@ namespace MvcSiteMapProvider.Web.Mvc
         public virtual ControllerContext CreateControllerContext(RequestContext requestContext, ControllerBase controller)
         {
             if (requestContext == null)
-                throw new ArgumentNullException("requestContext");
+                throw new ArgumentNullException(nameof(requestContext));
             if (controller == null)
-                throw new ArgumentNullException("controller");
+                throw new ArgumentNullException(nameof(controller));
 
             var result = new ControllerContext(requestContext, controller);
 
@@ -113,9 +113,9 @@ namespace MvcSiteMapProvider.Web.Mvc
         public virtual AuthorizationContext CreateAuthorizationContext(ControllerContext controllerContext, ActionDescriptor actionDescriptor)
         {
             if (controllerContext == null)
-                throw new ArgumentNullException("controllerContext");
+                throw new ArgumentNullException(nameof(controllerContext));
             if (actionDescriptor == null)
-                throw new ArgumentNullException("actionDescriptor");
+                throw new ArgumentNullException(nameof(actionDescriptor));
 
             return new AuthorizationContext(controllerContext, actionDescriptor);
         }

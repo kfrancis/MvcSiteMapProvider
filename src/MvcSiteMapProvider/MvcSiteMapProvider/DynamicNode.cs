@@ -101,8 +101,8 @@ namespace MvcSiteMapProvider
         /// <value>The change frequency.</value>
         public virtual ChangeFrequency ChangeFrequency
         {
-            get { return changeFrequency; }
-            set { changeFrequency = value; }
+            get => changeFrequency;
+            set => changeFrequency = value;
         }
 
         /// <summary>
@@ -111,8 +111,8 @@ namespace MvcSiteMapProvider
         /// <value>The update priority.</value>
         public virtual UpdatePriority UpdatePriority
         {
-            get { return updatePriority; }
-            set { updatePriority = value; }
+            get => updatePriority;
+            set => updatePriority = value;
         }
 
         /// <summary>

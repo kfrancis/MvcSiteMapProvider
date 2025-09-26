@@ -6,8 +6,8 @@ namespace MvcSiteMapProvider.Text
     public static class StringExtensions
     {
         // C# keywords: http://msdn.microsoft.com/en-us/library/x53a06bb(v=vs.71).aspx
-        private static string[] keywords = new[]
-        {
+        private static string[] keywords =
+        [
             "abstract", "event", "new", "struct",
             "as", "explicit", "null", "switch",
             "base", "extern", "object", "this",
@@ -28,7 +28,7 @@ namespace MvcSiteMapProvider.Text
             "double", "lock", "stackalloc",
             "else", "long", "static",
             "enum", "namespace", "string"
-        };
+        ];
 
         // definition of a valid C# identifier: http://msdn.microsoft.com/en-us/library/aa664670(v=vs.71).aspx
         private const string formattingCharacter = @"\p{Cf}";

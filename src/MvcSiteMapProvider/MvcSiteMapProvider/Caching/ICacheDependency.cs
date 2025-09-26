@@ -5,6 +5,6 @@
     /// </summary>
     public interface ICacheDependency
     {
-        object Dependency { get; }
+        object? Dependency { get; }
     }
 }

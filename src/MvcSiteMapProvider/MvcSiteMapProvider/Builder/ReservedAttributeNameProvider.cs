@@ -17,10 +17,7 @@ namespace MvcSiteMapProvider.Builder
             IEnumerable<string> attributesToIgnore
             )
         {
-            if (attributesToIgnore == null)
-                throw new ArgumentNullException("attributesToIgnore");
-
-            this.attributesToIgnore = attributesToIgnore;
+            this.attributesToIgnore = attributesToIgnore ?? throw new ArgumentNullException(nameof(attributesToIgnore));
         }
 
         protected readonly IEnumerable<string> attributesToIgnore;

@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.DI;
+using MvcSiteMapProvider.DI;
 using MvcSiteMapProvider.Globalization;
 using System;
 using System.Collections.Generic;
@@ -18,27 +18,21 @@ namespace MvcSiteMapProvider.Builder
             ICultureContextFactory cultureContextFactory
             )
         {
-            if (siteMapNodeCreator == null)
-                throw new ArgumentNullException("siteMapNodeCreator");
-            if (cultureContext == null)
-                throw new ArgumentNullException("cultureContext");
-            if (cultureContextFactory == null)
-                throw new ArgumentNullException("cultureContextFactory");
-
-            this.siteMapNodeCreator = siteMapNodeCreator;
-            this.cultureContext = cultureContext;
-            this.cultureContextFactory = cultureContextFactory;
+            this.siteMapNodeCreator = siteMapNodeCreator ?? throw new ArgumentNullException(nameof(siteMapNodeCreator));
+            this.cultureContext = cultureContext ?? throw new ArgumentNullException(nameof(cultureContext));
+            this.cultureContextFactory = cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
         }
-        protected readonly ISiteMapNodeCreator siteMapNodeCreator;
-        protected readonly ICultureContext cultureContext;
-        protected readonly ICultureContextFactory cultureContextFactory;
+
+        private readonly ISiteMapNodeCreator siteMapNodeCreator;
+        private readonly ICultureContext cultureContext;
+        private readonly ICultureContextFactory cultureContextFactory;
 
         /// <summary>
         /// Gets the dynamic nodes for node.
         /// </summary>
         /// <param name="node">The SiteMap node.</param>
         /// <param name="defaultParentKey">The key of the parent node.</param>
-        public virtual IEnumerable<ISiteMapNodeToParentRelation> BuildDynamicNodes(ISiteMapNode node, string defaultParentKey)
+        public virtual IEnumerable<ISiteMapNodeToParentRelation> BuildDynamicNodes(ISiteMapNode node, string? defaultParentKey)
         {
             var result = new List<ISiteMapNodeToParentRelation>();
 
@@ -64,7 +58,7 @@ namespace MvcSiteMapProvider.Builder
             foreach (var dynamicNode in dynamicNodes)
             {
                 // If the dynamic node has a parent key set, use that as the parent. Otherwise use the parentNode.
-                var parentKey = !string.IsNullOrEmpty(dynamicNode.ParentKey) ? dynamicNode.ParentKey : defaultParentKey;
+                var parentKey = !string.IsNullOrEmpty(dynamicNode.ParentKey) ? dynamicNode.ParentKey : (defaultParentKey ?? string.Empty);
                 var key = dynamicNode.Key;
 
                 if (string.IsNullOrEmpty(key))

@@ -9,10 +9,7 @@
     {
         #region ICacheDependency Members
 
-        public object Dependency
-        {
-            get { return null; }
-        }
+        public object? Dependency => null;
 
         #endregion
     }

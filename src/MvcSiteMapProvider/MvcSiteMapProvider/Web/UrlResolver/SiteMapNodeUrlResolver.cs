@@ -19,13 +19,8 @@ namespace MvcSiteMapProvider.Web.UrlResolver
             IUrlPath urlPath
             )
         {
-            if (mvcContextFactory == null)
-                throw new ArgumentNullException("mvcContextFactory");
-            if (urlPath == null)
-                throw new ArgumentNullException("urlPath");
-
-            this.mvcContextFactory = mvcContextFactory;
-            this.urlPath = urlPath;
+            this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
+            this.urlPath = urlPath ?? throw new ArgumentNullException(nameof(urlPath));
             this.routeValueDictionary = new RouteValueDictionary();
             this.lockObject = new object();
         }
@@ -64,7 +59,7 @@ namespace MvcSiteMapProvider.Web.UrlResolver
 
         protected virtual string ResolveRouteUrl(ISiteMapNode node, string area, string controller, string action, IDictionary<string, object> routeValues)
         {
-            string result = string.Empty;
+            var result = string.Empty;
             // Create a TextWriter with null stream as a backing stream 
             // which doesn't consume resources
             using (var nullWriter = new StreamWriter(Stream.Null))
@@ -84,7 +79,7 @@ namespace MvcSiteMapProvider.Web.UrlResolver
 
         protected virtual string ResolveRouteUrl(ISiteMapNode node, string area, string controller, string action, IDictionary<string, object> routeValues, RequestContext requestContext)
         {
-            string result = string.Empty;
+            var result = string.Empty;
             var urlHelper = this.mvcContextFactory.CreateUrlHelper(requestContext);
             
             // Thread-safe reuse of the dictionary instance to reduce memory allocations

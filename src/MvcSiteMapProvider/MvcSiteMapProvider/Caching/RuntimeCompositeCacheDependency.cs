@@ -17,40 +17,37 @@ namespace MvcSiteMapProvider.Caching
             params ICacheDependency[] cacheDependencies
             )
         {
-            if (cacheDependencies == null)
-                throw new ArgumentNullException("cacheDependencies");
-            this.cacheDependencies = cacheDependencies;
+            this.cacheDependencies = cacheDependencies ?? throw new ArgumentNullException(nameof(cacheDependencies));
         }
 
         protected readonly ICacheDependency[] cacheDependencies;
 
-        #region ICacheDependency Members
-
-        public object Dependency
+        public object? Dependency
         {
             get
             {
-                if (this.cacheDependencies.Count() > 0)
+                if (!this.cacheDependencies.Any())
                 {
-                    var list = new List<ChangeMonitor>();
-                    foreach (var item in this.cacheDependencies)
-                    {
-                        var changeMonitorList = (IList<ChangeMonitor>)item.Dependency;
-                        if (changeMonitorList != null)
-                        {
-                            foreach (var changeMonitor in changeMonitorList)
-                            {
-                                list.Add(changeMonitor);
-                            }
-                        }
-                    }
-                    return list;
+                    return null;
                 }
-                return null;
+
+                var list = new List<ChangeMonitor>();
+                foreach (var item in this.cacheDependencies)
+                {
+                    if (item.Dependency is not IList<ChangeMonitor> changeMonitorList)
+                    {
+                        continue;
+                    }
+
+                    foreach (var changeMonitor in changeMonitorList)
+                    {
+                        list.Add(changeMonitor);
+                    }
+                }
+                return list;
             }
         }
 
-        #endregion
     }
 }
 #endif

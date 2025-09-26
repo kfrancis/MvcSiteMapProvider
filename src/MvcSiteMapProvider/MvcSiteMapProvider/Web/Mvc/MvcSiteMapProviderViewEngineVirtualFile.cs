@@ -42,8 +42,8 @@ namespace MvcSiteMapProvider.Web.Mvc
         /// <returns></returns>
         private static Stream ReadResource(string embeddedFileName)
         {
-            string resourceFileName = Path.GetFileName(embeddedFileName);
-            Assembly assembly = typeof(MvcSiteMapProviderViewEngineVirtualFile).Assembly;
+            var resourceFileName = Path.GetFileName(embeddedFileName);
+            var assembly = typeof(MvcSiteMapProviderViewEngineVirtualFile).Assembly;
             return assembly.GetManifestResourceStream("MvcSiteMapProvider.Web.Html.DisplayTemplates." + resourceFileName);
         }
     }

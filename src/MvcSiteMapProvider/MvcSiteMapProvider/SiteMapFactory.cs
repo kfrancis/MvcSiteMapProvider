@@ -22,28 +22,13 @@ namespace MvcSiteMapProvider
             IActionMethodParameterResolverFactory actionMethodParameterResolverFactory
             )
         {
-            if (pluginProviderFactory == null)
-                throw new ArgumentNullException("pluginProviderFactory");
-            if (mvcResolverFactory == null)
-                throw new ArgumentNullException("mvcResolverFactory");
-            if (mvcContextFactory == null)
-                throw new ArgumentNullException("mvcContextFactory");
-            if (siteMapChildStateFactory == null)
-                throw new ArgumentNullException("siteMapChildStateFactory");
-            if (urlPath == null)
-                throw new ArgumentNullException("urlPath");
-            if (controllerTypeResolverFactory == null)
-                throw new ArgumentNullException("controllerTypeResolverFactory");
-            if (actionMethodParameterResolverFactory == null)
-                throw new ArgumentNullException("actionMethodParameterResolverFactory");
-
-            this.pluginProviderFactory = pluginProviderFactory;
-            this.mvcResolverFactory = mvcResolverFactory;
-            this.mvcContextFactory = mvcContextFactory;
-            this.siteMapChildStateFactory = siteMapChildStateFactory;
-            this.urlPath = urlPath;
-            this.controllerTypeResolverFactory = controllerTypeResolverFactory;
-            this.actionMethodParameterResolverFactory = actionMethodParameterResolverFactory;
+            this.pluginProviderFactory = pluginProviderFactory ?? throw new ArgumentNullException(nameof(pluginProviderFactory));
+            this.mvcResolverFactory = mvcResolverFactory ?? throw new ArgumentNullException(nameof(mvcResolverFactory));
+            this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
+            this.siteMapChildStateFactory = siteMapChildStateFactory ?? throw new ArgumentNullException(nameof(siteMapChildStateFactory));
+            this.urlPath = urlPath ?? throw new ArgumentNullException(nameof(urlPath));
+            this.controllerTypeResolverFactory = controllerTypeResolverFactory ?? throw new ArgumentNullException(nameof(controllerTypeResolverFactory));
+            this.actionMethodParameterResolverFactory = actionMethodParameterResolverFactory ?? throw new ArgumentNullException(nameof(actionMethodParameterResolverFactory));
         }
 
         protected readonly ISiteMapPluginProviderFactory pluginProviderFactory;

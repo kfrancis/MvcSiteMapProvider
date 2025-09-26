@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace MvcSiteMapProvider
 {
@@ -11,16 +11,17 @@ namespace MvcSiteMapProvider
     /// </summary>
     public interface ISiteMapNodeVisibilityProviderStrategy
     {
-        ISiteMapNodeVisibilityProvider GetProvider(string providerName);
+        ISiteMapNodeVisibilityProvider? GetProvider(string providerName);
 
         /// <summary>
         /// Determines whether the node is visible.
         /// </summary>
+        /// <param name="providerName"></param>
         /// <param name="node">The node.</param>
         /// <param name="sourceMetadata">The source metadata.</param>
         /// <returns>
         /// 	<c>true</c> if the specified node is visible; otherwise, <c>false</c>.
         /// </returns>
-        bool IsVisible(string providerName, ISiteMapNode node, IDictionary<string, object> sourceMetadata);
+        bool IsVisible(string providerName, ISiteMapNode node, IDictionary<string, object?> sourceMetadata);
     }
 }

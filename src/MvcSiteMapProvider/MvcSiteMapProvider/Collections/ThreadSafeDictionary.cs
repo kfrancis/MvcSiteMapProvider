@@ -46,10 +46,7 @@ namespace MvcSiteMapProvider.Collections
         {
             using (new WriteLock(dictionaryLock)) // take a writelock immediately since we will always be writing
             {
-                if (dict.ContainsKey(key))
-                {
-                    dict.Remove(key);
-                }
+                dict.Remove(key);
 
                 dict.Add(key, newValue);
             }
@@ -303,7 +300,7 @@ namespace MvcSiteMapProvider.Collections
         /// <param name="locks">The locks.</param>
         public static void GetReadLock(ReaderWriterLockSlim locks)
         {
-            bool lockAcquired = false;
+            var lockAcquired = false;
             while (!lockAcquired)
                 lockAcquired = locks.TryEnterUpgradeableReadLock(1);
         }
@@ -314,7 +311,7 @@ namespace MvcSiteMapProvider.Collections
         /// <param name="locks">The locks.</param>
         public static void GetReadOnlyLock(ReaderWriterLockSlim locks)
         {
-            bool lockAcquired = false;
+            var lockAcquired = false;
             while (!lockAcquired)
                 lockAcquired = locks.TryEnterReadLock(1);
         }
@@ -325,7 +322,7 @@ namespace MvcSiteMapProvider.Collections
         /// <param name="locks">The locks.</param>
         public static void GetWriteLock(ReaderWriterLockSlim locks)
         {
-            bool lockAcquired = false;
+            var lockAcquired = false;
             while (!lockAcquired)
                 lockAcquired = locks.TryEnterWriteLock(1);
         }

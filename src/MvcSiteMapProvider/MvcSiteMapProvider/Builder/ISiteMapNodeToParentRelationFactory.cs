@@ -5,6 +5,6 @@
     /// </summary>
     public interface ISiteMapNodeToParentRelationFactory
     {
-        ISiteMapNodeToParentRelation Create(string parentKey, ISiteMapNode node, string sourceName);
+        ISiteMapNodeToParentRelation Create(string? parentKey, ISiteMapNode node, string sourceName);
     }
 }

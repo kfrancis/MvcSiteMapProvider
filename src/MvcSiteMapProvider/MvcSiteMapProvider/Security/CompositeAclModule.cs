@@ -13,10 +13,7 @@ namespace MvcSiteMapProvider.Security
             params IAclModule[] aclModules
             )
         {
-            if (aclModules == null)
-                throw new ArgumentNullException("aclModules");
-
-            this.aclModules = aclModules;
+            this.aclModules = aclModules ?? throw new ArgumentNullException(nameof(aclModules));
         }
 
         protected readonly IAclModule[] aclModules;

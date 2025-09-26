@@ -19,16 +19,9 @@ namespace MvcSiteMapProvider.Collections.Specialized
             IJsonToDictionaryDeserializer jsonToDictionaryDeserializer
             )
         {
-            if (requestCache == null)
-                throw new ArgumentNullException("requestCache");
-            if (reservedAttributeNameProvider == null)
-                throw new ArgumentNullException("reservedAttributeNameProvider");
-            if (jsonToDictionaryDeserializer == null)
-                throw new ArgumentNullException("jsonToDictionaryDeserializer");
-
-            this.requestCache = requestCache;
-            this.reservedAttributeNameProvider = reservedAttributeNameProvider;
-            this.jsonToDictionaryDeserializer = jsonToDictionaryDeserializer;
+            this.requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
+            this.reservedAttributeNameProvider = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
+            this.jsonToDictionaryDeserializer = jsonToDictionaryDeserializer ?? throw new ArgumentNullException(nameof(jsonToDictionaryDeserializer));
         }
 
         protected readonly IRequestCache requestCache;

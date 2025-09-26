@@ -9,7 +9,7 @@
     {
         #region ISiteMapNodeVisitor Members
 
-        public void Execute(ISiteMapNode node)
+        public void Execute(ISiteMapNode? node)
         {
             // No Implementation
         }

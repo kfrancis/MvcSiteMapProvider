@@ -20,12 +20,8 @@ namespace MvcSiteMapProvider.DI
             ConfigurationSettings settings
             )
         {
-            if (controllerFactory == null)
-                throw new ArgumentNullException("controllerFactory");
-            if (settings == null)
-                throw new ArgumentNullException("settings");
-            this.innerControllerFactory = controllerFactory;
-            this.settings = settings;
+            this.innerControllerFactory = controllerFactory ?? throw new ArgumentNullException(nameof(controllerFactory));
+            this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         }
 
         private readonly IControllerFactory innerControllerFactory;
@@ -44,13 +40,13 @@ namespace MvcSiteMapProvider.DI
         {
             if (requestContext == null)
             {
-                throw new ArgumentNullException("requestContext");
+                throw new ArgumentNullException(nameof(requestContext));
             }
             if (string.IsNullOrEmpty(controllerName))
             {
-                throw new ArgumentNullException("controllerName");
+                throw new ArgumentNullException(nameof(controllerName));
             }
-            Type controllerType = this.GetControllerType(requestContext, controllerName);
+            var controllerType = this.GetControllerType(requestContext, controllerName);
 
             // Yield control back to the original controller factory if this isn't an
             // internal controller.

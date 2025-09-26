@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace MvcSiteMapProvider
@@ -19,7 +19,7 @@ namespace MvcSiteMapProvider
         /// <returns>
         /// 	<c>true</c> if the specified node is visible; otherwise, <c>false</c>.
         /// </returns>
-        public abstract bool IsVisible(ISiteMapNode node, IDictionary<string, object> sourceMetadata);
+        public abstract bool IsVisible(ISiteMapNode node, IDictionary<string, object?> sourceMetadata);
 
         /// <summary>
         /// Determines whether the provider instance matches the name

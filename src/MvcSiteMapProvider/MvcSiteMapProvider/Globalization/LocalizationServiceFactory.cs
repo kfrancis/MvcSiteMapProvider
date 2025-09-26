@@ -14,13 +14,8 @@ namespace MvcSiteMapProvider.Globalization
             IStringLocalizer stringLocalizer
             )
         {
-            if (explicitResourceKeyParser == null)
-                throw new ArgumentNullException("explicitResourceKeyParser");
-            if (stringLocalizer == null)
-                throw new ArgumentNullException("stringLocalizer");
-
-            this.explicitResourceKeyParser = explicitResourceKeyParser;
-            this.stringLocalizer = stringLocalizer;
+            this.explicitResourceKeyParser = explicitResourceKeyParser ?? throw new ArgumentNullException(nameof(explicitResourceKeyParser));
+            this.stringLocalizer = stringLocalizer ?? throw new ArgumentNullException(nameof(stringLocalizer));
         }
 
         protected readonly IExplicitResourceKeyParser explicitResourceKeyParser;

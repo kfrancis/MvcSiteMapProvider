@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Web.Mvc;
 
 namespace MvcSiteMapProvider.Web.Mvc.Filters
@@ -32,23 +32,17 @@ namespace MvcSiteMapProvider.Web.Mvc.Filters
         /// <param name="filterContext">The current filter context.</param>
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
-            ISiteMapNode node = null;
             var siteMap = SiteMaps.Current;
-            if (Target != AttributeTarget.ParentNode)
+            var node = Target != AttributeTarget.ParentNode ? siteMap?.CurrentNode : siteMap?.CurrentNode?.ParentNode;
+
+            if (node == null)
             {
-                node = siteMap.CurrentNode;
-            }
-            else
-            {
-                node = siteMap.CurrentNode.ParentNode;
+                return;
             }
 
-            if (node != null)
+            foreach (var routeitem in filterContext.RouteData.Values)
             {
-                foreach (var routeitem in filterContext.RouteData.Values)
-                {
-                    node.RouteValues[routeitem.Key] = routeitem.Value;
-                }
+                node.RouteValues[routeitem.Key] = routeitem.Value;
             }
         }
     }

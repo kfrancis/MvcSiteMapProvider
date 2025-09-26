@@ -39,13 +39,8 @@ namespace MvcSiteMapProvider.Web.Html
         /// <param name="useViewEngine"><c>true</c> to use the internal view engine; otherwise <c>false</c></param>
         internal MvcSiteMapHtmlHelper(HtmlHelper htmlHelper, ISiteMap siteMap, bool useViewEngine)
         {
-            if (htmlHelper == null)
-                throw new ArgumentNullException("htmlHelper");
-            if (siteMap == null)
-                throw new ArgumentNullException("siteMap");
-
-            HtmlHelper = htmlHelper;
-            SiteMap = siteMap;
+            HtmlHelper = htmlHelper ?? throw new ArgumentNullException(nameof(htmlHelper));
+            SiteMap = siteMap ?? throw new ArgumentNullException(nameof(siteMap));
 
             if (useViewEngine) 
                 MvcSiteMapProviderViewEngine.Register();

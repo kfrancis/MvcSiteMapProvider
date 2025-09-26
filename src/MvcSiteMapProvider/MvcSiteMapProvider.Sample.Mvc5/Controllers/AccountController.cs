@@ -8,6 +8,7 @@ using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
 using MvcSiteMapProvider.Sample.Mvc5.Models;
+// ReSharper disable Mvc.ViewNotResolved
 
 namespace MvcSiteMapProvider.Sample.Mvc5.Controllers
 {

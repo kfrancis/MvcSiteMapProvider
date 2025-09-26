@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Web.Mvc;
 using System.Web.Mvc.Async;
 
@@ -14,9 +14,9 @@ namespace MvcSiteMapProvider.Web.Mvc
     {
         #region IControllerDescriptorFactory Members
 
-        public ControllerDescriptor Create(Type controllerType)
+        public ControllerDescriptor? Create(Type controllerType)
         {
-            ControllerDescriptor controllerDescriptor = null;
+            ControllerDescriptor? controllerDescriptor = null;
             if (typeof(IController).IsAssignableFrom(controllerType))
             {
                 controllerDescriptor = new ReflectedControllerDescriptor(controllerType);

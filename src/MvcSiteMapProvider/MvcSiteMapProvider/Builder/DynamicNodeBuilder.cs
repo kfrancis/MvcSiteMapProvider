@@ -15,13 +15,8 @@ namespace MvcSiteMapProvider.Builder
             ISiteMapNodeFactory siteMapNodeFactory
             )
         {
-            if (nodeKeyGenerator == null)
-                throw new ArgumentNullException("nodeKeyGenerator");
-            if (siteMapNodeFactory == null)
-                throw new ArgumentNullException("siteMapNodeFactory");
-
-            this.nodeKeyGenerator = nodeKeyGenerator;
-            this.siteMapNodeFactory = siteMapNodeFactory;
+            this.nodeKeyGenerator = nodeKeyGenerator ?? throw new ArgumentNullException(nameof(nodeKeyGenerator));
+            this.siteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
         }
 
         private readonly INodeKeyGenerator nodeKeyGenerator;
@@ -45,7 +40,7 @@ namespace MvcSiteMapProvider.Builder
             // Build dynamic nodes
             foreach (var dynamicNode in node.GetDynamicNodeCollection())
             {
-                string key = dynamicNode.Key;
+                var key = dynamicNode.Key;
                 if (string.IsNullOrEmpty(key))
                 {
                     key = nodeKeyGenerator.GenerateKey(

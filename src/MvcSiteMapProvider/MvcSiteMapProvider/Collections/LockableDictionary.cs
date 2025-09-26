@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace MvcSiteMapProvider.Collections
@@ -14,10 +14,7 @@ namespace MvcSiteMapProvider.Collections
             ISiteMap siteMap
             )
         {
-            if (siteMap == null)
-                throw new ArgumentNullException("siteMap");
-
-            this.siteMap = siteMap;
+            this.siteMap = siteMap ?? throw new ArgumentNullException(nameof(siteMap));
         }
 
         protected readonly ISiteMap siteMap;
@@ -52,10 +49,7 @@ namespace MvcSiteMapProvider.Collections
             base.Insert(key, value, add);
         }
 
-        public override bool IsReadOnly
-        {
-            get { return this.siteMap.IsReadOnly; }
-        }
+        public override bool IsReadOnly => this.siteMap.IsReadOnly;
 
         public override bool Remove(KeyValuePair<TKey, TValue> item)
         {
@@ -71,10 +65,7 @@ namespace MvcSiteMapProvider.Collections
 
         public override TValue this[TKey key]
         {
-            get
-            {
-                return base[key];
-            }
+            get => base[key];
             set
             {
                 this.ThrowIfReadOnly();
@@ -86,8 +77,11 @@ namespace MvcSiteMapProvider.Collections
         {
             foreach (var item in this.Dictionary)
             {
-                var keyIsPointer = item.Key.GetType().IsPointer;
-                var valueIsPointer = item.Value.GetType().IsPointer;
+                // Use null-forgiving to satisfy analyzer - reference types used as designed.
+                var keyType = item.Key!.GetType();
+                var valueType = item.Value!.GetType();
+                var keyIsPointer = keyType.IsPointer;
+                var valueIsPointer = valueType.IsPointer;
                 if (!keyIsPointer && !valueIsPointer)
                 {
                     destination.Add(new KeyValuePair<TKey, TValue>(item.Key, item.Value));

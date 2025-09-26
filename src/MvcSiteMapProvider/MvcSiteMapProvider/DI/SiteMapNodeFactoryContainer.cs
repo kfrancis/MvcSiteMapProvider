@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Builder;
+using MvcSiteMapProvider.Builder;
 using MvcSiteMapProvider.Caching;
 using MvcSiteMapProvider.Collections.Specialized;
 using MvcSiteMapProvider.Globalization;
@@ -43,7 +43,7 @@ namespace MvcSiteMapProvider.DI
             this.siteMapNodeVisibilityProviders = this.ResolveSiteMapNodeVisibilityProviders(settings.DefaultSiteMapNodeVisibiltyProvider);
         }
 
-        private readonly string absoluteFileName;
+        private readonly string? absoluteFileName; // Nullable: only assigned when EnableSiteMapFile is true
         private readonly ConfigurationSettings settings;
         private readonly IMvcContextFactory mvcContextFactory;
         private readonly IRequestCache requestCache;
@@ -160,7 +160,7 @@ namespace MvcSiteMapProvider.DI
             IList<string> result = new List<string>();
             if (this.settings.EnableSiteMapFile)
             {
-                var xmlSource = new FileXmlSource(this.absoluteFileName);
+                var xmlSource = new FileXmlSource(this.absoluteFileName!); // guarded by EnableSiteMapFile
                 result = xmlAggergator.GetAttributeValues(xmlSource, attributeName);
             }
             return result;
@@ -174,8 +174,8 @@ namespace MvcSiteMapProvider.DI
                 var assemblies = assemblyProvider.GetAssemblies();
                 var definitions = mvcSiteMapNodeAttributeProvider.GetMvcSiteMapNodeAttributeDefinitions(assemblies);
                 result.AddRange(definitions
-                    .Where(x => !string.IsNullOrEmpty(x.SiteMapNodeAttribute.DynamicNodeProvider))
-                    .Select(x => x.SiteMapNodeAttribute.DynamicNodeProvider)
+                    .Where(x => !string.IsNullOrEmpty(x.SiteMapNodeAttribute?.DynamicNodeProvider))
+                    .Select(x => x.SiteMapNodeAttribute!.DynamicNodeProvider)
                     );
             }
             return result;
@@ -189,8 +189,8 @@ namespace MvcSiteMapProvider.DI
                 var assemblies = assemblyProvider.GetAssemblies();
                 var definitions = mvcSiteMapNodeAttributeProvider.GetMvcSiteMapNodeAttributeDefinitions(assemblies);
                 result.AddRange(definitions
-                    .Where(x => !string.IsNullOrEmpty(x.SiteMapNodeAttribute.UrlResolver))
-                    .Select(x => x.SiteMapNodeAttribute.UrlResolver)
+                    .Where(x => !string.IsNullOrEmpty(x.SiteMapNodeAttribute?.UrlResolver))
+                    .Select(x => x.SiteMapNodeAttribute!.UrlResolver)
                     );
             }
             return result;
@@ -204,8 +204,8 @@ namespace MvcSiteMapProvider.DI
                 var assemblies = assemblyProvider.GetAssemblies();
                 var definitions = mvcSiteMapNodeAttributeProvider.GetMvcSiteMapNodeAttributeDefinitions(assemblies);
                 result.AddRange(definitions
-                    .Where(x => !string.IsNullOrEmpty(x.SiteMapNodeAttribute.VisibilityProvider))
-                    .Select(x => x.SiteMapNodeAttribute.VisibilityProvider)
+                    .Where(x => !string.IsNullOrEmpty(x.SiteMapNodeAttribute?.VisibilityProvider))
+                    .Select(x => x.SiteMapNodeAttribute!.VisibilityProvider)
                     );
             }
             return result;

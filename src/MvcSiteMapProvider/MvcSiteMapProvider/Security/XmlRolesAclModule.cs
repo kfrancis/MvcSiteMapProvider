@@ -14,10 +14,7 @@ namespace MvcSiteMapProvider.Security
             IMvcContextFactory mvcContextFactory
             )
         {
-            if (mvcContextFactory == null)
-                throw new ArgumentNullException("mvcContextFactory");
-
-            this.mvcContextFactory = mvcContextFactory;
+            this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
         }
 
         protected readonly IMvcContextFactory mvcContextFactory;

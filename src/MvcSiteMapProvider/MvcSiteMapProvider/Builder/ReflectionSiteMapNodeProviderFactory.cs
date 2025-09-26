@@ -16,18 +16,13 @@ namespace MvcSiteMapProvider.Builder
             IMvcSiteMapNodeAttributeDefinitionProvider attributeNodeDefinitionProvider
             )
         {
-            if (attributeAssemblyProviderFactory == null)
-                throw new ArgumentNullException("attributeAssemblyProviderFactory");
-            if (attributeNodeDefinitionProvider == null)
-                throw new ArgumentNullException("attributeNodeDefinitionProvider");
-
-            this.attributeAssemblyProviderFactory = attributeAssemblyProviderFactory;
-            this.attributeNodeDefinitionProvider = attributeNodeDefinitionProvider;
+            this.attributeAssemblyProviderFactory = attributeAssemblyProviderFactory ?? throw new ArgumentNullException(nameof(attributeAssemblyProviderFactory));
+            this.attributeNodeDefinitionProvider = attributeNodeDefinitionProvider ?? throw new ArgumentNullException(nameof(attributeNodeDefinitionProvider));
         }
         protected readonly IMvcSiteMapNodeAttributeDefinitionProvider attributeNodeDefinitionProvider;
         protected readonly IAttributeAssemblyProviderFactory attributeAssemblyProviderFactory;
 
-        public ReflectionSiteMapNodeProvider Create(IEnumerable<String> includeAssemblies, IEnumerable<String> excludeAssemblies)
+        public ReflectionSiteMapNodeProvider Create(IEnumerable<string> includeAssemblies, IEnumerable<string> excludeAssemblies)
         {
             return new ReflectionSiteMapNodeProvider(
                 includeAssemblies, 
@@ -36,7 +31,7 @@ namespace MvcSiteMapProvider.Builder
                 this.attributeNodeDefinitionProvider);
         }
 
-        public ReflectionSiteMapNodeProvider Create(IEnumerable<String> includeAssemblies)
+        public ReflectionSiteMapNodeProvider Create(IEnumerable<string> includeAssemblies)
         {
             return new ReflectionSiteMapNodeProvider(
                 includeAssemblies, 

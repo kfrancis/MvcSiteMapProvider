@@ -15,16 +15,9 @@ namespace MvcSiteMapProvider
             ISiteMapNodeVisibilityProviderStrategy siteMapNodeVisibilityProviderStrategy
             )
         {
-            if (dynamicNodeProviderStrategy == null)
-                throw new ArgumentNullException("dynamicNodeProviderStrategy");
-            if (siteMapNodeUrlResolverStrategy == null)
-                throw new ArgumentNullException("siteMapNodeUrlResolverStrategy");
-            if (siteMapNodeVisibilityProviderStrategy == null)
-                throw new ArgumentNullException("siteMapNodeVisibilityProviderStrategy");
-
-            this.dynamicNodeProviderStrategy = dynamicNodeProviderStrategy;
-            this.siteMapNodeUrlResolverStrategy = siteMapNodeUrlResolverStrategy;
-            this.siteMapNodeVisibilityProviderStrategy = siteMapNodeVisibilityProviderStrategy;
+            this.dynamicNodeProviderStrategy = dynamicNodeProviderStrategy ?? throw new ArgumentNullException(nameof(dynamicNodeProviderStrategy));
+            this.siteMapNodeUrlResolverStrategy = siteMapNodeUrlResolverStrategy ?? throw new ArgumentNullException(nameof(siteMapNodeUrlResolverStrategy));
+            this.siteMapNodeVisibilityProviderStrategy = siteMapNodeVisibilityProviderStrategy ?? throw new ArgumentNullException(nameof(siteMapNodeVisibilityProviderStrategy));
         }
 
         protected readonly IDynamicNodeProviderStrategy dynamicNodeProviderStrategy;
@@ -33,20 +26,11 @@ namespace MvcSiteMapProvider
 
         #region ISiteMapNodePluginService Members
 
-        public virtual IDynamicNodeProviderStrategy DynamicNodeProviderStrategy
-        {
-            get { return this.dynamicNodeProviderStrategy; }
-        }
+        public virtual IDynamicNodeProviderStrategy DynamicNodeProviderStrategy => this.dynamicNodeProviderStrategy;
 
-        public virtual ISiteMapNodeUrlResolverStrategy UrlResolverStrategy
-        {
-            get { return this.siteMapNodeUrlResolverStrategy; }
-        }
+        public virtual ISiteMapNodeUrlResolverStrategy UrlResolverStrategy => this.siteMapNodeUrlResolverStrategy;
 
-        public virtual ISiteMapNodeVisibilityProviderStrategy VisibilityProviderStrategy
-        {
-            get { return this.siteMapNodeVisibilityProviderStrategy; }
-        }
+        public virtual ISiteMapNodeVisibilityProviderStrategy VisibilityProviderStrategy => this.siteMapNodeVisibilityProviderStrategy;
 
         #endregion
     }

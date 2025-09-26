@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Globalization;
+using MvcSiteMapProvider.Globalization;
 using MvcSiteMapProvider.Web;
 using MvcSiteMapProvider.Web.Mvc;
 using System;
@@ -20,22 +20,11 @@ namespace MvcSiteMapProvider
             IMvcContextFactory mvcContextFactory
             ) 
         {
-            if (siteMapNodeChildStateFactory == null)
-                throw new ArgumentNullException("siteMapNodeChildStateFactory");
-            if (localizationServiceFactory == null)
-                throw new ArgumentNullException("localizationServiceFactory");
-            if (pluginProvider == null)
-                throw new ArgumentNullException("pluginProvider");
-            if (urlPath == null)
-                throw new ArgumentNullException("urlPath");
-            if (mvcContextFactory == null)
-                throw new ArgumentNullException("mvcContextFactory");
-
-            this.siteMapNodeChildStateFactory = siteMapNodeChildStateFactory;
-            this.localizationServiceFactory = localizationServiceFactory;
-            this.pluginProvider = pluginProvider;
-            this.urlPath = urlPath;
-            this.mvcContextFactory = mvcContextFactory;
+            this.siteMapNodeChildStateFactory = siteMapNodeChildStateFactory ?? throw new ArgumentNullException(nameof(siteMapNodeChildStateFactory));
+            this.localizationServiceFactory = localizationServiceFactory ?? throw new ArgumentNullException(nameof(localizationServiceFactory));
+            this.pluginProvider = pluginProvider ?? throw new ArgumentNullException(nameof(pluginProvider));
+            this.urlPath = urlPath ?? throw new ArgumentNullException(nameof(urlPath));
+            this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
         }
 
         // Services
@@ -48,7 +37,7 @@ namespace MvcSiteMapProvider
 
         #region ISiteMapNodeFactory Members
 
-        public ISiteMapNode Create(ISiteMap siteMap, string key, string implicitResourceKey)
+        public ISiteMapNode Create(ISiteMap siteMap, string key, string? implicitResourceKey)
         {
             return CreateInternal(siteMap, key, implicitResourceKey, false);
         }
@@ -58,10 +47,10 @@ namespace MvcSiteMapProvider
             return CreateInternal(siteMap, key, implicitResourceKey, true);
         }
 
-        protected ISiteMapNode CreateInternal(ISiteMap siteMap, string key, string implicitResourceKey, bool isDynamic)
+        protected ISiteMapNode CreateInternal(ISiteMap siteMap, string key, string? implicitResourceKey, bool isDynamic)
         {
             // IMPORTANT: we must create one localization service per node because the service contains its own state that applies to the node
-            var localizationService = localizationServiceFactory.Create(implicitResourceKey);
+            var localizationService = localizationServiceFactory.Create(implicitResourceKey ?? string.Empty);
 
             return new RequestCacheableSiteMapNode(
                 siteMap,

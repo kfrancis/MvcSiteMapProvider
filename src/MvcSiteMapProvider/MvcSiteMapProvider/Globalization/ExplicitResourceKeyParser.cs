@@ -24,8 +24,8 @@ namespace MvcSiteMapProvider.Globalization
                 {
                     resourceString = trimmedText.Substring(11);
                     var index = resourceString.IndexOf(',');
-                    string resourceLocation = resourceString.Substring(0, index);
-                    string resourceName = resourceString.Substring(index + 1);
+                    var resourceLocation = resourceString.Substring(0, index);
+                    var resourceName = resourceString.Substring(index + 1);
                     var length = resourceName.IndexOf(',');
                     if (length != -1)
                     {

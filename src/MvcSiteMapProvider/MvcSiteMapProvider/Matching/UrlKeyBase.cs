@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Web;
+using MvcSiteMapProvider.Web;
 using System;
 
 namespace MvcSiteMapProvider.Matching
@@ -13,25 +13,24 @@ namespace MvcSiteMapProvider.Matching
                 IUrlPath urlPath
             )
         {
-            if (urlPath == null)
-                throw new ArgumentNullException("urlPath");
-
-            this.urlPath = urlPath;
+            this.urlPath = urlPath ?? throw new ArgumentNullException(nameof(urlPath));
+            this.hostName = string.Empty;
+            this.rootRelativeUrl = string.Empty;
         }
 
         protected IUrlPath urlPath;
         protected string hostName;
         protected string rootRelativeUrl;
 
-        public virtual string HostName { get { return this.hostName; } }
+        public virtual string HostName => this.hostName;
 
-        public virtual string RootRelativeUrl { get { return this.rootRelativeUrl; } }
+        public virtual string RootRelativeUrl => this.rootRelativeUrl;
 
         protected virtual void SetUrlValues(string relativeOrAbsoluteUrl)
         {
             if (this.urlPath.IsAbsolutePhysicalPath(relativeOrAbsoluteUrl) || this.urlPath.IsAppRelativePath(relativeOrAbsoluteUrl))
             {
-                this.rootRelativeUrl = this.urlPath.ResolveVirtualApplicationToRootRelativeUrl(relativeOrAbsoluteUrl);
+                this.rootRelativeUrl = this.urlPath.ResolveVirtualApplicationToRootRelativeUrl(relativeOrAbsoluteUrl) ?? string.Empty;
             }
             else if (this.urlPath.IsAbsoluteUrl(relativeOrAbsoluteUrl))
             {
@@ -45,7 +44,7 @@ namespace MvcSiteMapProvider.Matching
             else
             {
                 // We must assume we already have a relative root URL
-                this.rootRelativeUrl = relativeOrAbsoluteUrl;
+                this.rootRelativeUrl = relativeOrAbsoluteUrl ?? string.Empty;
             }
         }
 
@@ -54,7 +53,7 @@ namespace MvcSiteMapProvider.Matching
         {
             unchecked
             {
-                int hashCode = 0;
+                var hashCode = 0;
 
                 // String properties
                 hashCode = (hashCode * 397) ^ (this.HostName != null ? this.HostName.GetHashCode() : string.Empty.GetHashCode());
@@ -69,12 +68,7 @@ namespace MvcSiteMapProvider.Matching
 
         public override bool Equals(object obj)
         {
-            if (this == null)
-            {
-                return false;
-            }
-            IUrlKey objB = obj as IUrlKey;
-            if (objB == null)
+            if (obj is not IUrlKey objB)
             {
                 return false;
             }

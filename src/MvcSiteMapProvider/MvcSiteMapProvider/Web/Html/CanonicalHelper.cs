@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Collections.Specialized;
+using MvcSiteMapProvider.Collections.Specialized;
 using MvcSiteMapProvider.Web.Html.Models;
 using System.Collections.Generic;
 using System.Web.Mvc;
@@ -96,11 +96,11 @@ namespace MvcSiteMapProvider.Web.Html
         }
 
         /// <summary>
-        /// Gets the source meta data for the current context.
+        /// Gets the source metadata for the current context.
         /// </summary>
         /// <param name="sourceMetadata">User-defined metadata.</param>
         /// <returns>SourceMetadataDictionary for the current request.</returns>
-        private static SourceMetadataDictionary GetSourceMetadata(IDictionary<string, object> sourceMetadata)
+        private static SourceMetadataDictionary GetSourceMetadata(IDictionary<string, object?> sourceMetadata)
         {
             var result = new SourceMetadataDictionary(sourceMetadata);
             result.Add("HtmlHelper", typeof(CanonicalHelper).FullName);

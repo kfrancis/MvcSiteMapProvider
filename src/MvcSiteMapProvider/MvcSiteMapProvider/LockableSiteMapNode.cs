@@ -40,7 +40,7 @@ namespace MvcSiteMapProvider
         /// </summary>
         public override int Order 
         {
-            get { return base.Order; }
+            get => base.Order;
             set
             {
                 this.ThrowIfReadOnly("Order");
@@ -56,7 +56,7 @@ namespace MvcSiteMapProvider
         /// </value>
         public override string HttpMethod
         {
-            get { return base.HttpMethod; }
+            get => base.HttpMethod;
             set
             {
                 this.ThrowIfReadOnly("HttpMethod");
@@ -70,7 +70,7 @@ namespace MvcSiteMapProvider
         /// <value>The title.</value>
         public override string Title
         {
-            get { return base.Title; }
+            get => base.Title;
             set
             {
                 this.ThrowIfReadOnly("Title");
@@ -84,7 +84,7 @@ namespace MvcSiteMapProvider
         /// <value>The description.</value>
         public override string Description
         {
-            get { return base.Description; }
+            get => base.Description;
             set
             {
                 this.ThrowIfReadOnly("Description");
@@ -98,7 +98,7 @@ namespace MvcSiteMapProvider
         /// <value>The target frame.</value>
         public override string TargetFrame
         {
-            get { return base.TargetFrame; }
+            get => base.TargetFrame;
             set
             {
                 this.ThrowIfReadOnly("TargetFrame");
@@ -112,7 +112,7 @@ namespace MvcSiteMapProvider
         /// <value>The image URL.</value>
         public override string ImageUrl
         {
-            get { return base.ImageUrl; }
+            get => base.ImageUrl;
             set
             {
                 this.ThrowIfReadOnly("ImageUrl");
@@ -127,7 +127,7 @@ namespace MvcSiteMapProvider
         /// <value>The protocol of the image URL.</value>
         public override string ImageUrlProtocol 
         {
-            get { return base.ImageUrlProtocol; }
+            get => base.ImageUrlProtocol;
             set
             {
                 this.ThrowIfReadOnly("ImageUrlProtocol");
@@ -141,7 +141,7 @@ namespace MvcSiteMapProvider
         /// <value>The protocol of the image URL.</value>
         public override string ImageUrlHostName 
         {
-            get { return base.ImageUrlHostName; }
+            get => base.ImageUrlHostName;
             set
             {
                 this.ThrowIfReadOnly("ImageUrlHostName");
@@ -155,7 +155,7 @@ namespace MvcSiteMapProvider
         /// <value>The last modified date.</value>
         public override DateTime LastModifiedDate
         {
-            get { return base.LastModifiedDate; }
+            get => base.LastModifiedDate;
             set
             {
                 this.ThrowIfReadOnly("LastModifiedDate");
@@ -169,7 +169,7 @@ namespace MvcSiteMapProvider
         /// <value>The change frequency.</value>
         public override ChangeFrequency ChangeFrequency
         {
-            get { return base.ChangeFrequency; }
+            get => base.ChangeFrequency;
             set
             {
                 this.ThrowIfReadOnly("ChangeFrequency");
@@ -183,7 +183,7 @@ namespace MvcSiteMapProvider
         /// <value>The update priority.</value>
         public override UpdatePriority UpdatePriority
         {
-            get { return base.UpdatePriority; }
+            get => base.UpdatePriority;
             set
             {
                 this.ThrowIfReadOnly("UpdatePriority");
@@ -204,7 +204,7 @@ namespace MvcSiteMapProvider
         /// </value>
         public override string VisibilityProvider
         {
-            get { return base.VisibilityProvider; }
+            get => base.VisibilityProvider;
             set
             {
                 this.ThrowIfReadOnly("VisibilityProvider");
@@ -224,7 +224,7 @@ namespace MvcSiteMapProvider
         /// </value>
         public override string DynamicNodeProvider
         {
-            get { return base.DynamicNodeProvider; }
+            get => base.DynamicNodeProvider;
             set
             {
                 this.ThrowIfReadOnly("DynamicNodeProvider");
@@ -244,7 +244,7 @@ namespace MvcSiteMapProvider
         /// </value>
         public override bool Clickable
         {
-            get { return base.Clickable; }
+            get => base.Clickable;
             set
             {
                 this.ThrowIfReadOnly("Clickable");
@@ -260,7 +260,7 @@ namespace MvcSiteMapProvider
         /// </value>
         public override string UrlResolver
         {
-            get { return base.UrlResolver; }
+            get => base.UrlResolver;
             set
             {
                 this.ThrowIfReadOnly("UrlResolver");
@@ -276,7 +276,7 @@ namespace MvcSiteMapProvider
         /// </value>
         public override string Url
         {
-            get { return base.Url; }
+            get => base.Url;
             set
             {
                 this.ThrowIfReadOnly("Url");
@@ -290,7 +290,7 @@ namespace MvcSiteMapProvider
         /// </summary>
         public override bool CacheResolvedUrl 
         {
-            get { return base.CacheResolvedUrl; }
+            get => base.CacheResolvedUrl;
             set
             {
                 this.ThrowIfReadOnly("CacheResolvedUrl");
@@ -305,7 +305,7 @@ namespace MvcSiteMapProvider
         /// <value><b>true</b> to include ambient values (like MVC does); otherwise <b>false</b>.</value>
         public override bool IncludeAmbientValuesInUrl
         {
-            get { return base.IncludeAmbientValuesInUrl; }
+            get => base.IncludeAmbientValuesInUrl;
             set
             {
                 this.ThrowIfReadOnly("IncludeAmbientValuesInUrl");
@@ -320,7 +320,7 @@ namespace MvcSiteMapProvider
         /// <value>The protocol.</value>
         public override string Protocol
         {
-            get { return base.Protocol; }
+            get => base.Protocol;
             set
             {
                 this.ThrowIfReadOnly("Protocol");
@@ -334,7 +334,7 @@ namespace MvcSiteMapProvider
         /// <value>The host name.</value>
         public override string HostName
         {
-            get { return base.HostName; }
+            get => base.HostName;
             set
             {
                 this.ThrowIfReadOnly("HostName");
@@ -361,7 +361,7 @@ namespace MvcSiteMapProvider
         /// <remarks>May not be used in conjunction with CanonicalUrl; only 1 canonical value is allowed.</remarks>
         public override string CanonicalKey
         {
-            get { return base.CanonicalKey; }
+            get => base.CanonicalKey;
             set
             {
                 this.ThrowIfReadOnly("CanonicalKey");
@@ -375,7 +375,7 @@ namespace MvcSiteMapProvider
         /// <remarks>May not be used in conjunction with CanonicalKey; only 1 canonical value is allowed.</remarks>
         public override string CanonicalUrl
         {
-            get { return base.CanonicalUrl; }
+            get => base.CanonicalUrl;
             set
             {
                 this.ThrowIfReadOnly("CanonicalUrl");
@@ -389,7 +389,7 @@ namespace MvcSiteMapProvider
         /// <value>The protocol of the image URL.</value>
         public override string CanonicalUrlProtocol 
         {
-            get { return base.CanonicalUrlProtocol; }
+            get => base.CanonicalUrlProtocol;
             set
             {
                 this.ThrowIfReadOnly("CanonicalUrlProtocol");
@@ -403,7 +403,7 @@ namespace MvcSiteMapProvider
         /// <value>The protocol of the image URL.</value>
         public override string CanonicalUrlHostName 
         {
-            get { return base.CanonicalUrlHostName; }
+            get => base.CanonicalUrlHostName;
             set
             {
                 this.ThrowIfReadOnly("CanonicalUrlHostName");
@@ -421,7 +421,7 @@ namespace MvcSiteMapProvider
         /// <value>The route.</value>
         public override string Route
         {
-            get { return base.Route; }
+            get => base.Route;
             set
             {
                 this.ThrowIfReadOnly("Route");
@@ -439,7 +439,7 @@ namespace MvcSiteMapProvider
         /// <value>The area.</value>
         public override string Area
         {
-            get { return base.Area; }
+            get => base.Area;
             set
             {
                 this.ThrowIfReadOnly("Area");
@@ -453,7 +453,7 @@ namespace MvcSiteMapProvider
         /// <value>The controller.</value>
         public override string Controller
         {
-            get { return base.Controller; }
+            get => base.Controller;
             set
             {
                 this.ThrowIfReadOnly("Controller");
@@ -467,7 +467,7 @@ namespace MvcSiteMapProvider
         /// <value>The action.</value>
         public override string Action
         {
-            get { return base.Action; }
+            get => base.Action;
             set
             {
                 this.ThrowIfReadOnly("Action");

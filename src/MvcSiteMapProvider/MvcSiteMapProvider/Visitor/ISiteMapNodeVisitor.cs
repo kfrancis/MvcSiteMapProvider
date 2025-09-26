@@ -5,6 +5,6 @@
     /// </summary>
     public interface ISiteMapNodeVisitor
     {
-        void Execute(ISiteMapNode node);
+        void Execute(ISiteMapNode? node);
     }
 }

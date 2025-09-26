@@ -24,22 +24,11 @@ namespace MvcSiteMapProvider.Builder
             ICultureContextFactory cultureContextFactory
             )
         {
-            if (siteMapNodeProvider == null)
-                throw new ArgumentNullException("siteMapNodeProvider");
-            if (siteMapNodeVisitor == null)
-                throw new ArgumentNullException("siteMapNodeVisitor");
-            if (siteMapHierarchyBuilder == null)
-                throw new ArgumentNullException("siteMapHierarchyBuilder");
-            if (siteMapNodeHelperFactory == null)
-                throw new ArgumentNullException("siteMapNodeHelperFactory");
-            if (cultureContextFactory == null)
-                throw new ArgumentNullException("cultureContextFactory");
-
-            this.siteMapNodeProvider = siteMapNodeProvider;
-            this.siteMapHierarchyBuilder = siteMapHierarchyBuilder;
-            this.siteMapNodeHelperFactory = siteMapNodeHelperFactory;
-            this.siteMapNodeVisitor = siteMapNodeVisitor;
-            this.cultureContextFactory = cultureContextFactory;
+            this.siteMapNodeProvider = siteMapNodeProvider ?? throw new ArgumentNullException(nameof(siteMapNodeProvider));
+            this.siteMapHierarchyBuilder = siteMapHierarchyBuilder ?? throw new ArgumentNullException(nameof(siteMapHierarchyBuilder));
+            this.siteMapNodeHelperFactory = siteMapNodeHelperFactory ?? throw new ArgumentNullException(nameof(siteMapNodeHelperFactory));
+            this.siteMapNodeVisitor = siteMapNodeVisitor ?? throw new ArgumentNullException(nameof(siteMapNodeVisitor));
+            this.cultureContextFactory = cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
         }
         protected readonly ISiteMapNodeProvider siteMapNodeProvider;
         protected readonly ISiteMapHierarchyBuilder siteMapHierarchyBuilder;
@@ -49,7 +38,7 @@ namespace MvcSiteMapProvider.Builder
 
         #region ISiteMapBuilder Members
 
-        public ISiteMapNode BuildSiteMap(ISiteMap siteMap, ISiteMapNode rootNode)
+        public ISiteMapNode? BuildSiteMap(ISiteMap siteMap, ISiteMapNode? rootNode)
         {
             // Load the source nodes
             var sourceNodes = new List<ISiteMapNodeToParentRelation>();
@@ -64,7 +53,7 @@ namespace MvcSiteMapProvider.Builder
 
             var orphans = this.siteMapHierarchyBuilder.BuildHierarchy(siteMap, sourceNodes);
 
-            if (orphans.Count() > 0)
+            if (orphans.Any())
             {
                 // We have orphaned nodes - filter to remove the matching descendants of the mismatched keys.
                 var mismatched = from parent in orphans
@@ -99,9 +88,9 @@ namespace MvcSiteMapProvider.Builder
             }
         }
 
-        protected virtual ISiteMapNode GetRootNode(ISiteMap siteMap, IList<ISiteMapNodeToParentRelation> sourceNodes)
+        protected virtual ISiteMapNode? GetRootNode(ISiteMap siteMap, IList<ISiteMapNodeToParentRelation> sourceNodes)
         {
-            var rootNodes = sourceNodes.Where(x => string.IsNullOrEmpty(x.ParentKey) || x.ParentKey.Trim() == string.Empty);
+            var rootNodes = sourceNodes.Where(x => string.IsNullOrEmpty(x.ParentKey) || x.ParentKey?.Trim() == string.Empty);
 
             // Check if we have more than one root node defined or no root defined
             if (rootNodes.Count() > 1)
@@ -111,7 +100,7 @@ namespace MvcSiteMapProvider.Builder
                     x.Node.Action, x.Node.Area, x.Node.Url, x.Node.Key, x.SourceName)).ToArray());
                 throw new MvcSiteMapException(string.Format(Resources.Messages.SiteMapBuilderRootKeyAmbiguous, siteMap.CacheKey, names));
             }
-            else if (rootNodes.Count() == 0)
+            else if (!rootNodes.Any())
             {
                 throw new MvcSiteMapException(string.Format(Resources.Messages.SiteMapBuilderRootNodeNotDefined, siteMap.CacheKey));
             }
@@ -124,16 +113,16 @@ namespace MvcSiteMapProvider.Builder
             return root.Node;
         }
 
-        protected virtual void VisitNodes(ISiteMapNode node)
+        protected virtual void VisitNodes(ISiteMapNode? node)
         {
             this.siteMapNodeVisitor.Execute(node);
 
-            if (node.HasChildNodes)
+            if (node is not { HasChildNodes: true })
+                return;
+
+            foreach (var childNode in node.ChildNodes)
             {
-                foreach (var childNode in node.ChildNodes)
-                {
-                    VisitNodes(childNode);
-                }
+                VisitNodes(childNode);
             }
         }
     }

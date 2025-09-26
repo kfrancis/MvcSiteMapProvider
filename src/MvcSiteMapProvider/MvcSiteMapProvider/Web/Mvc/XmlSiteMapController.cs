@@ -16,9 +16,7 @@ namespace MvcSiteMapProvider.Web.Mvc
             IXmlSiteMapResultFactory xmlSiteMapResultFactory
             )
         {
-            if (xmlSiteMapResultFactory == null)
-                throw new ArgumentNullException("xmlSiteMapResultFactory");
-            this.xmlSiteMapResultFactory = xmlSiteMapResultFactory;
+            this.xmlSiteMapResultFactory = xmlSiteMapResultFactory ?? throw new ArgumentNullException(nameof(xmlSiteMapResultFactory));
         }
 
         private readonly IXmlSiteMapResultFactory xmlSiteMapResultFactory;
@@ -39,7 +37,7 @@ namespace MvcSiteMapProvider.Web.Mvc
         /// <param name="routeCollection">The route collection.</param>
         public static void RegisterRoutes(RouteCollection routeCollection)
         {
-            List<RouteBase> routes = new List<RouteBase> {
+            var routes = new List<RouteBase> {
                 new Route("sitemap.xml",
                     new RouteValueDictionary(
                         new { controller = "XmlSiteMap", action = "Index", page = 0 }),

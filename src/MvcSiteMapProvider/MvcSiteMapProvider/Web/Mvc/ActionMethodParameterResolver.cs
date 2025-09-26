@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Collections;
+using MvcSiteMapProvider.Collections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +21,7 @@ namespace MvcSiteMapProvider.Web.Mvc
             IControllerDescriptorFactory controllerDescriptorFactory
             )
         {
-            if (controllerDescriptorFactory == null)
-                throw new ArgumentNullException("controllerDescriptorFactory");
-
-            this.controllerDescriptorFactory = controllerDescriptorFactory;
+            this.controllerDescriptorFactory = controllerDescriptorFactory ?? throw new ArgumentNullException(nameof(controllerDescriptorFactory));
 
             Cache = new ThreadSafeDictionary<string, IEnumerable<string>>();
         }
@@ -54,14 +51,14 @@ namespace MvcSiteMapProvider.Web.Mvc
                                                                 string actionMethodName)
         {
             // Is the request cached?
-            string cacheKey = areaName + "_" + controllerName + "_" + actionMethodName;
-            if (Cache.ContainsKey(cacheKey))
+            var cacheKey = areaName + "_" + controllerName + "_" + actionMethodName;
+            if (Cache.TryGetValue(cacheKey, out var parameters))
             {
-                return Cache[cacheKey];
+                return parameters;
             }
 
             // Get controller type
-            Type controllerType = controllerTypeResolver.ResolveControllerType(areaName, controllerName);
+            var controllerType = controllerTypeResolver.ResolveControllerType(areaName, controllerName);
 
             // Get action method information
             var actionParameters = new List<string>();
@@ -69,12 +66,12 @@ namespace MvcSiteMapProvider.Web.Mvc
             {
                 var controllerDescriptor = controllerDescriptorFactory.Create(controllerType);
 
-                ActionDescriptor[] actionDescriptors = controllerDescriptor.GetCanonicalActions()
+                var actionDescriptors = controllerDescriptor?.GetCanonicalActions()
                     .Where(a => a.ActionName == actionMethodName).ToArray();
 
-                if (actionDescriptors != null && actionDescriptors.Length > 0)
+                if (actionDescriptors is { Length: > 0 })
                 {
-                    foreach (ActionDescriptor actionDescriptor in actionDescriptors)
+                    foreach (var actionDescriptor in actionDescriptors)
                     {
                         actionParameters.AddRange(actionDescriptor.GetParameters().Select(p => p.ParameterName));
                     }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -22,10 +22,10 @@ namespace MvcSiteMapProvider
         /// <returns>
         /// 	<c>true</c> if the specified node is visible; otherwise, <c>false</c>.
         /// </returns>
-        public override bool IsVisible(ISiteMapNode node, IDictionary<string, object> sourceMetadata)
+        public override bool IsVisible(ISiteMapNode node, IDictionary<string, object?> sourceMetadata)
         {
             // Is a visibility attribute specified?
-            string visibility = string.Empty;
+            var visibility = string.Empty;
             if (node.Attributes.ContainsKey("visibility"))
             {
                 visibility = node.Attributes["visibility"].GetType().Equals(typeof(string)) ? node.Attributes["visibility"].ToString() : string.Empty;
@@ -36,15 +36,15 @@ namespace MvcSiteMapProvider
             }
             visibility = visibility.Trim();
 
-            string name = string.Empty;
-            string htmlHelper = string.Empty;
-            if (sourceMetadata.ContainsKey("name"))
+            var name = string.Empty;
+            var htmlHelper = string.Empty;
+            if (sourceMetadata.TryGetValue("name", out var value))
             {
-                name = Convert.ToString(sourceMetadata["name"]);
+                name = Convert.ToString(value);
             }
-            if (sourceMetadata.ContainsKey("HtmlHelper"))
+            if (sourceMetadata.TryGetValue("HtmlHelper", out var value1))
             {
-                htmlHelper = Convert.ToString(sourceMetadata["HtmlHelper"]);
+                htmlHelper = Convert.ToString(value1);
             }
 
             // Check for the source HtmlHelper or given name. If neither are configured,
@@ -58,11 +58,11 @@ namespace MvcSiteMapProvider
             htmlHelper = htmlHelper.Substring(htmlHelper.LastIndexOf(".") + 1);
 
             // Get the keywords and trim any white-spaces
-            var visibilityKeywords = visibility.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+            var visibilityKeywords = visibility.Split([',', ';'], StringSplitOptions.RemoveEmptyEntries)
                 .Select(k => k.Trim()).ToList();
 
             // All set. Now parse the visibility variable.
-            foreach (string visibilityKeyword in visibilityKeywords)
+            foreach (var visibilityKeyword in visibilityKeywords)
             {
                 if (visibilityKeyword == htmlHelper || visibilityKeyword == name || visibilityKeyword == "*")
                 {

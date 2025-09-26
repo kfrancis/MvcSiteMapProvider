@@ -14,10 +14,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
             ISiteMapNodeCollection siteMapNodeCollection
             )
         {
-            if (siteMapNodeCollection == null)
-                throw new ArgumentNullException("siteMapNodeCollection");
-
-            this.siteMapNodeCollection = siteMapNodeCollection;
+            this.siteMapNodeCollection = siteMapNodeCollection ?? throw new ArgumentNullException(nameof(siteMapNodeCollection));
         }
 
         private readonly ISiteMapNodeCollection siteMapNodeCollection;
@@ -55,14 +52,8 @@ namespace MvcSiteMapProvider.Collections.Specialized
 
         public ISiteMapNode this[int index]
         {
-            get
-            {
-                return this.siteMapNodeCollection[index];
-            }
-            set
-            {
-                throw new NotSupportedException(Resources.Messages.CollectionReadOnly);
-            }
+            get => this.siteMapNodeCollection[index];
+            set => throw new NotSupportedException(Resources.Messages.CollectionReadOnly);
         }
 
         #endregion
@@ -89,15 +80,9 @@ namespace MvcSiteMapProvider.Collections.Specialized
             this.siteMapNodeCollection.CopyTo(array, arrayIndex);
         }
 
-        public int Count
-        {
-            get { return this.siteMapNodeCollection.Count; }
-        }
+        public int Count => this.siteMapNodeCollection.Count;
 
-        public bool IsReadOnly
-        {
-            get { return true; }
-        }
+        public bool IsReadOnly => true;
 
         public bool Remove(ISiteMapNode item)
         {

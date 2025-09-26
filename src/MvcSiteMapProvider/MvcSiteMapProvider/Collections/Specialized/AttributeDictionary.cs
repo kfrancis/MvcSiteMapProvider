@@ -30,21 +30,15 @@ namespace MvcSiteMapProvider.Collections.Specialized
             : base(siteMap, cache)
         {
             if (string.IsNullOrEmpty(siteMapNodeKey))
-                throw new ArgumentNullException("siteMapNodeKey");
+                throw new ArgumentNullException(nameof(siteMapNodeKey));
             if (string.IsNullOrEmpty(memberName))
-                throw new ArgumentNullException("memberName");
-            if (localizationService == null)
-                throw new ArgumentNullException("localizationService");
-            if (reservedAttributeNameProvider == null)
-                throw new ArgumentNullException("reservedAttributeNameProvider");
-            if (jsonToDictionaryDeserializer == null)
-                throw new ArgumentNullException("jsonToDictionaryDeserializer");
+                throw new ArgumentNullException(nameof(memberName));
 
             this.siteMapNodeKey = siteMapNodeKey;
             this.memberName = memberName;
-            this.localizationService = localizationService;
-            this.reservedAttributeNameProvider = reservedAttributeNameProvider;
-            this.jsonToDictionaryDeserializer = jsonToDictionaryDeserializer;
+            this.localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+            this.reservedAttributeNameProvider = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
+            this.jsonToDictionaryDeserializer = jsonToDictionaryDeserializer ?? throw new ArgumentNullException(nameof(jsonToDictionaryDeserializer));
         }
 
         protected readonly string siteMapNodeKey;
@@ -171,7 +165,7 @@ namespace MvcSiteMapProvider.Collections.Specialized
         /// <param name="throwIfReservedKey"><c>true</c> to throw an exception if one of the keys being added is a reserved key name; otherwise, <c>false</c>.</param>
         public void AddRange(XElement xmlNode, bool throwIfReservedKey)
         {
-            foreach (XAttribute attribute in xmlNode.Attributes())
+            foreach (var attribute in xmlNode.Attributes())
             {
                 this.Add(attribute.Name.ToString(), attribute.Value, throwIfReservedKey);
             }

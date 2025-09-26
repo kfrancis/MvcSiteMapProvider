@@ -12,29 +12,29 @@ namespace MvcSiteMapProvider.Caching
     public sealed class LazyLock
     {
         private volatile bool got;
-        private object value;
+        private object? value;
 
-        public TValue Get<TValue>(Func<TValue> activator)
+        public TValue? Get<TValue>(Func<TValue>? activator)
         {
-            if (!got)
+            if (got && value is TValue tValue)
+                return tValue;
+
+            if (activator == null)
             {
-                if (activator == null)
-                {
-                    return default(TValue);
-                }
-
-                lock (this)
-                {
-                    if (!got)
-                    {
-                        value = activator();
-
-                        got = true;
-                    }
-                }
+                return default;
             }
 
-            return (TValue)value;
+            lock (this)
+            {
+                if (got)
+                    return (TValue)value!;
+
+                value = activator();
+
+                got = true;
+            }
+
+            return (TValue)value!;
         }
     }
 }

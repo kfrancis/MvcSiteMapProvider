@@ -18,12 +18,8 @@ namespace MvcSiteMapProvider.DI
             ConfigurationSettings settings
             )
         {
-            if (dependencyResolver == null)
-                throw new ArgumentNullException("dependencyResolver");
-            if (settings == null)
-                throw new ArgumentNullException("settings");
-            this.innerDependencyResolver = dependencyResolver;
-            this.settings = settings;
+            this.innerDependencyResolver = dependencyResolver ?? throw new ArgumentNullException(nameof(dependencyResolver));
+            this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         }
 
         private readonly IDependencyResolver innerDependencyResolver;

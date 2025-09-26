@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Collections.Specialized;
+using MvcSiteMapProvider.Collections.Specialized;
 using MvcSiteMapProvider.Web.Html.Models;
 using System;
 using System.Collections.Generic;
@@ -373,7 +373,7 @@ namespace MvcSiteMapProvider.Web.Html
             if (node.IsAccessibleToUser())
             {
                 // Add node?
-                var nodeToAdd = new SiteMapNodeModel(node, sourceMetadata, Int32.MaxValue, false, startingNodeInChildLevel, visibilityAffectsDescendants);
+                var nodeToAdd = new SiteMapNodeModel(node, sourceMetadata, int.MaxValue, false, startingNodeInChildLevel, visibilityAffectsDescendants);
 
                 // Check visibility
                 if (node.IsVisible(sourceMetadata))
@@ -401,7 +401,7 @@ namespace MvcSiteMapProvider.Web.Html
         /// </summary>
         /// <param name="sourceMetadata">User-defined metadata.</param>
         /// <returns>SourceMetadataDictionary for the current request.</returns>
-        private static SourceMetadataDictionary GetSourceMetadata(IDictionary<string, object> sourceMetadata)
+        private static SourceMetadataDictionary GetSourceMetadata(SourceMetadataDictionary sourceMetadata)
         {
             var result = new SourceMetadataDictionary(sourceMetadata);
             result.Add("HtmlHelper", typeof(SiteMapHelper).FullName);

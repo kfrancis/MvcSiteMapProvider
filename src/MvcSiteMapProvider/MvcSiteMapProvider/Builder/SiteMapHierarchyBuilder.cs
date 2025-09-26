@@ -46,11 +46,10 @@ namespace MvcSiteMapProvider.Builder
 
         #endregion
         
-        protected virtual void AddDescendantNodes(
-            ISiteMap siteMap,
+        protected virtual void AddDescendantNodes(ISiteMap siteMap,
             ISiteMapNode currentNode,
             IList<ISiteMapNodeToParentRelation> sourceNodes,
-            ILookup<string, ISiteMapNodeToParentRelation> sourceNodesByParent,
+            ILookup<string?, ISiteMapNodeToParentRelation> sourceNodesByParent,
             HashSet<string> nodesAlreadyAdded)
         {
             if (sourceNodes.Count == 0)

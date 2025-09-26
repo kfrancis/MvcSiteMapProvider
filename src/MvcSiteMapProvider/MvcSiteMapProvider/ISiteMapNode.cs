@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Collections.Specialized;
+using MvcSiteMapProvider.Collections.Specialized;
 using System;
 using System.Collections.Generic;
 using System.Web;
@@ -17,14 +17,14 @@ namespace MvcSiteMapProvider
         bool IsDynamic { get; }
         bool IsReadOnly { get; }
 
-        ISiteMapNode ParentNode { get; }
+        ISiteMapNode? ParentNode { get; }
         ISiteMapNodeCollection ChildNodes { get; }
         ISiteMapNodeCollection Descendants { get; }
         ISiteMapNodeCollection Ancestors { get; }
         bool IsDescendantOf(ISiteMapNode node);
-        ISiteMapNode NextSibling { get; }
-        ISiteMapNode PreviousSibling { get; }
-        ISiteMapNode RootNode { get; }
+        ISiteMapNode? NextSibling { get; }
+        ISiteMapNode? PreviousSibling { get; }
+        ISiteMapNode? RootNode { get; }
         bool IsInCurrentPath();
         bool HasChildNodes { get; }
         int GetNodeLevel();
@@ -48,7 +48,7 @@ namespace MvcSiteMapProvider
         UpdatePriority UpdatePriority { get; set; }
 
         string VisibilityProvider { get; set; }
-        bool IsVisible(IDictionary<string, object> sourceMetadata);
+        bool IsVisible(IDictionary<string, object?> sourceMetadata);
 
         string DynamicNodeProvider { get; set; }
         IEnumerable<DynamicNode> GetDynamicNodeCollection();

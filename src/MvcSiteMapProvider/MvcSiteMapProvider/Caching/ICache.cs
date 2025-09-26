@@ -5,7 +5,7 @@
     /// </summary>
     public interface ICache
     {
-        T GetValue<T>(string key);
+        T? GetValue<T>(string key);
         void SetValue<T>(string key, T value);
     }
 }

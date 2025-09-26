@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace MvcSiteMapProvider
 {
@@ -18,13 +18,13 @@ namespace MvcSiteMapProvider
             result = default(TEnum);
             return false;
 #else
-            return Enum.TryParse<TEnum>(value, ignoreCase, out result);
+            return Enum.TryParse(value, ignoreCase, out result);
 #endif
         }
 
         public static bool TryParse<TEnum>(string value, out TEnum result) where TEnum : struct
         {
-            return EnumHelper.TryParse<TEnum>(value, false, out result);
+            return EnumHelper.TryParse(value, false, out result);
         }
     }
 }

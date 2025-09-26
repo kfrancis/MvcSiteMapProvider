@@ -14,10 +14,7 @@ namespace MvcSiteMapProvider.Builder
             ISiteMapXmlNameProvider xmlNameProvider
             )
         {
-            if (xmlNameProvider == null)
-                throw new ArgumentNullException("xmlNameProvider");
-
-            this.xmlNameProvider = xmlNameProvider;
+            this.xmlNameProvider = xmlNameProvider ?? throw new ArgumentNullException(nameof(xmlNameProvider));
         }
         protected readonly ISiteMapXmlNameProvider xmlNameProvider;
 

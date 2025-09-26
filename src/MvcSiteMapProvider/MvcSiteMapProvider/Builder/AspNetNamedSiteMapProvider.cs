@@ -20,7 +20,7 @@ namespace MvcSiteMapProvider.Builder
             this.providerName = providerName;
         }
 
-        protected readonly string providerName;
+        private readonly string providerName;
 
         #region IAspNetStaticSiteMapProvider Members
 

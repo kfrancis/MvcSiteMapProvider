@@ -14,15 +14,9 @@ namespace MvcSiteMapProvider.Xml
 
         #region ISiteMapXmlNameProvider Members
 
-        public virtual XName NodeName
-        {
-            get { return xmlSiteMapNamespace + xmlNodeName; }
-        }
+        public virtual XName NodeName => xmlSiteMapNamespace + xmlNodeName;
 
-        public virtual XName RootName
-        {
-            get { return xmlSiteMapNamespace + xmlRootName; }
-        }
+        public virtual XName RootName => xmlSiteMapNamespace + xmlRootName;
 
         public virtual void FixXmlNamespaces(XDocument xml)
         {

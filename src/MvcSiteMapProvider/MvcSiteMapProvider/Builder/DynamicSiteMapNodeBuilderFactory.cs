@@ -11,16 +11,12 @@ namespace MvcSiteMapProvider.Builder
             ICultureContextFactory cultureContextFactory
             )
         {
-            if (siteMapNodeCreatorFactory == null)
-                throw new ArgumentNullException("siteMapNodeCreatorFactory");
-            if (cultureContextFactory == null)
-                throw new ArgumentNullException("cultureContextFactory");
-
-            this.siteMapNodeCreatorFactory = siteMapNodeCreatorFactory;
-            this.cultureContextFactory = cultureContextFactory;
+            this.siteMapNodeCreatorFactory = siteMapNodeCreatorFactory ?? throw new ArgumentNullException(nameof(siteMapNodeCreatorFactory));
+            this.cultureContextFactory = cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
         }
-        protected readonly ISiteMapNodeCreatorFactory siteMapNodeCreatorFactory;
-        protected readonly ICultureContextFactory cultureContextFactory;
+
+        private readonly ISiteMapNodeCreatorFactory siteMapNodeCreatorFactory;
+        private readonly ICultureContextFactory cultureContextFactory;
 
         #region IDynamicSiteMapNodeBuilderFactory Members
 

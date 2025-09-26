@@ -12,19 +12,16 @@ namespace MvcSiteMapProvider.Builder
     {
         public CompositeSiteMapBuilder(params ISiteMapBuilder[] siteMapBuilders)
         {
-            if (siteMapBuilders == null)
-                throw new ArgumentNullException("siteMapBuilders");
-
-            this.siteMapBuilders = siteMapBuilders;
+            this.siteMapBuilders = siteMapBuilders ?? throw new ArgumentNullException(nameof(siteMapBuilders));
         }
 
-        protected readonly IEnumerable<ISiteMapBuilder> siteMapBuilders;
+        private readonly IEnumerable<ISiteMapBuilder> siteMapBuilders;
 
         #region ISiteMapBuilder Members
 
-        public ISiteMapNode BuildSiteMap(ISiteMap siteMap, ISiteMapNode rootNode)
+        public ISiteMapNode? BuildSiteMap(ISiteMap siteMap, ISiteMapNode? rootNode)
         {
-            ISiteMapNode result = rootNode;
+            var result = rootNode;
             foreach (var builder in this.siteMapBuilders)
             {
                 result = builder.BuildSiteMap(siteMap, result);

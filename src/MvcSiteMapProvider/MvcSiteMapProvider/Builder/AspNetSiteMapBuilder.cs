@@ -3,6 +3,7 @@ using MvcSiteMapProvider.Web;
 using MvcSiteMapProvider.Xml;
 using System;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Web;
 
 namespace MvcSiteMapProvider.Builder
@@ -37,29 +38,22 @@ namespace MvcSiteMapProvider.Builder
             ISiteMapNodeFactory siteMapNodeFactory
             )
         {
-            if (reservedAttributeNameProvider == null)
-                throw new ArgumentNullException("reservedAttributeNameProvider");
-            if (siteMapProvider == null)
-                throw new ArgumentNullException("siteMapProvider");
-            if (siteMapNodeFactory == null)
-                throw new ArgumentNullException("siteMapNodeFactory");
-
             this.reflectAttributes = reflectAttributes;
             this.reflectRouteValues = reflectRouteValues;
-            this.reservedAttributeNameProvider = reservedAttributeNameProvider;
-            this.siteMapProvider = siteMapProvider;
-            this.siteMapNodeFactory = siteMapNodeFactory;
+            this.reservedAttributeNameProvider = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
+            this.siteMapProvider = siteMapProvider ?? throw new ArgumentNullException(nameof(siteMapProvider));
+            this.siteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
         }
 
-        protected readonly bool reflectAttributes;
-        protected readonly bool reflectRouteValues;
+        private readonly bool reflectAttributes;
+        private readonly bool reflectRouteValues;
         protected readonly ISiteMapXmlReservedAttributeNameProvider reservedAttributeNameProvider;
-        protected readonly IAspNetSiteMapProvider siteMapProvider;
-        protected readonly ISiteMapNodeFactory siteMapNodeFactory;
+        private readonly IAspNetSiteMapProvider siteMapProvider;
+        private readonly ISiteMapNodeFactory siteMapNodeFactory;
 
         #region ISiteMapBuilder Members
 
-        public ISiteMapNode BuildSiteMap(ISiteMap siteMap, ISiteMapNode rootNode)
+        public ISiteMapNode? BuildSiteMap(ISiteMap siteMap, ISiteMapNode? rootNode)
         {
             var provider = siteMapProvider.GetProvider();
 
@@ -89,7 +83,7 @@ namespace MvcSiteMapProvider.Builder
             foreach (System.Web.SiteMapNode node in providerRootNode.ChildNodes)
             {
                 var childNode = GetSiteMapNodeFromProviderNode(siteMap, node, rootNode);
-                ISiteMapNode parentNode = rootNode;
+                var parentNode = rootNode;
 
                 siteMap.AddNode(childNode, parentNode);
 
@@ -98,14 +92,14 @@ namespace MvcSiteMapProvider.Builder
             }
         }
 
-        protected virtual ISiteMapNode GetSiteMapNodeFromProviderNode(ISiteMap siteMap, System.Web.SiteMapNode node, ISiteMapNode parentNode)
+        protected virtual ISiteMapNode GetSiteMapNodeFromProviderNode(ISiteMap siteMap, System.Web.SiteMapNode node, ISiteMapNode? parentNode)
         {
             // Use the same keys as the underlying provider.
-            string key = node.Key;
+            var key = node.Key;
             var implicitResourceKey = node.ResourceKey;
 
             // Create Node
-            ISiteMapNode siteMapNode = siteMapNodeFactory.Create(siteMap, key, implicitResourceKey);
+            var siteMapNode = siteMapNodeFactory.Create(siteMap, key, implicitResourceKey);
 
             siteMapNode.Title = node.Title;
             siteMapNode.Description = node.Description;
@@ -135,10 +129,10 @@ namespace MvcSiteMapProvider.Builder
             siteMapNode.CanonicalUrl = node.GetAttributeValue("canonicalUrl");
             siteMapNode.CanonicalUrlProtocol = node.GetAttributeValue("canonicalUrlProtocol");
             siteMapNode.CanonicalUrlHostName = node.GetAttributeValue("canonicalUrlHostName");
-            siteMapNode.MetaRobotsValues.AddRange(node.GetAttributeValue("metaRobotsValues"), new[] { ' ' });
+            siteMapNode.MetaRobotsValues.AddRange(node.GetAttributeValue("metaRobotsValues"), [' ']);
             siteMapNode.ChangeFrequency = (ChangeFrequency)Enum.Parse(typeof(ChangeFrequency), node.GetAttributeValueOrFallback("changeFrequency", "Undefined"));
             siteMapNode.UpdatePriority = (UpdatePriority)Enum.Parse(typeof(UpdatePriority), node.GetAttributeValueOrFallback("updatePriority", "Undefined"));
-            siteMapNode.LastModifiedDate = DateTime.Parse(node.GetAttributeValueOrFallback("lastModifiedDate", DateTime.MinValue.ToString()));
+            siteMapNode.LastModifiedDate = DateTime.Parse(node.GetAttributeValueOrFallback("lastModifiedDate", DateTime.MinValue.ToString(CultureInfo.CurrentCulture)));
             siteMapNode.Order = int.Parse(node.GetAttributeValueOrFallback("order", "0"));
 
             // Handle route details
@@ -153,16 +147,17 @@ namespace MvcSiteMapProvider.Builder
                 var attributeDictionary = node.GetPrivateFieldValue<NameValueCollection>("_attributes");
                 siteMapNode.RouteValues.AddRange(attributeDictionary, false);
             }
-            siteMapNode.PreservedRouteParameters.AddRange(node.GetAttributeValue("preservedRouteParameters"), new[] { ',', ';' });
+            siteMapNode.PreservedRouteParameters.AddRange(node.GetAttributeValue("preservedRouteParameters"), [',', ';'
+            ]);
             siteMapNode.UrlResolver = node.GetAttributeValue("urlResolver");
             
             // Add inherited route values to sitemap node
-            foreach (var inheritedRouteParameter in node.GetAttributeValue("inheritedRouteParameters").Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var inheritedRouteParameter in node.GetAttributeValue("inheritedRouteParameters").Split([',', ';'], StringSplitOptions.RemoveEmptyEntries))
             {
                 var item = inheritedRouteParameter.Trim();
-                if (parentNode.RouteValues.ContainsKey(item))
+                if (parentNode != null && parentNode.RouteValues.TryGetValue(item, out var value))
                 {
-                    siteMapNode.RouteValues.Add(item, parentNode.RouteValues[item]);
+                    siteMapNode.RouteValues.Add(item, value);
                 }
             }
 
@@ -181,7 +176,7 @@ namespace MvcSiteMapProvider.Builder
         /// <param name="node">The siteMapNode element.</param>
         /// <param name="parentNode">The parent node.</param>
         /// <returns>The value provided by either the siteMapNode or parentNode.Area.</returns>
-        protected virtual string InheritAreaIfNotProvided(System.Web.SiteMapNode node, ISiteMapNode parentNode)
+        protected virtual string InheritAreaIfNotProvided(System.Web.SiteMapNode node, ISiteMapNode? parentNode)
         {
             var result = node.GetAttributeValue("area");
 
@@ -201,7 +196,7 @@ namespace MvcSiteMapProvider.Builder
         /// <param name="node">The siteMapNode element.</param>
         /// <param name="parentNode">The parent node.</param>
         /// <returns>The value provided by either the siteMapNode or parentNode.Controller.</returns>
-        protected virtual string InheritControllerIfNotProvided(System.Web.SiteMapNode node, ISiteMapNode parentNode)
+        protected virtual string InheritControllerIfNotProvided(System.Web.SiteMapNode node, ISiteMapNode? parentNode)
         {
             var result = node.GetAttributeValue("controller");
             if (string.IsNullOrEmpty(result) && parentNode != null)
