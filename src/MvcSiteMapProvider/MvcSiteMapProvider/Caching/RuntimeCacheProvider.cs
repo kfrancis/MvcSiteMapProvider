@@ -1,29 +1,22 @@
-﻿#if !NET35
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Caching;
 
 namespace MvcSiteMapProvider.Caching
 {
     /// <summary>
-    /// A cache provider that uses an <see cref="System.Runtime.Caching.ObjectCache"/> instance to 
-    /// cache items that are added.
+    /// A cache provider that uses an <see cref="System.Runtime.Caching.ObjectCache"/> instance to cache items.
     /// </summary>
     /// <typeparam name="T">The type of item that will be stored in the cache.</typeparam>
-    public class RuntimeCacheProvider<T>
-        : ICacheProvider<T>
+    public class RuntimeCacheProvider<T> : ICacheProvider<T>
     {
-        public RuntimeCacheProvider(
-            ObjectCache cache
-            )
+        public RuntimeCacheProvider(ObjectCache cache)
         {
             if (cache == null)
                 throw new ArgumentNullException("cache");
             this.cache = cache;
         }
         private readonly ObjectCache cache;
-
-        #region ICacheProvider<T> Members
 
         public event EventHandler<MicroCacheItemRemovedEventArgs<T>> ItemRemoved;
 
@@ -40,18 +33,14 @@ namespace MvcSiteMapProvider.Caching
         public bool TryGetValue(string key, out LazyLock value)
         {
             value = this.Get(key);
-            if (value != null)
-            {
-                return true;
-            }
-            return false;
+            return value != null;
         }
 
         public void Add(string key, LazyLock item, ICacheDetails cacheDetails)
         {
             var policy = new CacheItemPolicy();
 
-            // Set timeout
+            // Timeout
             policy.Priority = CacheItemPriority.NotRemovable;
             if (IsTimespanSet(cacheDetails.AbsoluteCacheExpiration))
             {
@@ -62,7 +51,7 @@ namespace MvcSiteMapProvider.Caching
                 policy.SlidingExpiration = cacheDetails.SlidingCacheExpiration;
             }
 
-            // Add dependencies
+            // Dependencies
             var dependencies = (IList<ChangeMonitor>)cacheDetails.CacheDependency.Dependency;
             if (dependencies != null)
             {
@@ -72,11 +61,7 @@ namespace MvcSiteMapProvider.Caching
                 }
             }
 
-            // Setting priority to not removable ensures an 
-            // app pool recycle doesn't unload the item, but a timeout will.
-            policy.Priority = CacheItemPriority.NotRemovable;
-
-            // Setup callback
+            // Callback
             policy.RemovedCallback = CacheItemRemoved;
 
             cache.Add(key, item, policy);
@@ -87,11 +72,9 @@ namespace MvcSiteMapProvider.Caching
             cache.Remove(key);
         }
 
-        #endregion
-
         private bool IsTimespanSet(TimeSpan timeSpan)
         {
-            return (!timeSpan.Equals(TimeSpan.MinValue));
+            return !timeSpan.Equals(TimeSpan.MinValue);
         }
 
         protected virtual void CacheItemRemoved(CacheEntryRemovedArguments arguments)
@@ -103,11 +86,11 @@ namespace MvcSiteMapProvider.Caching
 
         protected virtual void OnCacheItemRemoved(MicroCacheItemRemovedEventArgs<T> e)
         {
-            if (this.ItemRemoved != null)
+            var handler = ItemRemoved;
+            if (handler != null)
             {
-                ItemRemoved(this, e);
+                handler(this, e);
             }
         }
     }
 }
-#endif

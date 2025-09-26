@@ -8,11 +8,7 @@ namespace MvcSiteMapProvider.Web.Mvc
     /// <summary>
     /// XmlSiteMapController class
     /// </summary>
-#if !MVC2
-#if !MVC3
     [AllowAnonymous]
-#endif
-#endif
     public class XmlSiteMapController
         : Controller
     {

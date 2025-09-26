@@ -78,7 +78,7 @@ namespace DI.SimpleInjector
 
             // Multiple implementations of strategy based extension points (and not decorated with [ExcludeFromAutoRegistrationAttribute]).
             CommonConventions.RegisterAllImplementationsOfInterfaceSingle(
-                (interfaceType, implementationTypes) => container.RegisterCollection(interfaceType, implementationTypes),
+                (interfaceType, implementationTypes) => container.Collection.Register(interfaceType, implementationTypes),
                 multipleImplementationTypes,
                 allAssemblies,
                 excludeTypes,
@@ -105,7 +105,7 @@ namespace DI.SimpleInjector
                 Lifestyle.Singleton);
 
             // Configure Security
-            container.RegisterCollection(typeof(IAclModule), new Type[] { typeof(AuthorizeAttributeAclModule), typeof(XmlRolesAclModule) });
+            container.Collection.Register(typeof(IAclModule), new Type[] { typeof(AuthorizeAttributeAclModule), typeof(XmlRolesAclModule) });
             container.Register<IAclModule>(() => new CompositeAclModule(container.GetAllInstances<IAclModule>().ToArray()), Lifestyle.Singleton);
 
             // Setup cache
@@ -139,7 +139,7 @@ namespace DI.SimpleInjector
                 .Create(new CompositeSiteMapNodeProvider(container.GetInstance<XmlSiteMapNodeProvider>(), container.GetInstance<ReflectionSiteMapNodeProvider>())), 
                 Lifestyle.Singleton);
 
-            container.RegisterCollection<ISiteMapBuilderSet>(
+            container.Collection.Register<ISiteMapBuilderSet>(
                 ResolveISiteMapBuilderSets(container, securityTrimmingEnabled, enableLocalization, visibilityAffectsDescendants, useTitleIfDescriptionNotProvided));
             container.Register<ISiteMapBuilderSetStrategy>(() => new SiteMapBuilderSetStrategy(container.GetAllInstances<ISiteMapBuilderSet>().ToArray()), 
                 Lifestyle.Singleton);
@@ -263,7 +263,7 @@ namespace DI.SimpleInjector
 
         public static void RegisterMvcController<TService>(this Container container) where TService: IController
         {
-            var registration = Lifestyle.Transient.CreateRegistration(typeof(IController), typeof(TService), container);
+            var registration = Lifestyle.Transient.CreateRegistration(typeof(TService), container);
             container.AddRegistration(typeof(TService), registration);
 
             // This will run if using SimpleInjector 3.x
