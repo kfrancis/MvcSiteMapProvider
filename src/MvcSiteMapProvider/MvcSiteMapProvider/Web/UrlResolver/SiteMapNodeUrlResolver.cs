@@ -26,10 +26,14 @@ namespace MvcSiteMapProvider.Web.UrlResolver
 
             this.mvcContextFactory = mvcContextFactory;
             this.urlPath = urlPath;
+            this.routeValueDictionary = new RouteValueDictionary();
+            this.lockObject = new object();
         }
 
         protected readonly IMvcContextFactory mvcContextFactory;
         protected readonly IUrlPath urlPath;
+        private readonly RouteValueDictionary routeValueDictionary;
+        private readonly object lockObject;
 
         #region ISiteMapNodeUrlResolver Members
 
@@ -82,23 +86,35 @@ namespace MvcSiteMapProvider.Web.UrlResolver
         {
             string result = string.Empty;
             var urlHelper = this.mvcContextFactory.CreateUrlHelper(requestContext);
-            var routeValueDictionary = new RouteValueDictionary(routeValues);
+            
+            // Thread-safe reuse of the dictionary instance to reduce memory allocations
+            lock (this.lockObject)
+            {
+                this.routeValueDictionary.Clear();
+                if (routeValues != null)
+                {
+                    foreach (var kvp in routeValues)
+                    {
+                        this.routeValueDictionary[kvp.Key] = kvp.Value;
+                    }
+                }
 
-            if (!string.IsNullOrEmpty(node.Route))
-            {
-                // (comment copied from MVC source code)
-                // We only include MVC-specific values like 'controller' and 'action' if we are generating an action link.
-                // If we are generating a route link [as to MapRoute("Foo", "any/url", new { controller = ... })], including
-                // the current controller name will cause the route match to fail if the current controller is not the same
-                // as the destination controller.
-                routeValueDictionary.Remove("route");
-                routeValueDictionary.Remove("controller");
-                routeValueDictionary.Remove("action");
-                result = urlHelper.RouteUrl(node.Route, routeValueDictionary);
-            }
-            else
-            {
-                result = urlHelper.Action(action, controller, routeValueDictionary);
+                if (!string.IsNullOrEmpty(node.Route))
+                {
+                    // (comment copied from MVC source code)
+                    // We only include MVC-specific values like 'controller' and 'action' if we are generating an action link.
+                    // If we are generating a route link [as to MapRoute("Foo", "any/url", new { controller = ... })], including
+                    // the current controller name will cause the route match to fail if the current controller is not the same
+                    // as the destination controller.
+                    this.routeValueDictionary.Remove("route");
+                    this.routeValueDictionary.Remove("controller");
+                    this.routeValueDictionary.Remove("action");
+                    result = urlHelper.RouteUrl(node.Route, this.routeValueDictionary);
+                }
+                else
+                {
+                    result = urlHelper.Action(action, controller, this.routeValueDictionary);
+                }
             }
 
             if (!string.IsNullOrEmpty(result))
