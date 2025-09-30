@@ -271,8 +271,7 @@ namespace MvcSiteMapProvider.Linq
             try
             {
                 var signature = new Signature(properties);
-                Type type;
-                if (!classes.TryGetValue(signature, out type))
+                if (!classes.TryGetValue(signature, out var type))
                 {
                     type = CreateDynamicClass(signature.properties);
                     classes.Add(signature, type);
@@ -622,7 +621,7 @@ namespace MvcSiteMapProvider.Linq
         public ExpressionParser(ParameterExpression[] parameters, string expression, object[] values)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
-            if (keywords == null) keywords = CreateKeywords();
+            keywords ??= CreateKeywords();
             symbols = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             literals = new Dictionary<Expression, string>();
             if (parameters != null) ProcessParameters(parameters);
@@ -992,8 +991,7 @@ namespace MvcSiteMapProvider.Linq
             var tokenText = token.text;
             if (tokenText[0] != '-')
             {
-                ulong value;
-                if (!ulong.TryParse(tokenText, out value))
+                if (!ulong.TryParse(tokenText, out var value))
                     throw ParseError(Res.InvalidIntegerLiteral, tokenText);
                 NextToken();
                 if (value <= int.MaxValue) return CreateLiteral((int)value, tokenText);
@@ -1003,11 +1001,10 @@ namespace MvcSiteMapProvider.Linq
             }
             else
             {
-                long value;
-                if (!long.TryParse(tokenText, out value))
+                if (!long.TryParse(tokenText, out var value))
                     throw ParseError(Res.InvalidIntegerLiteral, tokenText);
                 NextToken();
-                if (value >= int.MinValue && value <= int.MaxValue)
+                if (value is >= int.MinValue and <= int.MaxValue)
                     return CreateLiteral((int)value, tokenText);
                 return CreateLiteral(value, tokenText);
             }
@@ -1021,13 +1018,11 @@ namespace MvcSiteMapProvider.Linq
             var last = text[text.Length - 1];
             if (last == 'F' || last == 'f')
             {
-                float f;
-                if (float.TryParse(text.Substring(0, text.Length - 1), out f)) value = f;
+                if (float.TryParse(text.Substring(0, text.Length - 1), out var f)) value = f;
             }
             else
             {
-                double d;
-                if (double.TryParse(text, out d)) value = d;
+                if (double.TryParse(text, out var d)) value = d;
             }
             if (value == null) throw ParseError(Res.InvalidRealLiteral, text);
             NextToken();
@@ -1054,8 +1049,7 @@ namespace MvcSiteMapProvider.Linq
         Expression ParseIdentifier()
         {
             ValidateToken(TokenId.Identifier);
-            object value;
-            if (keywords.TryGetValue(token.text, out value))
+            if (keywords.TryGetValue(token.text, out object value))
             {
                 if (value is Type) return ParseTypeAccess((Type)value);
                 if (value == (object)keywordIt) return ParseIt();
@@ -1190,8 +1184,7 @@ namespace MvcSiteMapProvider.Linq
             if (token.id == TokenId.OpenParen)
             {
                 var args = ParseArgumentList();
-                MethodBase method;
-                switch (FindBestMethod(type.GetConstructors(), args, out method))
+                switch (FindBestMethod(type.GetConstructors(), args, out var method))
                 {
                     case 0:
                         if (args.Length == 1)
@@ -1246,8 +1239,7 @@ namespace MvcSiteMapProvider.Linq
                     }
                 }
                 var args = ParseArgumentList();
-                MethodBase mb;
-                switch (FindMethod(type, id, instance == null, args, out mb))
+                switch (FindMethod(type, id, instance == null, args, out var mb))
                 {
                     case 0:
                         throw ParseError(errorPos, Res.NoApplicableMethod,
@@ -1302,8 +1294,7 @@ namespace MvcSiteMapProvider.Linq
             it = innerIt;
             var args = ParseArgumentList();
             it = outerIt;
-            MethodBase signature;
-            if (FindMethod(typeof(IEnumerableSignatures), methodName, false, args, out signature) != 1)
+            if (FindMethod(typeof(IEnumerableSignatures), methodName, false, args, out var signature) != 1)
                 throw ParseError(errorPos, Res.NoApplicableAggregate, methodName);
             Type[] typeArgs;
             if (signature.Name == "Min" || signature.Name == "Max")
@@ -1366,8 +1357,7 @@ namespace MvcSiteMapProvider.Linq
             }
             else
             {
-                MethodBase mb;
-                switch (FindIndexer(expr.Type, args, out mb))
+                switch (FindIndexer(expr.Type, args, out var mb))
                 {
                     case 0:
                         throw ParseError(errorPos, Res.NoApplicableIndexer,
@@ -1614,8 +1604,7 @@ namespace MvcSiteMapProvider.Linq
                 }
                 else
                 {
-                    string text;
-                    if (literals.TryGetValue(ce, out text))
+                    if (literals.TryGetValue(ce, out var text))
                     {
                         var target = GetNonNullableType(type);
                         object? value = null;
@@ -1652,48 +1641,37 @@ namespace MvcSiteMapProvider.Linq
             switch (Type.GetTypeCode(GetNonNullableType(type)))
             {
                 case TypeCode.SByte:
-                    sbyte sb;
-                    if (sbyte.TryParse(text, out sb)) return sb;
+                    if (sbyte.TryParse(text, out var sb)) return sb;
                     break;
                 case TypeCode.Byte:
-                    byte b;
-                    if (byte.TryParse(text, out b)) return b;
+                    if (byte.TryParse(text, out var b)) return b;
                     break;
                 case TypeCode.Int16:
-                    short s;
-                    if (short.TryParse(text, out s)) return s;
+                    if (short.TryParse(text, out var s)) return s;
                     break;
                 case TypeCode.UInt16:
-                    ushort us;
-                    if (ushort.TryParse(text, out us)) return us;
+                    if (ushort.TryParse(text, out var us)) return us;
                     break;
                 case TypeCode.Int32:
-                    int i;
-                    if (int.TryParse(text, out i)) return i;
+                    if (int.TryParse(text, out var i)) return i;
                     break;
                 case TypeCode.UInt32:
-                    uint ui;
-                    if (uint.TryParse(text, out ui)) return ui;
+                    if (uint.TryParse(text, out var ui)) return ui;
                     break;
                 case TypeCode.Int64:
-                    long l;
-                    if (long.TryParse(text, out l)) return l;
+                    if (long.TryParse(text, out var l)) return l;
                     break;
                 case TypeCode.UInt64:
-                    ulong ul;
-                    if (ulong.TryParse(text, out ul)) return ul;
+                    if (ulong.TryParse(text, out var ul)) return ul;
                     break;
                 case TypeCode.Single:
-                    float f;
-                    if (float.TryParse(text, out f)) return f;
+                    if (float.TryParse(text, out var f)) return f;
                     break;
                 case TypeCode.Double:
-                    double d;
-                    if (double.TryParse(text, out d)) return d;
+                    if (double.TryParse(text, out var d)) return d;
                     break;
                 case TypeCode.Decimal:
-                    decimal e;
-                    if (decimal.TryParse(text, out e)) return e;
+                    if (decimal.TryParse(text, out var e)) return e;
                     break;
             }
             return null;

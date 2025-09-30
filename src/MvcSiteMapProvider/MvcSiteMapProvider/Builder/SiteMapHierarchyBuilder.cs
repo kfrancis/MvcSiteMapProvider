@@ -1,22 +1,27 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MvcSiteMapProvider.Builder
 {
     /// <summary>
-    /// A service that changes a list of ISiteMapNodeToParentRelation instances into a hierarchy
-    /// by mapping each node to its parent node and adds the hierarchy to the SiteMap.
+    ///     A service that changes a list of ISiteMapNodeToParentRelation instances into a hierarchy
+    ///     by mapping each node to its parent node and adds the hierarchy to the SiteMap.
     /// </summary>
     public class SiteMapHierarchyBuilder
         : ISiteMapHierarchyBuilder
     {
-        #region ISiteMapHierarchyBuilder Members
-
-        public IEnumerable<ISiteMapNodeToParentRelation> BuildHierarchy(ISiteMap siteMap, IEnumerable<ISiteMapNodeToParentRelation> nodes)
+        public IEnumerable<ISiteMapNodeToParentRelation> BuildHierarchy(ISiteMap siteMap,
+            IEnumerable<ISiteMapNodeToParentRelation> nodes)
         {
+            if (nodes == null)
+            {
+                throw new ArgumentNullException(nameof(nodes));
+            }
+
             var sourceNodesByParent = nodes.ToLookup(n => n.ParentKey);
             var sourceNodes = new List<ISiteMapNodeToParentRelation>(nodes);
-            var nodesAddedThisIteration = 0;
+            int nodesAddedThisIteration;
             do
             {
                 var nodesAlreadyAdded = new HashSet<string>();
@@ -29,23 +34,22 @@ namespace MvcSiteMapProvider.Builder
                     }
 
                     var parentNode = siteMap.FindSiteMapNodeFromKey(node.ParentKey);
-                    if (parentNode != null)
+                    if (parentNode == null)
                     {
-                        this.AddAndTrackNode(siteMap, node, parentNode, sourceNodes, nodesAlreadyAdded);
-                        nodesAddedThisIteration += 1;
-
-                        // Add the rest of the tree branch below the current node
-                        this.AddDescendantNodes(siteMap, node.Node, sourceNodes, sourceNodesByParent, nodesAlreadyAdded);
+                        continue;
                     }
+
+                    AddAndTrackNode(siteMap, node, parentNode, sourceNodes, nodesAlreadyAdded);
+                    nodesAddedThisIteration += 1;
+
+                    // Add the rest of the tree branch below the current node
+                    AddDescendantNodes(siteMap, node.Node, sourceNodes, sourceNodesByParent, nodesAlreadyAdded);
                 }
-            }
-            while (nodesAddedThisIteration > 0 && sourceNodes.Count > 0);
+            } while (nodesAddedThisIteration > 0 && sourceNodes.Count > 0);
 
             return sourceNodes;
         }
 
-        #endregion
-        
         protected virtual void AddDescendantNodes(ISiteMap siteMap,
             ISiteMapNode currentNode,
             IList<ISiteMapNodeToParentRelation> sourceNodes,
@@ -58,7 +62,7 @@ namespace MvcSiteMapProvider.Builder
             }
 
             var children = sourceNodesByParent[currentNode.Key].OrderBy(x => x.Node.Order).ToArray();
-            if (children.Count() == 0)
+            if (!children.Any())
             {
                 return;
             }
@@ -70,14 +74,14 @@ namespace MvcSiteMapProvider.Builder
                     return;
                 }
 
-                this.AddAndTrackNode(siteMap, child, currentNode, sourceNodes, nodesAlreadyAdded);
+                AddAndTrackNode(siteMap, child, currentNode, sourceNodes, nodesAlreadyAdded);
 
                 if (sourceNodes.Count == 0)
                 {
                     return;
                 }
 
-                this.AddDescendantNodes(siteMap, child.Node, sourceNodes, sourceNodesByParent, nodesAlreadyAdded);
+                AddDescendantNodes(siteMap, child.Node, sourceNodes, sourceNodesByParent, nodesAlreadyAdded);
             }
         }
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -371,18 +371,9 @@ namespace MvcSiteMapProvider.Collections
         /// <summary>
         /// Gets the lock instance.
         /// </summary>
-        /// <returns></returns>
-        public static ReaderWriterLockSlim GetLockInstance()
-        {
-            return GetLockInstance(LockRecursionPolicy.SupportsRecursion);
-        }
-
-        /// <summary>
-        /// Gets the lock instance.
-        /// </summary>
         /// <param name="recursionPolicy">The recursion policy.</param>
         /// <returns></returns>
-        public static ReaderWriterLockSlim GetLockInstance(LockRecursionPolicy recursionPolicy)
+        public static ReaderWriterLockSlim GetLockInstance(LockRecursionPolicy recursionPolicy = LockRecursionPolicy.SupportsRecursion)
         {
             return new ReaderWriterLockSlim(recursionPolicy);
         }

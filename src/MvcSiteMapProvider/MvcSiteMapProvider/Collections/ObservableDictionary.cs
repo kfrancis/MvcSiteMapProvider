@@ -189,8 +189,7 @@ namespace MvcSiteMapProvider.Collections
         {
             if (key == null) throw new ArgumentNullException(nameof(key));
 
-            TValue item;
-            if (Dictionary.TryGetValue(key, out item))
+            if (Dictionary.TryGetValue(key, out var item))
             {
                 if (add) throw new ArgumentException(Resources.Messages.DictionaryAlreadyContainsKey);
                 if (Equals(item, value)) return;

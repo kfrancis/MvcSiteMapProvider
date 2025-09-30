@@ -16,11 +16,11 @@ namespace MvcSiteMapProvider.Builder
     public class ReflectionSiteMapNodeProvider
         : ISiteMapNodeProvider
     {
-        protected const string SourceName = "MvcSiteMapNodeAttribute";
-        protected readonly IAttributeAssemblyProviderFactory attributeAssemblyProviderFactory;
-        protected readonly IMvcSiteMapNodeAttributeDefinitionProvider attributeNodeDefinitionProvider;
-        protected readonly IEnumerable<string> excludeAssemblies;
-        protected readonly IEnumerable<string> includeAssemblies;
+        private const string SourceName = "MvcSiteMapNodeAttribute";
+        private readonly IAttributeAssemblyProviderFactory _attributeAssemblyProviderFactory;
+        private readonly IMvcSiteMapNodeAttributeDefinitionProvider _attributeNodeDefinitionProvider;
+        private readonly IEnumerable<string> _excludeAssemblies;
+        private readonly IEnumerable<string> _includeAssemblies;
 
         public ReflectionSiteMapNodeProvider(
             IEnumerable<string> includeAssemblies,
@@ -29,12 +29,12 @@ namespace MvcSiteMapProvider.Builder
             IMvcSiteMapNodeAttributeDefinitionProvider attributeNodeDefinitionProvider
         )
         {
-            this.includeAssemblies = includeAssemblies ?? throw new ArgumentNullException(nameof(includeAssemblies));
-            this.excludeAssemblies = excludeAssemblies ?? throw new ArgumentNullException(nameof(excludeAssemblies));
-            this.attributeAssemblyProviderFactory = attributeAssemblyProviderFactory ??
+            _includeAssemblies = includeAssemblies ?? throw new ArgumentNullException(nameof(includeAssemblies));
+            _excludeAssemblies = excludeAssemblies ?? throw new ArgumentNullException(nameof(excludeAssemblies));
+            _attributeAssemblyProviderFactory = attributeAssemblyProviderFactory ??
                                                     throw new ArgumentNullException(
                                                         nameof(attributeAssemblyProviderFactory));
-            this.attributeNodeDefinitionProvider = attributeNodeDefinitionProvider ??
+            _attributeNodeDefinitionProvider = attributeNodeDefinitionProvider ??
                                                    throw new ArgumentNullException(
                                                        nameof(attributeNodeDefinitionProvider));
         }
@@ -64,9 +64,9 @@ namespace MvcSiteMapProvider.Builder
 
         protected virtual IEnumerable<IMvcSiteMapNodeAttributeDefinition> GetMvcSiteMapNodeAttributeDefinitions()
         {
-            var assemblyProvider = attributeAssemblyProviderFactory.Create(includeAssemblies, excludeAssemblies);
+            var assemblyProvider = _attributeAssemblyProviderFactory.Create(_includeAssemblies, _excludeAssemblies);
             var assemblies = assemblyProvider.GetAssemblies();
-            var definitions = attributeNodeDefinitionProvider.GetMvcSiteMapNodeAttributeDefinitions(assemblies);
+            var definitions = _attributeNodeDefinitionProvider.GetMvcSiteMapNodeAttributeDefinitions(assemblies);
             return definitions;
         }
 
@@ -196,7 +196,7 @@ namespace MvcSiteMapProvider.Builder
             }
 
             // Determine controller and (index) action
-            var controller = type.Name.Substring(0, type.Name.IndexOf("Controller"));
+            var controller = type.Name.Substring(0, type.Name.IndexOf("Controller", StringComparison.OrdinalIgnoreCase));
             var action = (methodInfo != null ? methodInfo.Name : null) ?? "Index";
 
             if (methodInfo != null)
@@ -210,7 +210,7 @@ namespace MvcSiteMapProvider.Builder
             }
 
             var httpMethod =
-                (string.IsNullOrEmpty(attribute.HttpMethod) ? HttpVerbs.Get.ToString() : attribute.HttpMethod)
+                (string.IsNullOrEmpty(attribute.HttpMethod) ? nameof(HttpVerbs.Get) : attribute.HttpMethod)
                 .ToUpper();
 
             // Handle title

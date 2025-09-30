@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Caching;
+using MvcSiteMapProvider.Caching;
 using System;
 using System.Collections.Generic;
 #if !NET35
@@ -54,8 +54,7 @@ namespace MvcSiteMapProvider.Collections
         {
             if (key == null) throw new ArgumentNullException(nameof(key));
 
-            TValue item;
-            if (this.ReadOperationDictionary.TryGetValue(key, out item))
+            if (this.ReadOperationDictionary.TryGetValue(key, out var item))
             {
                 if (add) throw new ArgumentException(Resources.Messages.DictionaryAlreadyContainsKey);
                 if (Equals(item, value)) return;
@@ -158,12 +157,8 @@ namespace MvcSiteMapProvider.Collections
                 if (this.CachingEnabled)
                 {
                     var key = this.GetCacheKey();
-                    result = this.cache.GetValue<IDictionary<TKey, TValue>>(key);
-                    if (result == null)
-                    {
-                        // Request is not cached, return base dictionary
-                        result = base.Dictionary;
-                    }
+                    // Request is not cached, return base dictionary
+                    result = this.cache.GetValue<IDictionary<TKey, TValue>>(key) ?? base.Dictionary;
                 }
                 else
                 {

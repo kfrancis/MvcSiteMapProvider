@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -273,7 +273,7 @@ namespace MvcSiteMapProvider
                     }
                 }
             }
-            if (this.LastModifiedDate != null && this.LastModifiedDate.HasValue)
+            if (this.LastModifiedDate is not null)
                 node.LastModifiedDate = this.LastModifiedDate.Value;
             if (this.ChangeFrequency != ChangeFrequency.Undefined)
                 node.ChangeFrequency = this.ChangeFrequency;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.Globalization;
 
@@ -38,10 +38,7 @@ namespace MvcSiteMapProvider.Globalization
                         // attributes can still be identified as string vs another datatype.
                         value = string.Empty;
                     }
-                    if (explicitResourceKeys == null)
-                    {
-                        explicitResourceKeys = new NameValueCollection();
-                    }
+                    explicitResourceKeys ??= new NameValueCollection();
                     explicitResourceKeys.Add(attributeName, resourceLocation.Trim());
                     explicitResourceKeys.Add(attributeName, resourceName.Trim());
                 }

@@ -836,12 +836,9 @@ namespace MvcSiteMapProvider.Web
                     {
                         // Favor an exact match
                         var binding = protocolBindings.FirstOrDefault(x =>
-                            string.Equals(x.HostName, hostName, StringComparison.OrdinalIgnoreCase));
-                        if (binding == null)
-                        {
-                            // Try using a wildcard *
-                            binding = protocolBindings.FirstOrDefault(x => x.HostName == "*");
-                        }
+                            string.Equals(x.HostName, hostName, StringComparison.OrdinalIgnoreCase)) ??
+                                      // Try using a wildcard *
+                                      protocolBindings.FirstOrDefault(x => x.HostName == "*");
 
                         if (binding != null)
                         {

@@ -286,15 +286,13 @@ namespace MvcSiteMapProvider
             {
                 // Create a TextWriter with null stream as a backing stream 
                 // which doesn't consume resources
-                using (var nullWriter = new StreamWriter(Stream.Null))
-                {
-                    // Create a new HTTP context using the current URL.
-                    var currentUrlHttpContext = this.mvcContextFactory.CreateHttpContext(null, currentUrl, nullWriter);
+                using var nullWriter = new StreamWriter(Stream.Null);
+                // Create a new HTTP context using the current URL.
+                var currentUrlHttpContext = this.mvcContextFactory.CreateHttpContext(null, currentUrl, nullWriter);
 
-                    // Find node for the passed-in URL using the new HTTP context. This will do a
-                    // match based on route values and/or query string values.
-                    node = this.FindSiteMapNodeFromMvc(currentUrlHttpContext);
-                }
+                // Find node for the passed-in URL using the new HTTP context. This will do a
+                // match based on route values and/or query string values.
+                node = this.FindSiteMapNodeFromMvc(currentUrlHttpContext);
             }
 
             return this.ReturnNodeIfAccessible(node);

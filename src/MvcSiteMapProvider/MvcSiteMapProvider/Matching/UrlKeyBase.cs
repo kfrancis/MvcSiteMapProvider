@@ -89,7 +89,7 @@ namespace MvcSiteMapProvider.Matching
 
         public override string ToString()
         {
-            return string.Format("[HostName: {0}, RootRelativeUrl: {1}]", this.HostName, this.RootRelativeUrl);
+            return $"[HostName: {this.HostName}, RootRelativeUrl: {this.RootRelativeUrl}]";
         }
     }
 }

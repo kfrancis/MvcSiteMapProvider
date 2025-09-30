@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Xml;
+using MvcSiteMapProvider.Xml;
 using System;
 using System.Collections.Generic;
 using System.Web.Mvc;
@@ -136,17 +136,12 @@ namespace MvcSiteMapProvider.Builder
                     {
                         result.Add(dynamicNode);
 
-                        if (!this.useNestedDynamicNodeRecursion)
-                        {
-                            // Recursively add non-dynamic children for every dynamic node
-                            result.AddRange(ProcessXmlNodes(dynamicNode.Node, node, NodesToProcess.StandardNodes, helper));
-                        }
-                        else
-                        {
+                        // Recursively add non-dynamic children for every dynamic node
+                        result.AddRange(!this.useNestedDynamicNodeRecursion
+                            ? ProcessXmlNodes(dynamicNode.Node, node, NodesToProcess.StandardNodes, helper)
                             // Recursively process both dynamic nodes and static nodes.
                             // This is to allow V3 recursion behavior for those who depended on it - it is not a feature.
-                            result.AddRange(ProcessXmlNodes(dynamicNode.Node, node, NodesToProcess.All, helper));
-                        }
+                            : ProcessXmlNodes(dynamicNode.Node, node, NodesToProcess.All, helper));
                     }
 
                     if (!this.useNestedDynamicNodeRecursion)
@@ -185,7 +180,7 @@ namespace MvcSiteMapProvider.Builder
             var url = node.GetAttributeValue("url");
             var explicitKey = node.GetAttributeValue("key");
             var parentKey = parentNode == null ? "" : parentNode.Key;
-            var httpMethod = node.GetAttributeValueOrFallback("httpMethod", HttpVerbs.Get.ToString()).ToUpper();
+            var httpMethod = node.GetAttributeValueOrFallback("httpMethod", nameof(HttpVerbs.Get)).ToUpper();
             var clickable = bool.Parse(node.GetAttributeValueOrFallback("clickable", "true"));
             var title = node.GetAttributeValue("title");
             var implicitResourceKey = node.GetAttributeValue("resourceKey");

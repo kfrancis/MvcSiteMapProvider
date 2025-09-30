@@ -1,4 +1,4 @@
-﻿using MvcSiteMapProvider.Web.Mvc;
+using MvcSiteMapProvider.Web.Mvc;
 using System;
 using System.Linq;
 
@@ -32,7 +32,7 @@ namespace MvcSiteMapProvider.Security
         public bool IsAccessibleToUser(ISiteMap siteMap, ISiteMapNode node)
         {
             // If we have roles assigned, check them against the roles defined in the sitemap
-            if (node.Roles != null && node.Roles.Count > 0)
+            if (node.Roles is { Count: > 0 })
             {
                 var context = mvcContextFactory.CreateHttpContext();
 

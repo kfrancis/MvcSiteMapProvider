@@ -17,29 +17,25 @@ namespace MvcSiteMapProvider.Xml
 
             var xsdPath = resourceNamespace + "." + resourceFileName;
             var xsdStream = this.GetType().Assembly.GetManifestResourceStream(xsdPath);
-            using (var xsd = XmlReader.Create(xsdStream))
+            using var xsd = XmlReader.Create(xsdStream);
+            var schema = new XmlSchemaSet();
+            schema.Add(null, xsd);
+
+            var xmlReaderSettings = new XmlReaderSettings
             {
-                var schema = new XmlSchemaSet();
-                schema.Add(null, xsd);
+                ValidationType = ValidationType.Schema
+            };
+            xmlReaderSettings.Schemas.Add(schema);
+            //xmlReaderSettings.ValidationEventHandler += new ValidationEventHandler(ValidationHandler);
 
-                var xmlReaderSettings = new XmlReaderSettings
-                {
-                    ValidationType = ValidationType.Schema
-                };
-                xmlReaderSettings.Schemas.Add(schema);
-                //xmlReaderSettings.ValidationEventHandler += new ValidationEventHandler(ValidationHandler);
-
-                using (var xmlReader = XmlReader.Create(xmlPath, xmlReaderSettings))
-                {
-                    try
-                    {
-                        while (xmlReader.Read()) ;
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new MvcSiteMapException(string.Format(Resources.Messages.XmlValidationFailed, xmlPath), ex);
-                    }
-                }
+            using var xmlReader = XmlReader.Create(xmlPath, xmlReaderSettings);
+            try
+            {
+                while (xmlReader.Read()) ;
+            }
+            catch (Exception ex)
+            {
+                throw new MvcSiteMapException(string.Format(Resources.Messages.XmlValidationFailed, xmlPath), ex);
             }
         }
     }

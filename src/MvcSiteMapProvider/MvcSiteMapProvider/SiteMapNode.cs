@@ -42,7 +42,7 @@ namespace MvcSiteMapProvider
         private ChangeFrequency changeFrequency = ChangeFrequency.Undefined;
         private bool clickable = true;
         private string description = string.Empty;
-        private string httpMethod = HttpVerbs.Get.ToString().ToUpperInvariant();
+        private string httpMethod = nameof(HttpVerbs.Get).ToUpperInvariant();
         private string imageUrl = string.Empty;
         private DateTime lastModifiedDate = DateTime.MinValue;
         private string resolvedUrl = string.Empty;
@@ -564,14 +564,7 @@ namespace MvcSiteMapProvider
         {
             var routes = mvcContextFactory.GetRoutes();
             RouteData routeData;
-            if (!string.IsNullOrEmpty(Route))
-            {
-                routeData = routes[Route].GetRouteData(httpContext);
-            }
-            else
-            {
-                routeData = routes.GetRouteData(httpContext);
-            }
+            routeData = !string.IsNullOrEmpty(Route) ? routes[Route].GetRouteData(httpContext) : routes.GetRouteData(httpContext);
 
             return routeData;
         }
