@@ -1,41 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
-    <!--<WarningsAsErrors>nullable</WarningsAsErrors>-->
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{8625FB9C-BE71-41EF-993D-3C05EA11DEF4}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MvcSiteMapProvider</RootNamespace>
-    <AssemblyName>MvcSiteMapProvider</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <DefineConstants>MVC5;NET45</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <DefineConstants>MVC5;NET45</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -43,352 +12,35 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\Shared\MvcSiteMapProvider.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <!-- Keep ONLY MVC5 refs -->
-  <ItemGroup>
-    <Reference Include="System.Web.Mvc, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.0.0\lib\net45\System.Web.Mvc.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.Razor.3.0.0\lib\net45\System.Web.Razor.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.0.0\lib\net45\System.Web.WebPages.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.0.0\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <!-- Always include System.Runtime.Caching (no NET35 condition) -->
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <DefineConstants>MVC5;NET45</DefineConstants>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.Runtime.Caching" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Web.Administration, Version=7.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Windows\System32\inetsrv\Microsoft.Web.Administration.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Web.Infrastructure, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Web.Infrastructure.2.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
     <Reference Include="System.configuration" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Routing" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <MinVerSkip>false</MinVerSkip>
+  </PropertyGroup>
+  
   <ItemGroup>
     <Compile Include="..\Shared\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Builder\AspNetNamedSiteMapProvider.cs" />
-    <Compile Include="Builder\AspNetSiteMapBuilder.cs" />
-    <Compile Include="Builder\AspNetDefaultSiteMapProvider.cs" />
-    <Compile Include="Builder\AspNetSiteMapNodeProvider.cs" />
-    <Compile Include="Builder\DynamicNodeBuilder.cs" />
-    <Compile Include="Builder\DynamicSiteMapNodeBuilderFactory.cs" />
-    <Compile Include="Builder\IDynamicSiteMapNodeBuilderFactory.cs" />
-    <Compile Include="Builder\IAspNetSiteMapProvider.cs" />
-    <Compile Include="Builder\IDynamicNodeBuilder.cs" />
-    <Compile Include="Builder\IReservedAttributeNameProvider.cs" />
-    <Compile Include="Builder\ISiteMapHierarchyBuilder.cs" />
-    <Compile Include="Builder\ISiteMapNodeHelper.cs" />
-    <Compile Include="Builder\ISiteMapNodeCreator.cs" />
-    <Compile Include="Builder\ISiteMapNodeHelperFactory.cs" />
-    <Compile Include="Builder\ISiteMapNodeToParentRelation.cs" />
-    <Compile Include="Builder\ISiteMapNodeToParentRelationFactory.cs" />
-    <Compile Include="Builder\ReflectionSiteMapNodeProvider.cs" />
-    <Compile Include="Builder\ReflectionSiteMapNodeProviderFactory.cs" />
-    <Compile Include="Builder\ReservedAttributeNameProvider.cs" />
-    <Compile Include="Builder\SiteMapBuilder.cs" />
-    <Compile Include="Builder\SiteMapBuilderFactory.cs" />
-    <Compile Include="Builder\SiteMapHierarchyBuilder.cs" />
-    <Compile Include="Builder\ISiteMapNodeCreatorFactory.cs" />
-    <Compile Include="Builder\SiteMapNodeCreatorFactory.cs" />
-    <Compile Include="Builder\SiteMapNodeHelper.cs" />
-    <Compile Include="Builder\SiteMapNodeCreator.cs" />
-    <Compile Include="Builder\SiteMapNodeHelperFactory.cs" />
-    <Compile Include="Builder\SiteMapNodeToParentRelationFactory.cs" />
-    <Compile Include="Builder\SiteMapNodeToParentRelation.cs" />
-    <Compile Include="Builder\VisitingSiteMapBuilder.cs" />
-    <Compile Include="Builder\XmlSiteMapNodeProvider.cs" />
-    <Compile Include="Builder\XmlSiteMapNodeProviderFactory.cs" />
-    <Compile Include="Caching\AspNetCacheProvider.cs" />
-    <Compile Include="Caching\AspNetCompositeCacheDependency.cs" />
-    <Compile Include="Caching\AspNetFileCacheDependency.cs" />
-    <Compile Include="Caching\CacheDetails.cs" />
-    <Compile Include="Caching\ICache.cs" />
-    <Compile Include="Caching\ICacheDetails.cs" />
-    <Compile Include="Caching\ICacheDependency.cs" />
-    <Compile Include="Caching\ICacheProvider.cs" />
-    <Compile Include="Caching\IMicroCache.cs" />
-    <Compile Include="Caching\ISiteMapCache.cs" />
-    <Compile Include="Caching\ISiteMapCacheKeyGenerator.cs" />
-    <Compile Include="Caching\ISiteMapCacheKeyToBuilderSetMapper.cs" />
-    <Compile Include="Caching\LazyLock.cs" />
-    <Compile Include="Caching\MicroCache.cs" />
-    <Compile Include="Caching\MicroCacheItemRemovedEventArgs.cs" />
-    <Compile Include="Caching\NullCacheDependency.cs" />
-    <Compile Include="Caching\RuntimeCacheProvider.cs" />
-    <Compile Include="Caching\RuntimeCompositeCacheDependency.cs" />
-    <Compile Include="Caching\RuntimeFileCacheDependency.cs" />
-    <Compile Include="Caching\SiteMapCache.cs" />
-    <Compile Include="Caching\SiteMapCacheKeyGenerator.cs" />
-    <Compile Include="Caching\SiteMapCacheKeyToBuilderSetMapper.cs" />
-    <Compile Include="ChangeFrequency.cs" />
-    <Compile Include="Collections\GenericDictionaryFactory.cs" />
-    <Compile Include="Collections\IGenericDictionaryFactory.cs" />
-    <Compile Include="Collections\IThreadSafeDictionary.cs" />
-    <Compile Include="Collections\LockableDictionary.cs" />
-    <Compile Include="Collections\LockableList.cs" />
-    <Compile Include="Collections\CacheableDictionary.cs" />
-    <Compile Include="Collections\CacheableList.cs" />
-    <Compile Include="Collections\Specialized\NameValueCollectionExtensions.cs" />
-    <Compile Include="Collections\Specialized\ReservedKeyException.cs" />
-    <Compile Include="Collections\Specialized\SourceMetadataDictionary.cs" />
-    <Compile Include="CompositeSiteMapNodeProvider.cs" />
-    <Compile Include="CompositeSiteMapNodeVisibilityProvider.cs" />
-    <Compile Include="DI\Composer.cs" />
-    <Compile Include="DI\ConfigurationSettings.cs" />
-    <Compile Include="DI\ControllerFactoryDecorator.cs" />
-    <Compile Include="DI\DependencyResolverDecorator.cs" />
-    <Compile Include="DI\ExcludeFromAutoRegistrationAttribute.cs" />
-    <Compile Include="EnumHelper.cs" />
-    <Compile Include="Globalization\CultureContext.cs" />
-    <Compile Include="Globalization\CultureContextFactory.cs" />
-    <Compile Include="Globalization\ICultureContextFactory.cs" />
-    <Compile Include="Globalization\ICultureContext.cs" />
-    <Compile Include="ISiteMapNodeExtensions.cs" />
-    <Compile Include="ISiteMapNodeProvider.cs" />
-    <Compile Include="ISiteMapSettings.cs" />
-    <Compile Include="ISortable.cs" />
-    <Compile Include="Matching\IUrlKey.cs" />
-    <Compile Include="Matching\IUrlKeyFactory.cs" />
-    <Compile Include="Matching\RequestUrlKey.cs" />
-    <Compile Include="Matching\SiteMapNodeUrlKey.cs" />
-    <Compile Include="Matching\UrlKeyBase.cs" />
-    <Compile Include="Matching\UrlKeyFactory.cs" />
-    <Compile Include="Reflection\AttributeAssemblyProvider.cs" />
-    <Compile Include="Reflection\AttributeAssemblyProviderFactory.cs" />
-    <Compile Include="Reflection\IAttributeAssemblyProvider.cs" />
-    <Compile Include="Reflection\IAttributeAssemblyProviderFactory.cs" />
-    <Compile Include="Reflection\IMvcSiteMapNodeAttributeDefinitionProvider.cs" />
-    <Compile Include="Reflection\MvcSiteMapNodeAttributeDefinitionProvider.cs" />
-    <Compile Include="Reflection\ObjectExtensions.cs" />
-    <Compile Include="Reflection\PluginInstantiator.cs" />
-    <Compile Include="DI\SiteMapFactoryContainer.cs" />
-    <Compile Include="DI\SiteMapNodeFactoryContainer.cs" />
-    <Compile Include="Text\StringExtensions.cs" />
-    <Compile Include="TrimEmptyGroupingNodesVisibilityProvider.cs" />
-    <Compile Include="Visitor\NullSiteMapNodeVisitor.cs" />
-    <Compile Include="Web\Binding.cs" />
-    <Compile Include="Web\BindingFactory.cs" />
-    <Compile Include="Web\BindingProvider.cs" />
-    <Compile Include="Web\Compilation\BuildManagerAdapter.cs" />
-    <Compile Include="Web\CompositeBindingProvider.cs" />
-    <Compile Include="Web\CustomBindingProvider.cs" />
-    <Compile Include="Web\IBinding.cs" />
-    <Compile Include="Web\IBindingFactory.cs" />
-    <Compile Include="Web\IBindingProvider.cs" />
-    <Compile Include="Web\Mvc\ControllerBuilderAdapter.cs" />
-    <Compile Include="Web\Mvc\ControllerExtensions.cs" />
-    <Compile Include="Web\Mvc\Filters\Filter.cs" />
-    <Compile Include="Web\Mvc\Filters\GlobalFilterProvider.cs" />
-    <Compile Include="Web\Mvc\Filters\IGlobalFilterProvider.cs" />
-    <Compile Include="Web\Mvc\Filters\SiteMapCacheReleaseAttribute.cs" />
-    <Compile Include="Web\Routing\RouteDataExtensions.cs" />
-    <Compile Include="Web\Mvc\SiteMapHttpResponse.cs" />
-    <Compile Include="Web\Mvc\SiteMapHttpResponseCache.cs" />
-    <Compile Include="Web\Mvc\UrlHelperAdapter.cs" />
-    <Compile Include="Web\Script\Serialization\IJavaScriptSerializer.cs" />
-    <Compile Include="Web\Script\Serialization\IJsonToDictionaryDeserializer.cs" />
-    <Compile Include="Web\Script\Serialization\JavaScriptSerializerAdapter.cs" />
-    <Compile Include="Web\Script\Serialization\JsonToDictionaryDeserializer.cs" />
-    <Compile Include="Web\SiteMapNodeExtensions.cs" />
-    <Compile Include="Xml\ISiteMapXmlReservedAttributeNameProvider.cs" />
-    <Compile Include="Xml\SiteMapXmlReservedAttributeNameProvider.cs" />
-    <Compile Include="Xml\XmlDistinctAttributeAggregator.cs" />
-    <Compile Include="DI\XmlSiteMapResultFactoryContainer.cs" />
-    <Compile Include="FilteredSiteMapNodeVisibilityProvider.cs" />
-    <Compile Include="Globalization\ExplicitResourceKeyParser.cs" />
-    <Compile Include="Globalization\ILocalizationService.cs" />
-    <Compile Include="Globalization\IExplicitResourceKeyParser.cs" />
-    <Compile Include="Globalization\ILocalizationServiceFactory.cs" />
-    <Compile Include="Globalization\IStringLocalizer.cs" />
-    <Compile Include="Globalization\LocalizationService.cs" />
-    <Compile Include="Globalization\LocalizationServiceFactory.cs" />
-    <Compile Include="Globalization\StringLocalizer.cs" />
-    <Compile Include="Collections\Specialized\IPreservedRouteParameterCollection.cs" />
-    <Compile Include="Collections\Specialized\IRoleCollection.cs" />
-    <Compile Include="DI\SiteMapLoaderContainer.cs" />
-    <Compile Include="ISiteMapNodePluginProvider.cs" />
-    <Compile Include="ISiteMapPluginProvider.cs" />
-    <Compile Include="ISiteMapPluginProviderFactory.cs" />
-    <Compile Include="Linq\Dynamic.cs" />
-    <Compile Include="Loader\ISiteMapCreator.cs" />
-    <Compile Include="Loader\ISiteMapLoader.cs" />
-    <Compile Include="Loader\SiteMapCreator.cs" />
-    <Compile Include="Loader\SiteMapLoader.cs" />
-    <Compile Include="Collections\Specialized\PreservedRouteParameterCollection.cs" />
-    <Compile Include="Collections\Specialized\IMetaRobotsValueCollection.cs" />
-    <Compile Include="Collections\Specialized\MetaRobotsValueCollection.cs" />
-    <Compile Include="Collections\Specialized\RoleCollection.cs" />
-    <Compile Include="ISiteMapChildStateFactory.cs" />
-    <Compile Include="SiteMapChildStateFactory.cs" />
-    <Compile Include="SiteMapNodePluginProvider.cs" />
-    <Compile Include="SiteMapNodeVisibilityProviderBase.cs" />
-    <Compile Include="SiteMapPluginProvider.cs" />
-    <Compile Include="SiteMapPluginProviderFactory.cs" />
-    <Compile Include="Visitor\CompositeSiteMapNodeVisitor.cs" />
-    <Compile Include="Visitor\ISiteMapNodeVisitor.cs" />
-    <Compile Include="Visitor\UrlResolvingSiteMapNodeVisitor.cs" />
-    <Compile Include="Web\Compilation\BuildManagerAdaptor.cs" />
-    <Compile Include="Web\Html\CanonicalHelper.cs" />
-    <Compile Include="Web\Html\MetaRobotsHelper.cs" />
-    <Compile Include="Web\Html\Models\CanonicalHelperModel.cs" />
-    <Compile Include="Web\Html\Models\MetaRobotsHelperModel.cs" />
-    <Compile Include="Web\Compilation\IBuildManager.cs" />
-    <Compile Include="Web\Mvc\ActionMethodParameterResolverFactory.cs" />
-    <Compile Include="Web\Mvc\ControllerBuilderAdaptor.cs" />
-    <Compile Include="Web\Mvc\ControllerDescriptorFactory.cs" />
-    <Compile Include="Web\Mvc\IControllerDescriptorFactory.cs" />
-    <Compile Include="Web\Mvc\ControllerTypeResolverFactory.cs" />
-    <Compile Include="Web\Mvc\IActionMethodParameterResolverFactory.cs" />
-    <Compile Include="Web\Mvc\IControllerBuilder.cs" />
-    <Compile Include="Web\Mvc\IControllerTypeResolverFactory.cs" />
-    <Compile Include="Web\Mvc\IMvcResolver.cs" />
-    <Compile Include="Web\Mvc\IMvcResolverFactory.cs" />
-    <Compile Include="Web\Mvc\IUrlHelper.cs" />
-    <Compile Include="Web\Mvc\AmbiguousControllerException.cs" />
-    <Compile Include="Web\Mvc\ActionMethodParameterResolver.cs" />
-    <Compile Include="Web\Mvc\ControllerTypeResolver.cs" />
-    <Compile Include="Web\Mvc\Filters\AttributeTarget.cs" />
-    <Compile Include="Web\Mvc\Filters\SiteMapPreserveRouteDataAttribute.cs" />
-    <Compile Include="Web\Mvc\Filters\SiteMapTitleAttribute.cs" />
-    <Compile Include="Web\Mvc\IActionMethodParameterResolver.cs" />
-    <Compile Include="Web\Mvc\IControllerTypeResolver.cs" />
-    <Compile Include="Web\Mvc\IXmlSiteMapResultFactory.cs" />
-    <Compile Include="Web\Mvc\MvcContextFactory.cs" />
-    <Compile Include="Web\Mvc\IMvcContextFactory.cs" />
-    <Compile Include="Web\Mvc\MvcResolver.cs" />
-    <Compile Include="Web\Mvc\MvcResolverFactory.cs" />
-    <Compile Include="Web\Mvc\UrlHelperAdaptor.cs" />
-    <Compile Include="Web\Mvc\XmlSiteMapResultFactory.cs" />
-    <Compile Include="Web\UrlResolver\SiteMapNodeUrlResolverBase.cs" />
-    <Compile Include="Reflection\TypeExtensions.cs" />
-    <Compile Include="Caching\IRequestCache.cs" />
-    <Compile Include="Caching\RequestCache.cs" />
-    <Compile Include="Collections\Specialized\AttributeDictionaryFactory.cs" />
-    <Compile Include="Builder\SiteMapBuilderSetStrategy.cs" />
-    <Compile Include="Builder\CompositeSiteMapBuilder.cs" />
-    <Compile Include="Builder\DynamicSiteMapNodeBuilder.cs" />
-    <Compile Include="Builder\ISiteMapBuilderSetStrategy.cs" />
-    <Compile Include="Builder\IDynamicSiteMapNodeBuilder.cs" />
-    <Compile Include="Builder\ISiteMapBuilderSet.cs" />
-    <Compile Include="Builder\MvcSiteMapNodeAttributeDefinitionForAction.cs" />
-    <Compile Include="Builder\MvcSiteMapNodeAttributeDefinitionForController.cs" />
-    <Compile Include="Collections\ThreadSafeDictionary.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Resources\Messages.Designer.cs">
+    <Compile Update="Resources\Messages.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Messages.resx</DependentUpon>
     </Compile>
-    <Compile Include="Security\AuthorizeAttributeAclModule.cs" />
-    <Compile Include="Security\CompositeAclModule.cs" />
-    <Compile Include="Security\IAclModule.cs" />
-    <Compile Include="Security\XmlRolesAclModule.cs" />
-    <Compile Include="Builder\IMvcSiteMapNodeAttributeDefinition.cs" />
-    <Compile Include="Builder\INodeKeyGenerator.cs" />
-    <Compile Include="Builder\NodeKeyGenerator.cs" />
-    <Compile Include="Builder\ReflectionSiteMapBuilder.cs" />
-    <Compile Include="Builder\SiteMapBuilderSet.cs" />
-    <Compile Include="Web\UrlResolver\SiteMapNodeUrlResolver.cs" />
-    <Compile Include="Collections\Specialized\IAttributeDictionary.cs" />
-    <Compile Include="ISiteMapNodeChildStateFactory.cs" />
-    <Compile Include="Collections\Specialized\ISiteMapNodeCollectionFactory.cs" />
-    <Compile Include="LockableSiteMap.cs" />
-    <Compile Include="LockableSiteMapNode.cs" />
-    <Compile Include="Collections\Specialized\LockableSiteMapNodeCollection.cs" />
-    <Compile Include="Collections\Specialized\ReadOnlySiteMapNodeCollection.cs" />
-    <Compile Include="RequestCacheableSiteMap.cs" />
-    <Compile Include="RequestCacheableSiteMapNode.cs" />
-    <Compile Include="SiteMapNodeChildStateFactory.cs" />
-    <Compile Include="Collections\Specialized\SiteMapNodeCollection.cs" />
-    <Compile Include="DynamicNodeProviderBase.cs" />
-    <Compile Include="DynamicNodeProviderStrategy.cs" />
-    <Compile Include="Collections\Specialized\ISiteMapNodeCollection.cs" />
-    <Compile Include="IDynamicNodeProviderStrategy.cs" />
-    <Compile Include="IMvcSiteMapNodeAttribute.cs" />
-    <Compile Include="Collections\Specialized\IRouteValueDictionary.cs" />
-    <Compile Include="Collections\Specialized\IRouteValueDictionaryFactory.cs" />
-    <Compile Include="ISiteMapFactory.cs" />
-    <Compile Include="ISiteMapNode.cs" />
-    <Compile Include="Collections\Specialized\IAttributeDictionaryFactory.cs" />
-    <Compile Include="ISiteMapNodeFactory.cs" />
-    <Compile Include="Web\UrlResolver\ISiteMapNodeUrlResolverStrategy.cs" />
-    <Compile Include="ISiteMapNodeVisibilityProviderStrategy.cs" />
-    <Compile Include="MvcSiteMapNodeAttribute.cs" />
-    <Compile Include="Collections\ObservableDictionary.cs" />
-    <Compile Include="Collections\Specialized\RouteValueDictionary.cs" />
-    <Compile Include="Collections\Specialized\RouteValueDictionaryFactory.cs" />
-    <Compile Include="SiteMapFactory.cs" />
-    <Compile Include="SiteMapNode.cs" />
-    <Compile Include="Collections\Specialized\AttributeDictionary.cs" />
-    <Compile Include="Collections\Specialized\SiteMapNodeCollectionFactory.cs" />
-    <Compile Include="SiteMapNodeFactory.cs" />
-    <Compile Include="Web\UrlResolver\SiteMapNodeUrlResolverStrategy.cs" />
-    <Compile Include="SiteMapNodePositioningBase.cs" />
-    <Compile Include="SiteMapNodeSecurityBase.cs" />
-    <Compile Include="SiteMapNodeVisibilityProviderStrategy.cs" />
-    <Compile Include="SiteMaps.cs" />
-    <Compile Include="Web\Mvc\MvcSiteMapProviderViewEngine.cs" />
-    <Compile Include="Web\Mvc\MvcSiteMapProviderViewEngineVirtualFile.cs" />
-    <Compile Include="Web\Mvc\MvcSiteMapProviderViewEngineVirtualPathProvider.cs" />
-    <Compile Include="UnknownSiteMapException.cs" />
-    <Compile Include="Web\Html\HtmlHelperExtensions.cs" />
-    <Compile Include="Web\Html\MenuHelper.cs" />
-    <Compile Include="Web\Html\Models\MenuHelperModel.cs" />
-    <Compile Include="Web\Html\Models\SiteMapHelperModel.cs" />
-    <Compile Include="Web\Html\Models\SiteMapNodeModel.cs" />
-    <Compile Include="Web\Html\Models\SiteMapNodeModelList.cs" />
-    <Compile Include="Web\Html\Models\SiteMapPathHelperModel.cs" />
-    <Compile Include="Web\Html\Models\SiteMapTitleHelperModel.cs" />
-    <Compile Include="Web\Html\MvcSiteMapHtmlHelper.cs" />
-    <Compile Include="Web\Html\SiteMapHelper.cs" />
-    <Compile Include="Web\Html\SiteMapPathHelper.cs" />
-    <Compile Include="Web\Html\SiteMapTitleHelper.cs" />
-    <Compile Include="Web\IUrlPath.cs" />
-    <Compile Include="Web\ViewDataContainer.cs" />
-    <Compile Include="Web\Mvc\XmlSiteMapController.cs" />
-    <Compile Include="Web\Mvc\XmlSiteMapResult.cs" />
-    <Compile Include="Xml\FileXmlSource.cs" />
-    <Compile Include="Xml\ISiteMapXmlValidator.cs" />
-    <Compile Include="Xml\ISiteMapXmlNameProvider.cs" />
-    <Compile Include="Xml\XElementExtensions.cs" />
-    <Compile Include="Builder\XmlSiteMapBuilder.cs" />
-    <Compile Include="DynamicNode.cs" />
-    <Compile Include="Web\Mvc\SiteMapHttpContext.cs" />
-    <Compile Include="Web\Mvc\SiteMapHttpRequest.cs" />
-    <Compile Include="IDynamicNodeProvider.cs" />
-    <Compile Include="ISiteMap.cs" />
-    <Compile Include="Web\UrlResolver\ISiteMapNodeUrlResolver.cs" />
-    <Compile Include="ISiteMapNodeVisibilityProvider.cs" />
-    <Compile Include="Builder\ISiteMapBuilder.cs" />
-    <Compile Include="MvcSiteMapException.cs" />
-    <Compile Include="SiteMap.cs" />
-    <Compile Include="Web\UrlPath.cs" />
-    <Compile Include="UpdatePriority.cs" />
-    <Compile Include="Xml\SiteMapXmlValidator.cs" />
-    <Compile Include="Xml\IXmlSource.cs" />
-    <Compile Include="Xml\SiteMapXmlNameProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Xml\MvcSiteMapSchema.xsd">
@@ -410,7 +62,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Messages.resx">
+    <EmbeddedResource Update="Resources\Messages.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Messages.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
@@ -452,12 +104,18 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
-    <None Include="Web\Html\DisplayTemplates\CanonicalHelperModel.cshtml" />
+    <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.2.39">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
+    <PackageReference Include="Microsoft.Web.Administration" Version="11.1.0" />
+    <PackageReference Include="MinVer" Version="6.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.*" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="System.Runtime.Caching" Version="9.0.*" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Web\Html\DisplayTemplates\MetaRobotsHelperModel.cshtml" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
