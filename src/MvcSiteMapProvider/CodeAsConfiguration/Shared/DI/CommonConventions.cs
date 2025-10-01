@@ -30,9 +30,9 @@ namespace DI
         /// <param name="excludeRegEx">A regular expression that can be used to exclude types based on the type 
         /// name (excluding the namespace name). All types that match the regular expression will be excluded.</param>
         public static void RegisterDefaultConventions(
-            Action<Type, Type> registerMethod, 
-            Assembly[] interfaceAssemblies, 
-            Assembly[] implementationAssemblies, 
+            Action<Type, Type> registerMethod,
+            Assembly[] interfaceAssemblies,
+            Assembly[] implementationAssemblies,
             Type[] excludeTypes,
             string excludeRegEx)
         {
@@ -182,7 +182,7 @@ namespace DI
 
         private static bool IsExcludedType(Type type)
         {
-            return type.GetCustomAttributes(typeof(MvcSiteMapProvider.DI.ExcludeFromAutoRegistrationAttribute), false).Length > 0;  
+            return type.GetCustomAttributes(typeof(MvcSiteMapProvider.DI.ExcludeFromAutoRegistrationAttribute), false).Length > 0;
         }
 
         private static bool IsDefaultType(Type interfaceType, Type implementationType)
