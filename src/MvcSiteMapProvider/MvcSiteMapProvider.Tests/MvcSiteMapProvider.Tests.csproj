@@ -178,6 +178,9 @@
     <Compile Include="Unit\Collections\Specialized\NameValueCollectionExtensionsTest.cs" />
     <Compile Include="Unit\Collections\Specialized\RouteValueDictionaryTest.cs" />
     <Compile Include="Unit\Collections\ThreadSafeDictionaryTest.cs" />
+    <Compile Include="Unit\Core\SiteMapBuilderTests.cs" />
+    <Compile Include="Unit\Core\SiteMapNodeTests.cs" />
+    <Compile Include="Unit\Core\SiteMapTests.cs" />
     <Compile Include="Unit\Loader\SiteMapLoaderTest.cs" />
     <Compile Include="Unit\Web\Html\FakeSiteMap.cs" />
     <Compile Include="Unit\Web\Html\FakeSiteMapNode.cs" />

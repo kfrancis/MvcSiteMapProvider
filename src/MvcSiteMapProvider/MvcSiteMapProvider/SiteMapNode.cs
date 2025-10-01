@@ -643,9 +643,12 @@ public class SiteMapNode
     {
         // NOTE: Expected behavior is to reference 
         // the same child nodes, so this is okay.
-        foreach (var child in ChildNodes)
+        if (node.ChildNodes != null) // Guard for mocks or incomplete implementations
         {
-            node.ChildNodes.Add(child);
+            foreach (var child in ChildNodes)
+            {
+                node.ChildNodes.Add(child);
+            }
         }
 
         node.HttpMethod = HttpMethod;
@@ -655,8 +658,14 @@ public class SiteMapNode
         node.ImageUrl = ImageUrl;
         node.ImageUrlProtocol = ImageUrlProtocol;
         node.ImageUrlHostName = ImageUrlHostName;
-        Attributes.CopyTo(node.Attributes);
-        Roles.CopyTo(node.Roles);
+        if (node.Attributes != null) // Guard for mocks
+        {
+            Attributes.CopyTo(node.Attributes);
+        }
+        if (node.Roles != null)
+        {
+            Roles.CopyTo(node.Roles);
+        }
         node.LastModifiedDate = LastModifiedDate;
         node.ChangeFrequency = ChangeFrequency;
         node.UpdatePriority = UpdatePriority;
@@ -672,11 +681,20 @@ public class SiteMapNode
         node.CanonicalUrl = canonicalUrl; // Get protected member
         node.CanonicalUrlProtocol = CanonicalUrlProtocol;
         node.CanonicalUrlHostName = CanonicalUrlHostName;
-        MetaRobotsValues.CopyTo(node.MetaRobotsValues);
+        if (node.MetaRobotsValues != null)
+        {
+            MetaRobotsValues.CopyTo(node.MetaRobotsValues);
+        }
         node.DynamicNodeProvider = DynamicNodeProvider;
         node.Route = Route;
-        RouteValues.CopyTo(node.RouteValues);
-        PreservedRouteParameters.CopyTo(node.PreservedRouteParameters);
+        if (node.RouteValues != null)
+        {
+            RouteValues.CopyTo(node.RouteValues);
+        }
+        if (node.PreservedRouteParameters != null)
+        {
+            PreservedRouteParameters.CopyTo(node.PreservedRouteParameters);
+        }
         // NOTE: Area, Controller, and Action are covered under RouteValues.
     }
 
