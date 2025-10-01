@@ -1,35 +1,34 @@
 ﻿using System.Xml.Linq;
 
-namespace MvcSiteMapProvider.Xml
+namespace MvcSiteMapProvider.Xml;
+
+/// <summary>
+/// Class that provides details of the sitemap XML element names.
+/// </summary>
+public class SiteMapXmlNameProvider
+    : ISiteMapXmlNameProvider
 {
-    /// <summary>
-    /// Class that provides details of the sitemap XML element names.
-    /// </summary>
-    public class SiteMapXmlNameProvider
-        : ISiteMapXmlNameProvider
+    protected const string xmlRootName = "mvcSiteMap";
+    protected const string xmlNodeName = "mvcSiteMapNode";
+    protected readonly XNamespace xmlSiteMapNamespace = "http://mvcsitemap.codeplex.com/schemas/MvcSiteMap-File-4.0";
+
+    #region ISiteMapXmlNameProvider Members
+
+    public virtual XName NodeName => xmlSiteMapNamespace + xmlNodeName;
+
+    public virtual XName RootName => xmlSiteMapNamespace + xmlRootName;
+
+    public virtual void FixXmlNamespaces(XDocument xml)
     {
-        protected const string xmlRootName = "mvcSiteMap";
-        protected const string xmlNodeName = "mvcSiteMapNode";
-        protected readonly XNamespace xmlSiteMapNamespace = "http://mvcsitemap.codeplex.com/schemas/MvcSiteMap-File-4.0";
-
-        #region ISiteMapXmlNameProvider Members
-
-        public virtual XName NodeName => xmlSiteMapNamespace + xmlNodeName;
-
-        public virtual XName RootName => xmlSiteMapNamespace + xmlRootName;
-
-        public virtual void FixXmlNamespaces(XDocument xml)
+        // If no namespace is present (or the wrong one is present), replace it
+        foreach (var node in xml.Descendants())
         {
-            // If no namespace is present (or the wrong one is present), replace it
-            foreach (var node in xml.Descendants())
+            if (string.IsNullOrEmpty(node.Name.Namespace.NamespaceName) || node.Name.Namespace != this.xmlSiteMapNamespace)
             {
-                if (string.IsNullOrEmpty(node.Name.Namespace.NamespaceName) || node.Name.Namespace != this.xmlSiteMapNamespace)
-                {
-                    node.Name = XName.Get(node.Name.LocalName, this.xmlSiteMapNamespace.ToString());
-                }
+                node.Name = XName.Get(node.Name.LocalName, this.xmlSiteMapNamespace.ToString());
             }
         }
-
-        #endregion
     }
+
+    #endregion
 }

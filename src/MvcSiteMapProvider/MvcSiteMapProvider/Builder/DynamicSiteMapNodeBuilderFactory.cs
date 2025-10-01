@@ -1,31 +1,29 @@
-﻿using MvcSiteMapProvider.Globalization;
 using System;
+using MvcSiteMapProvider.Globalization;
 
-namespace MvcSiteMapProvider.Builder
+namespace MvcSiteMapProvider.Builder;
+
+public class DynamicSiteMapNodeBuilderFactory
+    : IDynamicSiteMapNodeBuilderFactory
 {
-    public class DynamicSiteMapNodeBuilderFactory
-        : IDynamicSiteMapNodeBuilderFactory
+    private readonly ICultureContextFactory _cultureContextFactory;
+
+    private readonly ISiteMapNodeCreatorFactory _siteMapNodeCreatorFactory;
+
+    public DynamicSiteMapNodeBuilderFactory(
+        ISiteMapNodeCreatorFactory siteMapNodeCreatorFactory,
+        ICultureContextFactory cultureContextFactory
+    )
     {
-        public DynamicSiteMapNodeBuilderFactory(
-            ISiteMapNodeCreatorFactory siteMapNodeCreatorFactory,
-            ICultureContextFactory cultureContextFactory
-            )
-        {
-            this.siteMapNodeCreatorFactory = siteMapNodeCreatorFactory ?? throw new ArgumentNullException(nameof(siteMapNodeCreatorFactory));
-            this.cultureContextFactory = cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
-        }
+        _siteMapNodeCreatorFactory = siteMapNodeCreatorFactory ??
+                                     throw new ArgumentNullException(nameof(siteMapNodeCreatorFactory));
+        _cultureContextFactory =
+            cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
+    }
 
-        private readonly ISiteMapNodeCreatorFactory siteMapNodeCreatorFactory;
-        private readonly ICultureContextFactory cultureContextFactory;
-
-        #region IDynamicSiteMapNodeBuilderFactory Members
-
-        public IDynamicSiteMapNodeBuilder Create(ISiteMap siteMap, ICultureContext cultureContext)
-        {
-            var siteMapNodeCreator = this.siteMapNodeCreatorFactory.Create(siteMap);
-            return new DynamicSiteMapNodeBuilder(siteMapNodeCreator, cultureContext, this.cultureContextFactory);
-        }
-
-        #endregion
+    public IDynamicSiteMapNodeBuilder Create(ISiteMap siteMap, ICultureContext cultureContext)
+    {
+        var siteMapNodeCreator = _siteMapNodeCreatorFactory.Create(siteMap);
+        return new DynamicSiteMapNodeBuilder(siteMapNodeCreator, cultureContext, _cultureContextFactory);
     }
 }

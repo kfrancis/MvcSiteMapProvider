@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace MvcSiteMapProvider.Reflection
+namespace MvcSiteMapProvider.Reflection;
+
+public interface IMvcSiteMapNodeAttributeDefinitionProvider
 {
-    public interface IMvcSiteMapNodeAttributeDefinitionProvider
-    {
-        IEnumerable<IMvcSiteMapNodeAttributeDefinition> GetMvcSiteMapNodeAttributeDefinitions(IEnumerable<Assembly> assemblies);
-    }
+    IEnumerable<IMvcSiteMapNodeAttributeDefinition> GetMvcSiteMapNodeAttributeDefinitions(IEnumerable<Assembly> assemblies);
 }

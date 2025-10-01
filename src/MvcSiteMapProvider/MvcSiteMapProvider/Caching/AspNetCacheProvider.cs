@@ -3,102 +3,101 @@ using System;
 using System.Web;
 using System.Web.Caching;
 
-namespace MvcSiteMapProvider.Caching
+namespace MvcSiteMapProvider.Caching;
+
+/// <summary>
+/// A cache provider that uses the <see cref="T:System.Web.HttpContext.Current.Cache"/> instance to 
+/// cache items that are added.
+/// </summary>
+/// <typeparam name="T">The type of item that will be stored in the cache.</typeparam>
+public class AspNetCacheProvider<T>
+    : ICacheProvider<T>
 {
-    /// <summary>
-    /// A cache provider that uses the <see cref="T:System.Web.HttpContext.Current.Cache"/> instance to 
-    /// cache items that are added.
-    /// </summary>
-    /// <typeparam name="T">The type of item that will be stored in the cache.</typeparam>
-    public class AspNetCacheProvider<T>
-        : ICacheProvider<T>
+    public AspNetCacheProvider(
+        IMvcContextFactory mvcContextFactory
+    )
     {
-        public AspNetCacheProvider(
-            IMvcContextFactory mvcContextFactory
-            )
+        this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
+    }
+    private readonly IMvcContextFactory mvcContextFactory;
+
+    private HttpContextBase Context => this.mvcContextFactory.CreateHttpContext();
+
+    #region ICacheProvider<T> Members
+
+    public event EventHandler<MicroCacheItemRemovedEventArgs<T?>>? ItemRemoved;
+
+    public bool Contains(string key)
+    {
+        return (Context.Cache[key] != null);
+    }
+
+    public LazyLock Get(string key)
+    {
+        return (LazyLock)Context.Cache.Get(key);
+    }
+
+    public bool TryGetValue(string key, out LazyLock value)
+    {
+        value = this.Get(key);
+        if (value != null)
         {
-            this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
+            return true;
         }
-        private readonly IMvcContextFactory mvcContextFactory;
+        return false;
+    }
 
-        private HttpContextBase Context => this.mvcContextFactory.CreateHttpContext();
-
-        #region ICacheProvider<T> Members
-
-        public event EventHandler<MicroCacheItemRemovedEventArgs<T?>>? ItemRemoved;
-
-        public bool Contains(string key)
+    public void Add(string key, LazyLock item, ICacheDetails cacheDetails)
+    {
+        var absolute = System.Web.Caching.Cache.NoAbsoluteExpiration;
+        var sliding = System.Web.Caching.Cache.NoSlidingExpiration;
+        if (IsTimespanSet(cacheDetails.AbsoluteCacheExpiration))
         {
-            return (Context.Cache[key] != null);
+            absolute = DateTime.UtcNow.Add(cacheDetails.AbsoluteCacheExpiration);
         }
-
-        public LazyLock Get(string key)
+        else if (IsTimespanSet(cacheDetails.SlidingCacheExpiration))
         {
-            return (LazyLock)Context.Cache.Get(key);
-        }
-
-        public bool TryGetValue(string key, out LazyLock value)
-        {
-            value = this.Get(key);
-            if (value != null)
-            {
-                return true;
-            }
-            return false;
-        }
-
-        public void Add(string key, LazyLock item, ICacheDetails cacheDetails)
-        {
-            var absolute = System.Web.Caching.Cache.NoAbsoluteExpiration;
-            var sliding = System.Web.Caching.Cache.NoSlidingExpiration;
-            if (IsTimespanSet(cacheDetails.AbsoluteCacheExpiration))
-            {
-                absolute = DateTime.UtcNow.Add(cacheDetails.AbsoluteCacheExpiration);
-            }
-            else if (IsTimespanSet(cacheDetails.SlidingCacheExpiration))
-            {
-                sliding = cacheDetails.SlidingCacheExpiration;
-            }
-
-            if (cacheDetails.CacheDependency.Dependency == null)
-                return;
-
-            var dependency = (CacheDependency)cacheDetails.CacheDependency.Dependency;
-
-            Context.Cache.Insert(key, item, dependency, absolute, sliding, CacheItemPriority.NotRemovable, this.OnItemRemoved);
+            sliding = cacheDetails.SlidingCacheExpiration;
         }
 
-        public void Remove(string key)
-        {
-            Context.Cache.Remove(key);
-        }
+        if (cacheDetails.CacheDependency.Dependency == null)
+            return;
 
-        #endregion
+        var dependency = (CacheDependency)cacheDetails.CacheDependency.Dependency;
 
-        private static bool IsTimespanSet(TimeSpan timeSpan)
-        {
-            return (!timeSpan.Equals(TimeSpan.MinValue));
-        }
+        Context.Cache.Insert(key, item, dependency, absolute, sliding, CacheItemPriority.NotRemovable, this.OnItemRemoved);
+    }
 
-        /// <summary>
-        /// This method is called when an item has been removed from the cache.
-        /// </summary>
-        /// <param name="key">Cached item key.</param>
-        /// <param name="item">Cached item.</param>
-        /// <param name="reason">Reason the cached item was removed.</param>
-        protected virtual void OnItemRemoved(string key, object item, CacheItemRemovedReason reason)
-        {
-            var args = new MicroCacheItemRemovedEventArgs<T?>(key, ((LazyLock)item).Get<T>(null));
-            OnCacheItemRemoved(args);
-        }
+    public void Remove(string key)
+    {
+        Context.Cache.Remove(key);
+    }
 
-        protected virtual void OnCacheItemRemoved(MicroCacheItemRemovedEventArgs<T?>? e)
+    #endregion
+
+    private static bool IsTimespanSet(TimeSpan timeSpan)
+    {
+        return (!timeSpan.Equals(TimeSpan.MinValue));
+    }
+
+    /// <summary>
+    /// This method is called when an item has been removed from the cache.
+    /// </summary>
+    /// <param name="key">Cached item key.</param>
+    /// <param name="item">Cached item.</param>
+    /// <param name="reason">Reason the cached item was removed.</param>
+    protected virtual void OnItemRemoved(string key, object item, CacheItemRemovedReason reason)
+    {
+        var args = new MicroCacheItemRemovedEventArgs<T?>(key, ((LazyLock)item).Get<T>(null));
+        OnCacheItemRemoved(args);
+    }
+
+    protected virtual void OnCacheItemRemoved(MicroCacheItemRemovedEventArgs<T?>? e)
+    {
+        if (this.ItemRemoved != null)
         {
-            if (this.ItemRemoved != null)
-            {
-                if (e != null)
-                    ItemRemoved(this, e);
-            }
+            if (e != null)
+                ItemRemoved(this, e);
         }
     }
 }

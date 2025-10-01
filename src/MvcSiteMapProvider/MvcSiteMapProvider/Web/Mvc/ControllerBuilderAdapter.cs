@@ -2,42 +2,41 @@
 using System.Collections.Generic;
 using System.Web.Mvc;
 
-namespace MvcSiteMapProvider.Web.Mvc
+namespace MvcSiteMapProvider.Web.Mvc;
+
+/// <summary>
+/// Adapter class so test doubles can be injected for <see cref="T:System.Web.Mvc.ControllerBuilder"/>.
+/// </summary>
+public class ControllerBuilderAdapter
+    : IControllerBuilder
 {
-    /// <summary>
-    /// Adapter class so test doubles can be injected for <see cref="T:System.Web.Mvc.ControllerBuilder"/>.
-    /// </summary>
-    public class ControllerBuilderAdapter
-        : IControllerBuilder
+    public ControllerBuilderAdapter(
+        ControllerBuilder controllerBuilder
+    )
     {
-        public ControllerBuilderAdapter(
-            ControllerBuilder controllerBuilder
-            )
-        {
-            this.controllerBuilder = controllerBuilder ?? throw new ArgumentNullException(nameof(controllerBuilder));
-        }
-
-        protected readonly ControllerBuilder controllerBuilder;
-
-        #region IControllerBuilder Members
-
-        public HashSet<string> DefaultNamespaces => controllerBuilder.DefaultNamespaces;
-
-        public IControllerFactory GetControllerFactory()
-        {
-            return controllerBuilder.GetControllerFactory();
-        }
-
-        public void SetControllerFactory(Type controllerFactoryType)
-        {
-            controllerBuilder.SetControllerFactory(controllerFactoryType);
-        }
-
-        public void SetControllerFactory(IControllerFactory controllerFactory)
-        {
-            controllerBuilder.SetControllerFactory(controllerFactory);
-        }
-
-        #endregion
+        this.controllerBuilder = controllerBuilder ?? throw new ArgumentNullException(nameof(controllerBuilder));
     }
+
+    protected readonly ControllerBuilder controllerBuilder;
+
+    #region IControllerBuilder Members
+
+    public HashSet<string> DefaultNamespaces => controllerBuilder.DefaultNamespaces;
+
+    public IControllerFactory GetControllerFactory()
+    {
+        return controllerBuilder.GetControllerFactory();
+    }
+
+    public void SetControllerFactory(Type controllerFactoryType)
+    {
+        controllerBuilder.SetControllerFactory(controllerFactoryType);
+    }
+
+    public void SetControllerFactory(IControllerFactory controllerFactory)
+    {
+        controllerBuilder.SetControllerFactory(controllerFactory);
+    }
+
+    #endregion
 }

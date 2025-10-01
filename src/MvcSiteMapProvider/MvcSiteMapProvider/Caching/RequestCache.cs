@@ -2,37 +2,36 @@
 using System;
 using System.Web;
 
-namespace MvcSiteMapProvider.Caching
+namespace MvcSiteMapProvider.Caching;
+
+/// <summary>
+/// Provides type-safe access to <see cref="P:System.Web.HttpContext.Items"/>.
+/// </summary>
+public class RequestCache 
+    : IRequestCache
 {
-    /// <summary>
-    /// Provides type-safe access to <see cref="P:System.Web.HttpContext.Items"/>.
-    /// </summary>
-    public class RequestCache 
-        : IRequestCache
+    public RequestCache(
+        IMvcContextFactory mvcContextFactory
+    )
     {
-        public RequestCache(
-            IMvcContextFactory mvcContextFactory
-            )
+        this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
+    }
+
+    private readonly IMvcContextFactory mvcContextFactory;
+
+    private HttpContextBase Context => this.mvcContextFactory.CreateHttpContext();
+
+    public virtual T? GetValue<T>(string key)
+    {
+        if (this.Context.Items.Contains(key))
         {
-            this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
+            return (T)this.Context.Items[key];
         }
+        return default(T);
+    }
 
-        private readonly IMvcContextFactory mvcContextFactory;
-
-        private HttpContextBase Context => this.mvcContextFactory.CreateHttpContext();
-
-        public virtual T? GetValue<T>(string key)
-        {
-            if (this.Context.Items.Contains(key))
-            {
-                return (T)this.Context.Items[key];
-            }
-            return default(T);
-        }
-
-        public virtual void SetValue<T>(string key, T value)
-        {
-            this.Context.Items[key] = value;
-        }
+    public virtual void SetValue<T>(string key, T value)
+    {
+        this.Context.Items[key] = value;
     }
 }

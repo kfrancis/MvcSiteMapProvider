@@ -1,12 +1,11 @@
-﻿namespace MvcSiteMapProvider.Caching
+﻿namespace MvcSiteMapProvider.Caching;
+
+public class SiteMapCache
+    : MicroCache<ISiteMap>, ISiteMapCache
 {
-    public class SiteMapCache
-        : MicroCache<ISiteMap>, ISiteMapCache
+    public SiteMapCache(
+        ICacheProvider<ISiteMap> cacheProvider
+    ) : base(cacheProvider)
     {
-        public SiteMapCache(
-            ICacheProvider<ISiteMap> cacheProvider
-            ) : base(cacheProvider)
-        {
-        }
     }
 }

@@ -1,210 +1,216 @@
-﻿using MvcSiteMapProvider.Reflection;
-using MvcSiteMapProvider.Web;
-using MvcSiteMapProvider.Xml;
-using System;
+﻿using System;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Web;
+using MvcSiteMapProvider.Reflection;
+using MvcSiteMapProvider.Web;
+using MvcSiteMapProvider.Xml;
 
-namespace MvcSiteMapProvider.Builder
+namespace MvcSiteMapProvider.Builder;
+
+/// <summary>
+///     AspNetSiteMapBuilder class. Builds a <see cref="T:MvcSiteMapProvider.ISiteMapNode" /> tree based on a
+///     <see cref="T:System.Web.SiteMapProvider" /> instance.
+/// </summary>
+/// <remarks>
+///     Use this class for interoperability with ASP.NET classic. To get a sitemap instance, you will need
+///     to configure a Web.sitemap XML file using the ASP.NET classic schema, then configure it for use in the
+///     sitemap/providers section of the Web.config file. Consult MSDN for information on how to do this.
+///     The sitemap provider can be retrieved from ASP.NET classic for injection into this class using
+///     an implementation of IAspNetSiteMapProvider. You may implement this interface to provide custom
+///     logic for retrieving a provider by name or other means by using
+///     System.Web.SiteMap.Providers[providerName] or for the default provider System.Web.SiteMap.Provider.
+///     Attributes and route values are obtained from a protected member variable of the
+///     System.Web.SiteMapProvider named _attributes using reflection. You may disable this functionality for
+///     performance reasons if the data is not required by setting reflectAttributes and/or reflectRouteValues to false.
+/// </remarks>
+[Obsolete(
+    "AspNetSiteMapBuilder is deprecated and will be removed in version 5. Use AspNetSiteMapNodeProvider in conjunction with SiteMapBuilder instead.")]
+public class AspNetSiteMapBuilder
+    : ISiteMapBuilder
 {
-    /// <summary>
-    /// AspNetSiteMapBuilder class. Builds a <see cref="T:MvcSiteMapProvider.ISiteMapNode"/> tree based on a 
-    /// <see cref="T:System.Web.SiteMapProvider"/> instance.
-    /// </summary>
-    /// <remarks>
-    /// Use this class for interoperability with ASP.NET classic. To get a sitemap instance, you will need
-    /// to configure a Web.sitemap XML file using the ASP.NET classic schema, then configure it for use in the
-    /// sitemap/providers section of the Web.config file. Consult MSDN for information on how to do this.
-    /// 
-    /// The sitemap provider can be retrieved from ASP.NET classic for injection into this class using 
-    /// an implementation of IAspNetSiteMapProvider. You may implement this interface to provide custom
-    /// logic for retrieving a provider by name or other means by using 
-    /// System.Web.SiteMap.Providers[providerName] or for the default provider System.Web.SiteMap.Provider.
-    /// 
-    /// Attributes and route values are obtained from a protected member variable of the 
-    /// System.Web.SiteMapProvider named _attributes using reflection. You may disable this functionality for 
-    /// performance reasons if the data is not required by setting reflectAttributes and/or reflectRouteValues to false.
-    /// </remarks>
-    [Obsolete("AspNetSiteMapBuilder is deprecated and will be removed in version 5. Use AspNetSiteMapNodeProvider in conjunction with SiteMapBuilder instead.")]
-    public class AspNetSiteMapBuilder
-        : ISiteMapBuilder
+    private readonly bool _reflectAttributes;
+    private readonly bool _reflectRouteValues;
+    private readonly ISiteMapNodeFactory _siteMapNodeFactory;
+    private readonly IAspNetSiteMapProvider _siteMapProvider;
+    protected readonly ISiteMapXmlReservedAttributeNameProvider ReservedAttributeNameProvider;
+
+    public AspNetSiteMapBuilder(
+        bool reflectAttributes,
+        bool reflectRouteValues,
+        ISiteMapXmlReservedAttributeNameProvider reservedAttributeNameProvider,
+        IAspNetSiteMapProvider siteMapProvider,
+        ISiteMapNodeFactory siteMapNodeFactory
+    )
     {
-        public AspNetSiteMapBuilder(
-            bool reflectAttributes,
-            bool reflectRouteValues,
-            ISiteMapXmlReservedAttributeNameProvider reservedAttributeNameProvider,
-            IAspNetSiteMapProvider siteMapProvider,
-            ISiteMapNodeFactory siteMapNodeFactory
-            )
+        _reflectAttributes = reflectAttributes;
+        _reflectRouteValues = reflectRouteValues;
+        ReservedAttributeNameProvider = reservedAttributeNameProvider ??
+                                        throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
+        _siteMapProvider = siteMapProvider ?? throw new ArgumentNullException(nameof(siteMapProvider));
+        _siteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
+    }
+
+    public ISiteMapNode? BuildSiteMap(ISiteMap siteMap, ISiteMapNode? rootNode)
+    {
+        var provider = _siteMapProvider.GetProvider();
+
+        rootNode = GetRootNode(siteMap, provider);
+        // Fixes #192 root node not added to sitemap
+        if (siteMap.FindSiteMapNodeFromKey(rootNode.Key) == null)
         {
-            this.reflectAttributes = reflectAttributes;
-            this.reflectRouteValues = reflectRouteValues;
-            this.reservedAttributeNameProvider = reservedAttributeNameProvider ?? throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
-            this.siteMapProvider = siteMapProvider ?? throw new ArgumentNullException(nameof(siteMapProvider));
-            this.siteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
+            // Add the root node to the sitemap
+            siteMap.AddNode(rootNode);
         }
 
-        private readonly bool reflectAttributes;
-        private readonly bool reflectRouteValues;
-        protected readonly ISiteMapXmlReservedAttributeNameProvider reservedAttributeNameProvider;
-        private readonly IAspNetSiteMapProvider siteMapProvider;
-        private readonly ISiteMapNodeFactory siteMapNodeFactory;
+        ProcessNodes(siteMap, rootNode, provider.RootNode);
 
-        #region ISiteMapBuilder Members
+        return rootNode;
+    }
 
-        public ISiteMapNode? BuildSiteMap(ISiteMap siteMap, ISiteMapNode? rootNode)
+    protected virtual ISiteMapNode GetRootNode(ISiteMap siteMap, SiteMapProvider provider)
+    {
+        var root = provider.RootNode;
+        return GetSiteMapNodeFromProviderNode(siteMap, root, null);
+    }
+
+    protected virtual void ProcessNodes(ISiteMap siteMap, ISiteMapNode rootNode,
+        System.Web.SiteMapNode? providerRootNode)
+    {
+        foreach (System.Web.SiteMapNode node in providerRootNode?.ChildNodes ?? [])
         {
-            var provider = siteMapProvider.GetProvider();
+            var childNode = GetSiteMapNodeFromProviderNode(siteMap, node, rootNode);
 
-            rootNode = GetRootNode(siteMap, provider);
-            // Fixes #192 root node not added to sitemap
-            if (siteMap.FindSiteMapNodeFromKey(rootNode.Key) == null)
-            {
-                // Add the root node to the sitemap
-                siteMap.AddNode(rootNode);
-            }
+            siteMap.AddNode(childNode, rootNode);
 
-            ProcessNodes(siteMap, rootNode, provider.RootNode);
+            // Continue recursively processing
+            ProcessNodes(siteMap, childNode, node);
+        }
+    }
 
-            return rootNode;
+    protected virtual ISiteMapNode GetSiteMapNodeFromProviderNode(ISiteMap siteMap, System.Web.SiteMapNode node,
+        ISiteMapNode? parentNode)
+    {
+        // Use the same keys as the underlying provider.
+        var key = node.Key;
+        var implicitResourceKey = node.ResourceKey;
+
+        // Create Node
+        var siteMapNode = _siteMapNodeFactory.Create(siteMap, key, implicitResourceKey);
+
+        siteMapNode.Title = node.Title;
+        siteMapNode.Description = node.Description;
+        if (_reflectAttributes)
+        {
+            // Unfortunately, the ASP.NET implementation uses a protected member variable to store
+            // the attributes, so there is no way to loop through them without reflection or some
+            // fancy dynamic subclass implementation.
+            var attributeDictionary = node.GetPrivateFieldValue<NameValueCollection>("_attributes");
+            siteMapNode.Attributes.AddRange(attributeDictionary, false);
         }
 
-        #endregion
+        siteMapNode.Roles.AddRange(node.Roles);
+        siteMapNode.Clickable = bool.Parse(node.GetAttributeValueOrFallback("clickable", "true"));
+        siteMapNode.VisibilityProvider = node.GetAttributeValue("visibilityProvider");
+        siteMapNode.DynamicNodeProvider = node.GetAttributeValue("dynamicNodeProvider");
+        siteMapNode.ImageUrl = node.GetAttributeValue("imageUrl");
+        siteMapNode.ImageUrlProtocol = node.GetAttributeValue("imageUrlProtocol");
+        siteMapNode.ImageUrlHostName = node.GetAttributeValue("imageUrlHostName");
+        siteMapNode.TargetFrame = node.GetAttributeValue("targetFrame");
+        siteMapNode.HttpMethod = node.GetAttributeValueOrFallback("httpMethod", "*").ToUpperInvariant();
+        siteMapNode.Url = node.Url;
+        siteMapNode.CacheResolvedUrl = bool.Parse(node.GetAttributeValueOrFallback("cacheResolvedUrl", "true"));
+        siteMapNode.IncludeAmbientValuesInUrl =
+            bool.Parse(node.GetAttributeValueOrFallback("includeAmbientValuesInUrl", "false"));
+        siteMapNode.Protocol = node.GetAttributeValue("protocol");
+        siteMapNode.HostName = node.GetAttributeValue("hostName");
+        siteMapNode.CanonicalKey = node.GetAttributeValue("canonicalKey");
+        siteMapNode.CanonicalUrl = node.GetAttributeValue("canonicalUrl");
+        siteMapNode.CanonicalUrlProtocol = node.GetAttributeValue("canonicalUrlProtocol");
+        siteMapNode.CanonicalUrlHostName = node.GetAttributeValue("canonicalUrlHostName");
+        siteMapNode.MetaRobotsValues.AddRange(node.GetAttributeValue("metaRobotsValues"), [' ']);
+        siteMapNode.ChangeFrequency = (ChangeFrequency)Enum.Parse(typeof(ChangeFrequency),
+            node.GetAttributeValueOrFallback("changeFrequency", "Undefined"));
+        siteMapNode.UpdatePriority = (UpdatePriority)Enum.Parse(typeof(UpdatePriority),
+            node.GetAttributeValueOrFallback("updatePriority", "Undefined"));
+        siteMapNode.LastModifiedDate = DateTime.Parse(node.GetAttributeValueOrFallback("lastModifiedDate",
+            DateTime.MinValue.ToString(CultureInfo.CurrentCulture)));
+        siteMapNode.Order = int.Parse(node.GetAttributeValueOrFallback("order", "0"));
 
-        protected virtual ISiteMapNode GetRootNode(ISiteMap siteMap, SiteMapProvider provider)
+        // Handle route details
+
+        // Assign to node
+        siteMapNode.Route = node.GetAttributeValue("route");
+        if (_reflectRouteValues)
         {
-            var root = provider.RootNode;
-            return GetSiteMapNodeFromProviderNode(siteMap, root, null);
+            // Unfortunately, the ASP.NET implementation uses a protected member variable to store
+            // the attributes, so there is no way to loop through them without reflection or some
+            // fancy dynamic subclass implementation.
+            var attributeDictionary = node.GetPrivateFieldValue<NameValueCollection>("_attributes");
+            siteMapNode.RouteValues.AddRange(attributeDictionary, false);
         }
 
-        protected virtual void ProcessNodes(ISiteMap siteMap, ISiteMapNode rootNode, System.Web.SiteMapNode providerRootNode)
+        siteMapNode.PreservedRouteParameters.AddRange(node.GetAttributeValue("preservedRouteParameters"), [
+            ',', ';'
+        ]);
+        siteMapNode.UrlResolver = node.GetAttributeValue("urlResolver");
+
+        // Add inherited route values to sitemap node
+        foreach (var inheritedRouteParameter in node.GetAttributeValue("inheritedRouteParameters")
+                     .Split([',', ';'], StringSplitOptions.RemoveEmptyEntries))
         {
-            foreach (System.Web.SiteMapNode node in providerRootNode.ChildNodes)
+            var item = inheritedRouteParameter.Trim();
+            if (parentNode != null && parentNode.RouteValues.TryGetValue(item, out var value))
             {
-                var childNode = GetSiteMapNodeFromProviderNode(siteMap, node, rootNode);
-                var parentNode = rootNode;
-
-                siteMap.AddNode(childNode, parentNode);
-
-                // Continue recursively processing
-                ProcessNodes(siteMap, childNode, node);
+                siteMapNode.RouteValues.Add(item, value);
             }
         }
 
-        protected virtual ISiteMapNode GetSiteMapNodeFromProviderNode(ISiteMap siteMap, System.Web.SiteMapNode node, ISiteMapNode? parentNode)
+        // Handle MVC details
+
+        // Get area and controller from node declaration
+        siteMapNode.Area = InheritAreaIfNotProvided(node, parentNode);
+        siteMapNode.Controller = InheritControllerIfNotProvided(node, parentNode);
+
+        return siteMapNode;
+    }
+
+    /// <summary>
+    ///     Inherits the area from the parent node if it is not provided in the current <see cref="System.Web.SiteMapNode" />
+    ///     and the parent node is not null.
+    /// </summary>
+    /// <param name="node">The siteMapNode element.</param>
+    /// <param name="parentNode">The parent node.</param>
+    /// <returns>The value provided by either the siteMapNode or parentNode.Area.</returns>
+    protected virtual string InheritAreaIfNotProvided(System.Web.SiteMapNode node, ISiteMapNode? parentNode)
+    {
+        var result = node.GetAttributeValue("area");
+
+        // NOTE: Since there is no way to determine if an attribute exists without using reflection, 
+        // using area="" to override the parent area is not supported.
+        if (string.IsNullOrEmpty(result) && parentNode != null)
         {
-            // Use the same keys as the underlying provider.
-            var key = node.Key;
-            var implicitResourceKey = node.ResourceKey;
-
-            // Create Node
-            var siteMapNode = siteMapNodeFactory.Create(siteMap, key, implicitResourceKey);
-
-            siteMapNode.Title = node.Title;
-            siteMapNode.Description = node.Description;
-            if (this.reflectAttributes)
-            {
-                // Unfortunately, the ASP.NET implementation uses a protected member variable to store
-                // the attributes, so there is no way to loop through them without reflection or some
-                // fancy dynamic subclass implementation.
-                var attributeDictionary = node.GetPrivateFieldValue<NameValueCollection>("_attributes");
-                siteMapNode.Attributes.AddRange(attributeDictionary, false);
-            }
-            siteMapNode.Roles.AddRange(node.Roles);
-            siteMapNode.Clickable = bool.Parse(node.GetAttributeValueOrFallback("clickable", "true"));
-            siteMapNode.VisibilityProvider = node.GetAttributeValue("visibilityProvider");
-            siteMapNode.DynamicNodeProvider = node.GetAttributeValue("dynamicNodeProvider");
-            siteMapNode.ImageUrl = node.GetAttributeValue("imageUrl");
-            siteMapNode.ImageUrlProtocol = node.GetAttributeValue("imageUrlProtocol");
-            siteMapNode.ImageUrlHostName = node.GetAttributeValue("imageUrlHostName");
-            siteMapNode.TargetFrame = node.GetAttributeValue("targetFrame");
-            siteMapNode.HttpMethod = node.GetAttributeValueOrFallback("httpMethod", "*").ToUpperInvariant();
-            siteMapNode.Url = node.Url;
-            siteMapNode.CacheResolvedUrl = bool.Parse(node.GetAttributeValueOrFallback("cacheResolvedUrl", "true"));
-            siteMapNode.IncludeAmbientValuesInUrl = bool.Parse(node.GetAttributeValueOrFallback("includeAmbientValuesInUrl", "false"));
-            siteMapNode.Protocol = node.GetAttributeValue("protocol");
-            siteMapNode.HostName = node.GetAttributeValue("hostName");
-            siteMapNode.CanonicalKey = node.GetAttributeValue("canonicalKey");
-            siteMapNode.CanonicalUrl = node.GetAttributeValue("canonicalUrl");
-            siteMapNode.CanonicalUrlProtocol = node.GetAttributeValue("canonicalUrlProtocol");
-            siteMapNode.CanonicalUrlHostName = node.GetAttributeValue("canonicalUrlHostName");
-            siteMapNode.MetaRobotsValues.AddRange(node.GetAttributeValue("metaRobotsValues"), [' ']);
-            siteMapNode.ChangeFrequency = (ChangeFrequency)Enum.Parse(typeof(ChangeFrequency), node.GetAttributeValueOrFallback("changeFrequency", "Undefined"));
-            siteMapNode.UpdatePriority = (UpdatePriority)Enum.Parse(typeof(UpdatePriority), node.GetAttributeValueOrFallback("updatePriority", "Undefined"));
-            siteMapNode.LastModifiedDate = DateTime.Parse(node.GetAttributeValueOrFallback("lastModifiedDate", DateTime.MinValue.ToString(CultureInfo.CurrentCulture)));
-            siteMapNode.Order = int.Parse(node.GetAttributeValueOrFallback("order", "0"));
-
-            // Handle route details
-
-            // Assign to node
-            siteMapNode.Route = node.GetAttributeValue("route");
-            if (this.reflectRouteValues)
-            {
-                // Unfortunately, the ASP.NET implementation uses a protected member variable to store
-                // the attributes, so there is no way to loop through them without reflection or some
-                // fancy dynamic subclass implementation.
-                var attributeDictionary = node.GetPrivateFieldValue<NameValueCollection>("_attributes");
-                siteMapNode.RouteValues.AddRange(attributeDictionary, false);
-            }
-            siteMapNode.PreservedRouteParameters.AddRange(node.GetAttributeValue("preservedRouteParameters"), [',', ';'
-            ]);
-            siteMapNode.UrlResolver = node.GetAttributeValue("urlResolver");
-            
-            // Add inherited route values to sitemap node
-            foreach (var inheritedRouteParameter in node.GetAttributeValue("inheritedRouteParameters").Split([',', ';'], StringSplitOptions.RemoveEmptyEntries))
-            {
-                var item = inheritedRouteParameter.Trim();
-                if (parentNode != null && parentNode.RouteValues.TryGetValue(item, out var value))
-                {
-                    siteMapNode.RouteValues.Add(item, value);
-                }
-            }
-
-            // Handle MVC details
-
-            // Get area and controller from node declaration
-            siteMapNode.Area = this.InheritAreaIfNotProvided(node, parentNode);
-            siteMapNode.Controller = this.InheritControllerIfNotProvided(node, parentNode);
-
-            return siteMapNode;
+            result = parentNode.Area;
         }
 
-        /// <summary>
-        /// Inherits the area from the parent node if it is not provided in the current <see cref="System.Web.SiteMapNode"/> and the parent node is not null.
-        /// </summary>
-        /// <param name="node">The siteMapNode element.</param>
-        /// <param name="parentNode">The parent node.</param>
-        /// <returns>The value provided by either the siteMapNode or parentNode.Area.</returns>
-        protected virtual string InheritAreaIfNotProvided(System.Web.SiteMapNode node, ISiteMapNode? parentNode)
+        return result;
+    }
+
+    /// <summary>
+    ///     Inherits the controller from the parent node if it is not provided in the current
+    ///     <see cref="System.Web.SiteMapNode" /> and the parent node is not null.
+    /// </summary>
+    /// <param name="node">The siteMapNode element.</param>
+    /// <param name="parentNode">The parent node.</param>
+    /// <returns>The value provided by either the siteMapNode or parentNode.Controller.</returns>
+    protected virtual string InheritControllerIfNotProvided(System.Web.SiteMapNode node, ISiteMapNode? parentNode)
+    {
+        var result = node.GetAttributeValue("controller");
+        if (string.IsNullOrEmpty(result) && parentNode != null)
         {
-            var result = node.GetAttributeValue("area");
-
-            // NOTE: Since there is no way to determine if an attribute exists without using reflection, 
-            // using area="" to override the parent area is not supported.
-            if (string.IsNullOrEmpty(result) && parentNode != null)
-            {
-                result = parentNode.Area;
-            }
-
-            return result;
+            result = parentNode.Controller;
         }
 
-        /// <summary>
-        /// Inherits the controller from the parent node if it is not provided in the current <see cref="System.Web.SiteMapNode"/> and the parent node is not null.
-        /// </summary>
-        /// <param name="node">The siteMapNode element.</param>
-        /// <param name="parentNode">The parent node.</param>
-        /// <returns>The value provided by either the siteMapNode or parentNode.Controller.</returns>
-        protected virtual string InheritControllerIfNotProvided(System.Web.SiteMapNode node, ISiteMapNode? parentNode)
-        {
-            var result = node.GetAttributeValue("controller");
-            if (string.IsNullOrEmpty(result) && parentNode != null)
-            {
-                result = parentNode.Controller;
-            }
-
-            return result;
-        }
+        return result;
     }
 }

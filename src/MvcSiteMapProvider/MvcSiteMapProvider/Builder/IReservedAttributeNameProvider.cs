@@ -1,24 +1,23 @@
-﻿namespace MvcSiteMapProvider.Builder
+namespace MvcSiteMapProvider.Builder;
+
+/// <summary>
+///     Contract for reserved attribute name provider for SiteMap nodes.
+/// </summary>
+public interface IReservedAttributeNameProvider
 {
     /// <summary>
-    /// Contract for reserved attribute name provider for SiteMap nodes.
+    ///     Determines whether the attribute with the supplied name can be added to the
+    ///     <see cref="T:Collections.Specialized.IAttributeDictionary" />.
     /// </summary>
-    public interface IReservedAttributeNameProvider
-    {
-        /// <summary>
-        /// Determines whether the attribute with the supplied name can be added to the 
-        /// <see cref="T:SiteMapNodeProvider.Collections.Specialized.IAttributeDictionary"/>.
-        /// </summary>
-        /// <param name="attributeName">The name of the attribute.</param>
-        /// <returns><c>true</c> if the attribute can be added; otherwise <c>false</c>.</returns>
-        bool IsRegularAttribute(string attributeName);
+    /// <param name="attributeName">The name of the attribute.</param>
+    /// <returns><c>true</c> if the attribute can be added; otherwise <c>false</c>.</returns>
+    bool IsRegularAttribute(string attributeName);
 
-        /// <summary>
-        /// Determines whether the route value with the supplied name can be added to the 
-        /// <see cref="T:SiteMapNodeProvider.Collections.Specialized.IRouteValueDictionary"/>.
-        /// </summary>
-        /// <param name="attributeName">The name of the attribute.</param>
-        /// <returns><c>true</c> if the attribute can be added; otherwise <c>false</c>.</returns>
-        bool IsRouteAttribute(string attributeName);
-    }
+    /// <summary>
+    ///     Determines whether the route value with the supplied name can be added to the
+    ///     <see cref="T:Collections.Specialized.IRouteValueDictionary" />.
+    /// </summary>
+    /// <param name="attributeName">The name of the attribute.</param>
+    /// <returns><c>true</c> if the attribute can be added; otherwise <c>false</c>.</returns>
+    bool IsRouteAttribute(string attributeName);
 }

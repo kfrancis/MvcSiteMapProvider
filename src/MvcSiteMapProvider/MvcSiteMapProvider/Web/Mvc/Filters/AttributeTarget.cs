@@ -1,18 +1,17 @@
-﻿namespace MvcSiteMapProvider.Web.Mvc.Filters
+﻿namespace MvcSiteMapProvider.Web.Mvc.Filters;
+
+/// <summary>
+/// AttributeTarget
+/// </summary>
+public enum AttributeTarget
 {
     /// <summary>
-    /// AttributeTarget
+    /// CurrentNode
     /// </summary>
-    public enum AttributeTarget
-    {
-        /// <summary>
-        /// CurrentNode
-        /// </summary>
-        CurrentNode = 0,
+    CurrentNode = 0,
 
-        /// <summary>
-        /// ParentNode
-        /// </summary>
-        ParentNode = 1
-    }
+    /// <summary>
+    /// ParentNode
+    /// </summary>
+    ParentNode = 1
 }

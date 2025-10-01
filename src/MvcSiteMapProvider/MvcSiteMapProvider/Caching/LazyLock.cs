@@ -1,40 +1,39 @@
 ﻿using System;
 
-namespace MvcSiteMapProvider.Caching
+namespace MvcSiteMapProvider.Caching;
+
+/// <summary>
+/// A lightweight lazy lock container for managing cache item storage and retrieval.
+/// </summary>
+/// <remarks>
+/// Caching strategy inspired by this post:
+/// http://www.superstarcoders.com/blogs/posts/micro-caching-in-asp-net.aspx
+/// </remarks>
+public sealed class LazyLock
 {
-    /// <summary>
-    /// A lightweight lazy lock container for managing cache item storage and retrieval.
-    /// </summary>
-    /// <remarks>
-    /// Caching strategy inspired by this post:
-    /// http://www.superstarcoders.com/blogs/posts/micro-caching-in-asp-net.aspx
-    /// </remarks>
-    public sealed class LazyLock
+    private volatile bool got;
+    private object? value;
+
+    public TValue? Get<TValue>(Func<TValue>? activator)
     {
-        private volatile bool got;
-        private object? value;
+        if (got && value is TValue tValue)
+            return tValue;
 
-        public TValue? Get<TValue>(Func<TValue>? activator)
+        if (activator == null)
         {
-            if (got && value is TValue tValue)
-                return tValue;
-
-            if (activator == null)
-            {
-                return default;
-            }
-
-            lock (this)
-            {
-                if (got)
-                    return (TValue)value!;
-
-                value = activator();
-
-                got = true;
-            }
-
-            return (TValue)value!;
+            return default;
         }
+
+        lock (this)
+        {
+            if (got)
+                return (TValue)value!;
+
+            value = activator();
+
+            got = true;
+        }
+
+        return (TValue)value!;
     }
 }

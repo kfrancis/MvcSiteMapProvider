@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Web.Mvc;
@@ -9,322 +10,345 @@ using MvcSiteMapProvider.DI;
 using MvcSiteMapProvider.Resources;
 using MvcSiteMapProvider.Web.Compilation;
 
-namespace MvcSiteMapProvider.Web.Mvc
+namespace MvcSiteMapProvider.Web.Mvc;
+
+/// <summary>
+///     ControllerTypeResolver class
+/// </summary>
+[ExcludeFromAutoRegistration]
+[SuppressMessage("ReSharper", "VirtualMemberNeverOverridden.Global")]
+public class ControllerTypeResolver
+    : IControllerTypeResolver
 {
-    /// <summary>
-    ///     ControllerTypeResolver class
-    /// </summary>
-    [ExcludeFromAutoRegistration]
-    public class ControllerTypeResolver
-        : IControllerTypeResolver
+    private readonly IEnumerable<string> _areaNamespacesToIgnore;
+    private readonly IControllerBuilder _controllerBuilder;
+    private readonly RouteCollection _routes;
+
+
+    private readonly object _synclock = new();
+    protected readonly IBuildManager BuildManager;
+
+    public ControllerTypeResolver(
+        IEnumerable<string> areaNamespacesToIgnore,
+        RouteCollection routes,
+        IControllerBuilder controllerBuilder,
+        IBuildManager buildManager
+    )
     {
-        protected readonly IEnumerable<string> areaNamespacesToIgnore;
-        protected readonly IBuildManager buildManager;
-        protected readonly IControllerBuilder controllerBuilder;
-        protected readonly RouteCollection routes;
+        _areaNamespacesToIgnore = areaNamespacesToIgnore ??
+                                  throw new ArgumentNullException(nameof(areaNamespacesToIgnore));
+        _routes = routes ?? throw new ArgumentNullException(nameof(routes));
+        _controllerBuilder = controllerBuilder ?? throw new ArgumentNullException(nameof(controllerBuilder));
+        BuildManager = buildManager ?? throw new ArgumentNullException(nameof(buildManager));
 
+        Cache = new ThreadSafeDictionary<string, Type>();
+    }
 
-        private readonly object synclock = new();
+    /// <summary>
+    ///     Gets or sets the cache.
+    /// </summary>
+    /// <value>The cache.</value>
+    private ThreadSafeDictionary<string, Type> Cache { get; }
 
-        public ControllerTypeResolver(
-            IEnumerable<string> areaNamespacesToIgnore,
-            RouteCollection routes,
-            IControllerBuilder controllerBuilder,
-            IBuildManager buildManager
-        )
+    /// <summary>
+    ///     Gets or sets the assembly cache.
+    /// </summary>
+    /// <value>The assembly cache.</value>
+    private Dictionary<string, ILookup<string, Type>>? AssemblyCache { get; set; }
+
+    /// <summary>
+    ///     Resolves the type of the controller.
+    /// </summary>
+    /// <param name="areaName">Name of the area.</param>
+    /// <param name="controllerName">Name of the controller.</param>
+    /// <returns>Controller type</returns>
+    public Type ResolveControllerType(string areaName, string controllerName)
+    {
+        // Is the type cached?
+        var cacheKey = areaName + "_" + controllerName;
+        if (Cache.TryGetValue(cacheKey, out var type))
         {
-            this.areaNamespacesToIgnore = areaNamespacesToIgnore ??
-                                          throw new ArgumentNullException(nameof(areaNamespacesToIgnore));
-            this.routes = routes ?? throw new ArgumentNullException(nameof(routes));
-            this.controllerBuilder = controllerBuilder ?? throw new ArgumentNullException(nameof(controllerBuilder));
-            this.buildManager = buildManager ?? throw new ArgumentNullException(nameof(buildManager));
-
-            Cache = new ThreadSafeDictionary<string, Type>();
+            return type;
         }
 
-        /// <summary>
-        ///     Gets or sets the cache.
-        /// </summary>
-        /// <value>The cache.</value>
-        protected ThreadSafeDictionary<string, Type> Cache { get; }
+        // Find controller details
+        var areaNamespaces = FindNamespacesForArea(areaName, _routes);
 
-        /// <summary>
-        ///     Gets or sets the assembly cache.
-        /// </summary>
-        /// <value>The assembly cache.</value>
-        protected Dictionary<string, ILookup<string, Type>>? AssemblyCache { get; private set; }
+        var area = areaName;
+        var controller = controllerName;
 
-
-        #region IControllerTypeResolver Members
-
-        /// <summary>
-        ///     Resolves the type of the controller.
-        /// </summary>
-        /// <param name="areaName">Name of the area.</param>
-        /// <param name="controllerName">Name of the controller.</param>
-        /// <returns>Controller type</returns>
-        public Type ResolveControllerType(string areaName, string controllerName)
+        // Find controller type
+        HashSet<string>? namespaces = null;
+        if (areaNamespaces != null)
         {
-            // Is the type cached?
-            var cacheKey = areaName + "_" + controllerName;
-            if (Cache.TryGetValue(cacheKey, out var type))
+            areaNamespaces = (from ns in areaNamespaces
+                where ns != "Elmah.Mvc"
+                where !_areaNamespacesToIgnore.Contains(ns)
+                select ns).ToList();
+            if (areaNamespaces.Any())
             {
-                return type;
-            }
-
-            // Find controller details
-            var areaNamespaces = FindNamespacesForArea(areaName, routes);
-
-            var area = areaName;
-            var controller = controllerName;
-
-            // Find controller type
-            HashSet<string>? namespaces = null;
-            if (areaNamespaces != null)
-            {
-                areaNamespaces = (from ns in areaNamespaces
-                    where ns != "Elmah.Mvc"
-                    where !areaNamespacesToIgnore.Contains(ns)
-                    select ns).ToList();
-                if (areaNamespaces.Any())
+                namespaces = new HashSet<string>(areaNamespaces, StringComparer.OrdinalIgnoreCase);
+                if (string.IsNullOrEmpty(areaName))
                 {
-                    namespaces = new HashSet<string>(areaNamespaces, StringComparer.OrdinalIgnoreCase);
-                    if (string.IsNullOrEmpty(areaName))
-                    {
-                        namespaces =
-                            new HashSet<string>(
-                                namespaces.Union(controllerBuilder.DefaultNamespaces, StringComparer.OrdinalIgnoreCase),
-                                StringComparer.OrdinalIgnoreCase);
-                    }
+                    namespaces =
+                        new HashSet<string>(
+                            namespaces.Union(_controllerBuilder.DefaultNamespaces,
+                                StringComparer.OrdinalIgnoreCase),
+                            StringComparer.OrdinalIgnoreCase);
                 }
             }
-            else if (controllerBuilder.DefaultNamespaces.Count > 0)
-            {
-                namespaces = controllerBuilder.DefaultNamespaces;
-            }
-
-            var controllerType = GetControllerTypeWithinNamespaces(area, controller, namespaces);
-
-            // Cache the result
-            Cache.Add(cacheKey, controllerType);
-
-            // Return
-            return controllerType;
+        }
+        else if (_controllerBuilder.DefaultNamespaces.Count > 0)
+        {
+            namespaces = _controllerBuilder.DefaultNamespaces;
         }
 
-        #endregion
+        var controllerType = GetControllerTypeWithinNamespaces(area, controller, namespaces);
 
-        /// <summary>
-        ///     Finds the namespaces for area.
-        /// </summary>
-        /// <param name="area">The area.</param>
-        /// <param name="routeCollection">The routes.</param>
-        /// <returns>
-        ///     A namespaces for area represented as a <see cref="string" /> instance
-        /// </returns>
-        protected virtual IEnumerable<string>? FindNamespacesForArea(string area, RouteCollection routeCollection)
+        // Cache the result
+        Cache.Add(cacheKey, controllerType);
+
+        // Return
+        return controllerType;
+    }
+
+    /// <summary>
+    ///     Finds the namespaces for area.
+    /// </summary>
+    /// <param name="area">The area.</param>
+    /// <param name="routeCollection">The routes.</param>
+    /// <returns>
+    ///     A namespaces for area represented as a <see cref="string" /> instance
+    /// </returns>
+    protected virtual IEnumerable<string>? FindNamespacesForArea(string area, RouteCollection routeCollection)
+    {
+        var namespacesForArea = new List<string>();
+        var namespacesCommon = new List<string>();
+
+        foreach (var route in routeCollection.OfType<Route>()
+                     .Where(r => r.DataTokens != null && r.DataTokens["Namespaces"] != null))
         {
-            var namespacesForArea = new List<string>();
-            var namespacesCommon = new List<string>();
-
-            foreach (var route in routeCollection.OfType<Route>()
-                         .Where(r => r.DataTokens != null && r.DataTokens["Namespaces"] != null))
+            // search for area-based namespaces
+            if (route.DataTokens["area"] != null &&
+                route.DataTokens["area"].ToString().Equals(area, StringComparison.OrdinalIgnoreCase))
             {
-                // search for area-based namespaces
-                if (route.DataTokens["area"] != null &&
-                    route.DataTokens["area"].ToString().Equals(area, StringComparison.OrdinalIgnoreCase))
-                {
-                    namespacesForArea.AddRange((IEnumerable<string>)route.DataTokens["Namespaces"]);
-                }
-                else if (route.DataTokens["area"] == null)
-                {
-                    namespacesCommon.AddRange((IEnumerable<string>)route.DataTokens["Namespaces"]);
-                }
+                namespacesForArea.AddRange((IEnumerable<string>)route.DataTokens["Namespaces"]);
             }
-
-            if (namespacesForArea.Count > 0)
+            else if (route.DataTokens["area"] == null)
             {
-                return namespacesForArea;
+                namespacesCommon.AddRange((IEnumerable<string>)route.DataTokens["Namespaces"]);
             }
-
-            return namespacesCommon.Count > 0 ? namespacesCommon : null;
         }
 
-        /// <summary>
-        ///     Inits the assembly cache.
-        /// </summary>
-        private void InitAssemblyCache()
+        if (namespacesForArea.Count > 0)
+        {
+            return namespacesForArea;
+        }
+
+        return namespacesCommon.Count > 0 ? namespacesCommon : null;
+    }
+
+    /// <summary>
+    ///     Inits the assembly cache.
+    /// </summary>
+    private void InitAssemblyCache()
+    {
+        if (AssemblyCache != null)
+        {
+            return;
+        }
+
+        lock (_synclock)
         {
             if (AssemblyCache != null)
             {
                 return;
             }
 
-            lock (synclock)
+            var controllerTypes = GetListOfControllerTypes();
+            var groupedByName = controllerTypes.GroupBy(
+                t => t.Name.Substring(0, t.Name.IndexOf("Controller", StringComparison.OrdinalIgnoreCase)),
+                StringComparer.OrdinalIgnoreCase);
+            AssemblyCache = groupedByName.ToDictionary(
+                g => g.Key,
+                g => g.ToLookup(t => t.Namespace ?? string.Empty, StringComparer.OrdinalIgnoreCase),
+                StringComparer.OrdinalIgnoreCase);
+        }
+    }
+
+    /// <summary>
+    ///     Gets the list of controller types.
+    /// </summary>
+    /// <returns></returns>
+    protected virtual List<Type> GetListOfControllerTypes()
+    {
+        var result = new List<Type>(512);
+        var assemblies = BuildManager.GetReferencedAssemblies();
+        foreach (Assembly assembly in assemblies)
+        {
+            Type?[] typesInAsm;
+            try
             {
-                if (AssemblyCache != null)
+                typesInAsm = assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                typesInAsm = ex.Types;
+            }
+
+            if (typesInAsm == null)
+            {
+                continue;
+            }
+
+            for (var i = 0; i < typesInAsm.Length; i++)
+            {
+                var t = typesInAsm[i];
+                if (t == null)
                 {
-                    return;
+                    continue;
                 }
 
-                var controllerTypes = GetListOfControllerTypes();
-                var groupedByName = controllerTypes.GroupBy(
-                    t => t.Name.Substring(0, t.Name.IndexOf("Controller", StringComparison.OrdinalIgnoreCase)),
-                    StringComparer.OrdinalIgnoreCase);
-                AssemblyCache = groupedByName.ToDictionary(
-                    g => g.Key,
-                    g => g.ToLookup(t => t.Namespace ?? string.Empty, StringComparer.OrdinalIgnoreCase),
-                    StringComparer.OrdinalIgnoreCase);
+                if (!t.IsClass || !t.IsPublic || t.IsAbstract)
+                {
+                    continue;
+                }
+
+                if (!typeof(IController).IsAssignableFrom(t))
+                {
+                    continue;
+                }
+
+                var name = t.Name;
+                if (name.IndexOf("Controller", StringComparison.OrdinalIgnoreCase) == -1)
+                {
+                    continue;
+                }
+
+                result.Add(t);
             }
         }
 
-        /// <summary>
-        ///     Gets the list of controller types.
-        /// </summary>
-        /// <returns></returns>
-        protected virtual List<Type> GetListOfControllerTypes()
+        return result;
+    }
+
+    /// <summary>
+    ///     Determines whether namespace matches the specified requested namespace.
+    /// </summary>
+    /// <param name="requestedNamespace">The requested namespace.</param>
+    /// <param name="targetNamespace">The target namespace.</param>
+    /// <returns>
+    ///     <c>true</c> if is namespace matches the specified requested namespace; otherwise, <c>false</c>.
+    /// </returns>
+    private static bool IsNamespaceMatch(string? requestedNamespace, string targetNamespace)
+    {
+        // degenerate cases
+        if (requestedNamespace == null)
         {
-            IEnumerable<Type> typesSoFar = Type.EmptyTypes;
-            var assemblies = buildManager.GetReferencedAssemblies();
-            foreach (Assembly assembly in assemblies)
-            {
-                Type[] typesInAsm;
-                try
-                {
-                    typesInAsm = assembly.GetTypes();
-                }
-                catch (ReflectionTypeLoadException ex)
-                {
-                    typesInAsm = ex.Types;
-                }
-
-                typesSoFar = typesSoFar.Concat(typesInAsm);
-            }
-
-            return typesSoFar.Where(t =>
-                t is { IsClass: true, IsPublic: true, IsAbstract: false } &&
-                t.Name.IndexOf("Controller", StringComparison.OrdinalIgnoreCase) != -1 &&
-                typeof(IController).IsAssignableFrom(t)).ToList();
-        }
-
-        /// <summary>
-        ///     Determines whether namespace matches the specified requested namespace.
-        /// </summary>
-        /// <param name="requestedNamespace">The requested namespace.</param>
-        /// <param name="targetNamespace">The target namespace.</param>
-        /// <returns>
-        ///     <c>true</c> if is namespace matches the specified requested namespace; otherwise, <c>false</c>.
-        /// </returns>
-        private static bool IsNamespaceMatch(string? requestedNamespace, string targetNamespace)
-        {
-            // degenerate cases
-            if (requestedNamespace == null)
-            {
-                return false;
-            }
-
-            if (requestedNamespace.Length == 0)
-            {
-                return true;
-            }
-
-            if (!requestedNamespace.EndsWith(".*", StringComparison.OrdinalIgnoreCase))
-            {
-                // looking for exact namespace match
-                return string.Equals(requestedNamespace, targetNamespace, StringComparison.OrdinalIgnoreCase);
-            }
-
-            // looking for exact or sub-namespace match
-            requestedNamespace = requestedNamespace.Substring(0, requestedNamespace.Length - ".*".Length);
-            if (!targetNamespace.StartsWith(requestedNamespace, StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-
-            if (requestedNamespace.Length == targetNamespace.Length)
-            {
-                // exact match
-                return true;
-            }
-
-            if (targetNamespace[requestedNamespace.Length] == '.')
-            {
-                // good prefix match, e.g. requestedNamespace = "Foo.Bar" and targetNamespace = "Foo.Bar.Baz"
-                return true;
-            }
-
-            // bad prefix match, e.g. requestedNamespace = "Foo.Bar" and targetNamespace = "Foo.Bar2"
             return false;
         }
 
-        /// <summary>
-        ///     Gets the controller type within namespaces.
-        /// </summary>
-        /// <param name="area">The area.</param>
-        /// <param name="controller">The controller.</param>
-        /// <param name="namespaces">The namespaces.</param>
-        /// <returns>
-        ///     A controller type within namespaces represented as a <see cref="Type" /> instance
-        /// </returns>
-        protected virtual Type? GetControllerTypeWithinNamespaces(string area, string controller,
-            HashSet<string>? namespaces)
+        if (requestedNamespace.Length == 0)
         {
-            if (string.IsNullOrEmpty(controller) || controller == "")
+            return true;
+        }
+
+        if (!requestedNamespace.EndsWith(".*", StringComparison.OrdinalIgnoreCase))
+        {
+            // looking for exact namespace match
+            return string.Equals(requestedNamespace, targetNamespace, StringComparison.OrdinalIgnoreCase);
+        }
+
+        // looking for exact or sub-namespace match
+        requestedNamespace = requestedNamespace.Substring(0, requestedNamespace.Length - ".*".Length);
+        if (!targetNamespace.StartsWith(requestedNamespace, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (requestedNamespace.Length == targetNamespace.Length)
+        {
+            // exact match
+            return true;
+        }
+
+        if (targetNamespace[requestedNamespace.Length] == '.')
+        {
+            // good prefix match, e.g. requestedNamespace = "Foo.Bar" and targetNamespace = "Foo.Bar.Baz"
+            return true;
+        }
+
+        // bad prefix match, e.g. requestedNamespace = "Foo.Bar" and targetNamespace = "Foo.Bar2"
+        return false;
+    }
+
+    /// <summary>
+    ///     Gets the controller type within namespaces.
+    /// </summary>
+    /// <param name="area">The area.</param>
+    /// <param name="controller">The controller.</param>
+    /// <param name="namespaces">The namespaces.</param>
+    /// <returns>
+    ///     A controller type within namespaces represented as a <see cref="Type" /> instance
+    /// </returns>
+    protected virtual Type? GetControllerTypeWithinNamespaces(string area, string controller,
+        HashSet<string>? namespaces)
+    {
+        if (string.IsNullOrEmpty(controller) || controller == "")
+        {
+            return null;
+        }
+
+        InitAssemblyCache();
+
+        var matchingTypes = new HashSet<Type>();
+        if (AssemblyCache != null && AssemblyCache.TryGetValue(controller, out var nsLookup))
+        {
+            // this friendly name was located in the cache, now cycle through namespaces
+            if (namespaces != null)
             {
+                foreach (var requestedNamespace in namespaces)
+                {
+                    foreach (var targetNamespaceGrouping in nsLookup)
+                    {
+                        if (IsNamespaceMatch(requestedNamespace, targetNamespaceGrouping.Key))
+                        {
+                            matchingTypes.UnionWith(targetNamespaceGrouping);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // if the namespaces parameter is null, search *every* namespace
+                foreach (var nsGroup in nsLookup)
+                {
+                    matchingTypes.UnionWith(nsGroup);
+                }
+            }
+        }
+
+        switch (matchingTypes.Count)
+        {
+            case 1:
+                return matchingTypes.First();
+
+            case > 1:
+                {
+                    var typeNames = Environment.NewLine + Environment.NewLine;
+                    foreach (var matchingType in matchingTypes)
+                    {
+                        typeNames += matchingType.FullName + Environment.NewLine;
+                    }
+
+                    typeNames += Environment.NewLine;
+
+                    throw new AmbiguousControllerException(
+                        string.Format(Messages.AmbiguousControllerFoundMultipleControllers, controller, typeNames));
+                }
+
+            default:
                 return null;
-            }
-
-            InitAssemblyCache();
-
-            var matchingTypes = new HashSet<Type>();
-            if (AssemblyCache != null && AssemblyCache.TryGetValue(controller, out var nsLookup))
-            {
-                // this friendly name was located in the cache, now cycle through namespaces
-                if (namespaces != null)
-                {
-                    foreach (var requestedNamespace in namespaces)
-                    {
-                        foreach (var targetNamespaceGrouping in nsLookup)
-                        {
-                            if (IsNamespaceMatch(requestedNamespace, targetNamespaceGrouping.Key))
-                            {
-                                matchingTypes.UnionWith(targetNamespaceGrouping);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    // if the namespaces parameter is null, search *every* namespace
-                    foreach (var nsGroup in nsLookup)
-                    {
-                        matchingTypes.UnionWith(nsGroup);
-                    }
-                }
-            }
-
-            switch (matchingTypes.Count)
-            {
-                case 1:
-                    return matchingTypes.First();
-
-                case > 1:
-                    {
-                        var typeNames = Environment.NewLine + Environment.NewLine;
-                        foreach (var matchingType in matchingTypes)
-                        {
-                            typeNames += matchingType.FullName + Environment.NewLine;
-                        }
-
-                        typeNames += Environment.NewLine;
-
-                        throw new AmbiguousControllerException(
-                            string.Format(Messages.AmbiguousControllerFoundMultipleControllers, controller, typeNames));
-                    }
-
-                default:
-                    return null;
-            }
         }
     }
 }

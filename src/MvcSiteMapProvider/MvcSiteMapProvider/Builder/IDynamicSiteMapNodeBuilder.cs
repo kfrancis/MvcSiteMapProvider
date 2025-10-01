@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
-namespace MvcSiteMapProvider.Builder
+namespace MvcSiteMapProvider.Builder;
+
+/// <summary>
+///     Contract for dynamic node parent map builder.
+/// </summary>
+public interface IDynamicSiteMapNodeBuilder
 {
-    /// <summary>
-    /// Contract for dynamic node parent map builder.
-    /// </summary>
-    public interface IDynamicSiteMapNodeBuilder
-    {
-        IEnumerable<ISiteMapNodeToParentRelation> BuildDynamicNodes(ISiteMapNode node, string? defaultParentKey);
-    }
+    IEnumerable<ISiteMapNodeToParentRelation> BuildDynamicNodes(ISiteMapNode node, string? defaultParentKey);
 }

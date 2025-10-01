@@ -2,66 +2,65 @@ using MvcSiteMapProvider.Web.Mvc;
 using System;
 using System.Linq;
 
-namespace MvcSiteMapProvider.Security
+namespace MvcSiteMapProvider.Security;
+
+/// <summary>
+/// XmlRolesAclModule class
+/// </summary>
+public class XmlRolesAclModule
+    : IAclModule
 {
-    /// <summary>
-    /// XmlRolesAclModule class
-    /// </summary>
-    public class XmlRolesAclModule
-        : IAclModule
+    public XmlRolesAclModule(
+        IMvcContextFactory mvcContextFactory
+    )
     {
-        public XmlRolesAclModule(
-            IMvcContextFactory mvcContextFactory
-            )
+        this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
+    }
+
+    protected readonly IMvcContextFactory mvcContextFactory;
+
+    #region IAclModule Members
+
+    /// <summary>
+    /// Determines whether node is accessible to user.
+    /// </summary>
+    /// <param name="siteMap">The site map.</param>
+    /// <param name="node">The node.</param>
+    /// <returns>
+    /// 	<c>true</c> if accessible to user; otherwise, <c>false</c>.
+    /// </returns>
+    public bool IsAccessibleToUser(ISiteMap siteMap, ISiteMapNode node)
+    {
+        // If we have roles assigned, check them against the roles defined in the sitemap
+        if (node.Roles is { Count: > 0 })
         {
-            this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
-        }
+            var context = mvcContextFactory.CreateHttpContext();
 
-        protected readonly IMvcContextFactory mvcContextFactory;
-
-        #region IAclModule Members
-
-        /// <summary>
-        /// Determines whether node is accessible to user.
-        /// </summary>
-        /// <param name="siteMap">The site map.</param>
-        /// <param name="node">The node.</param>
-        /// <returns>
-        /// 	<c>true</c> if accessible to user; otherwise, <c>false</c>.
-        /// </returns>
-        public bool IsAccessibleToUser(ISiteMap siteMap, ISiteMapNode node)
-        {
-            // If we have roles assigned, check them against the roles defined in the sitemap
-            if (node.Roles is { Count: > 0 })
+            // if there is an authenticated user and the role allows anyone authenticated ("*"), show it
+            if ((context.User.Identity.IsAuthenticated) && node.Roles.Contains("*"))
             {
-                var context = mvcContextFactory.CreateHttpContext();
-
-                    // if there is an authenticated user and the role allows anyone authenticated ("*"), show it
-                if ((context.User.Identity.IsAuthenticated) && node.Roles.Contains("*"))
-                {
-                    return true;
-                }
-
-                    // if there is no user, but the role allows unauthenticated users ("?"), show it
-                if ((!context.User.Identity.IsAuthenticated) && node.Roles.Contains("?"))
-                    {
-                        return true;
-                    }
-
-                    // if the user is in one of the listed roles, show it
-                if (node.Roles.OfType<string>().Any(role => context.User.IsInRole(role)))
-                    {
-                        return true;
-                    }
-
-                    // if we got this far, deny showing
-                    return false;
+                return true;
             }
 
-            // Everything seems OK...
-            return true;
+            // if there is no user, but the role allows unauthenticated users ("?"), show it
+            if ((!context.User.Identity.IsAuthenticated) && node.Roles.Contains("?"))
+            {
+                return true;
+            }
+
+            // if the user is in one of the listed roles, show it
+            if (node.Roles.OfType<string>().Any(role => context.User.IsInRole(role)))
+            {
+                return true;
+            }
+
+            // if we got this far, deny showing
+            return false;
         }
 
-        #endregion
+        // Everything seems OK...
+        return true;
     }
+
+    #endregion
 }

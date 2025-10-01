@@ -4,95 +4,94 @@ using System.Linq;
 using System.Reflection;
 using MvcSiteMapProvider.Builder;
 
-namespace MvcSiteMapProvider.Reflection
+namespace MvcSiteMapProvider.Reflection;
+
+public class MvcSiteMapNodeAttributeDefinitionProvider
+    : IMvcSiteMapNodeAttributeDefinitionProvider
 {
-    public class MvcSiteMapNodeAttributeDefinitionProvider
-        : IMvcSiteMapNodeAttributeDefinitionProvider
+    public IEnumerable<IMvcSiteMapNodeAttributeDefinition> GetMvcSiteMapNodeAttributeDefinitions(
+        IEnumerable<Assembly> assemblies)
     {
-        public IEnumerable<IMvcSiteMapNodeAttributeDefinition> GetMvcSiteMapNodeAttributeDefinitions(
-            IEnumerable<Assembly> assemblies)
+        var result = new List<IMvcSiteMapNodeAttributeDefinition>();
+        var types = GetTypesFromAssemblies(assemblies);
+
+        foreach (var type in types)
         {
-            var result = new List<IMvcSiteMapNodeAttributeDefinition>();
-            var types = GetTypesFromAssemblies(assemblies);
+            result.AddRange(GetAttributeDefinitionsForControllers(type));
+            result.AddRange(GetAttributeDefinitionsForActions(type));
+        }
 
-            foreach (var type in types)
-            {
-                result.AddRange(GetAttributeDefinitionsForControllers(type));
-                result.AddRange(GetAttributeDefinitionsForActions(type));
-            }
+        return result;
+    }
 
+    protected virtual IEnumerable<Type> GetTypesFromAssembly(Assembly assembly)
+    {
+        try
+        {
+            return assembly.GetTypes();
+        }
+        catch (ReflectionTypeLoadException ex)
+        {
+            return ex.Types.Where(t => t != null);
+        }
+    }
+
+    protected virtual IEnumerable<Type> GetTypesFromAssemblies(IEnumerable<Assembly> assemblies)
+    {
+        var result = new List<Type>();
+        foreach (var assembly in assemblies)
+        {
+            result.AddRange(GetTypesFromAssembly(assembly));
+        }
+
+        return result;
+    }
+
+    protected virtual IEnumerable<IMvcSiteMapNodeAttributeDefinition>
+        GetAttributeDefinitionsForControllers(Type type)
+    {
+        var result = new List<IMvcSiteMapNodeAttributeDefinition>();
+        if (type.GetCustomAttributes(typeof(IMvcSiteMapNodeAttribute), true) is not IMvcSiteMapNodeAttribute[]
+            attributes)
+        {
             return result;
         }
 
-        protected virtual IEnumerable<Type> GetTypesFromAssembly(Assembly assembly)
+        foreach (var attribute in attributes)
         {
-            try
+            result.Add(new MvcSiteMapNodeAttributeDefinitionForController
             {
-                return assembly.GetTypes();
-            }
-            catch (ReflectionTypeLoadException ex)
-            {
-                return ex.Types.Where(t => t != null);
-            }
+                SiteMapNodeAttribute = attribute, ControllerType = type
+            });
         }
 
-        protected virtual IEnumerable<Type> GetTypesFromAssemblies(IEnumerable<Assembly> assemblies)
-        {
-            var result = new List<Type>();
-            foreach (var assembly in assemblies)
-            {
-                result.AddRange(GetTypesFromAssembly(assembly));
-            }
+        return result;
+    }
 
-            return result;
-        }
+    protected virtual IEnumerable<IMvcSiteMapNodeAttributeDefinition> GetAttributeDefinitionsForActions(Type type)
+    {
+        var result = new List<IMvcSiteMapNodeAttributeDefinition>();
+        // Add their methods
+        var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+            .Where(x => x.GetCustomAttributes(typeof(IMvcSiteMapNodeAttribute), true).Any());
 
-        protected virtual IEnumerable<IMvcSiteMapNodeAttributeDefinition>
-            GetAttributeDefinitionsForControllers(Type type)
+        foreach (var method in methods)
         {
-            var result = new List<IMvcSiteMapNodeAttributeDefinition>();
-            if (type.GetCustomAttributes(typeof(IMvcSiteMapNodeAttribute), true) is not IMvcSiteMapNodeAttribute[]
-                attributes)
+            if (method.GetCustomAttributes(typeof(IMvcSiteMapNodeAttribute), false) is not IMvcSiteMapNodeAttribute
+                [] attributes)
             {
-                return result;
+                continue;
             }
 
             foreach (var attribute in attributes)
             {
-                result.Add(new MvcSiteMapNodeAttributeDefinitionForController
+                result.Add(new MvcSiteMapNodeAttributeDefinitionForAction
                 {
-                    SiteMapNodeAttribute = attribute, ControllerType = type
+                    SiteMapNodeAttribute = attribute, ControllerType = type, ActionMethodInfo = method
                 });
             }
-
-            return result;
         }
 
-        protected virtual IEnumerable<IMvcSiteMapNodeAttributeDefinition> GetAttributeDefinitionsForActions(Type type)
-        {
-            var result = new List<IMvcSiteMapNodeAttributeDefinition>();
-            // Add their methods
-            var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .Where(x => x.GetCustomAttributes(typeof(IMvcSiteMapNodeAttribute), true).Any());
-
-            foreach (var method in methods)
-            {
-                if (method.GetCustomAttributes(typeof(IMvcSiteMapNodeAttribute), false) is not IMvcSiteMapNodeAttribute
-                    [] attributes)
-                {
-                    continue;
-                }
-
-                foreach (var attribute in attributes)
-                {
-                    result.Add(new MvcSiteMapNodeAttributeDefinitionForAction
-                    {
-                        SiteMapNodeAttribute = attribute, ControllerType = type, ActionMethodInfo = method
-                    });
-                }
-            }
-
-            return result;
-        }
+        return result;
     }
 }

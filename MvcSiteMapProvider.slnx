@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="BenchmarkSuite1/BenchmarkSuite1.csproj" />
   <Project Path="src/MvcSiteMapProvider/CodeAsConfiguration/Ninject/Ninject.csproj" Id="4ec1aaed-4179-4adc-96bc-18cccf429b65" />
   <Project Path="src/MvcSiteMapProvider/CodeAsConfiguration/Shared/Shared.csproj" Id="7c763b28-50b2-4201-9bd0-659fc155e5f3" />
   <Project Path="src/MvcSiteMapProvider/CodeAsConfiguration/SimpleInjector/SimpleInjector.csproj" Id="029ea3f0-37fa-4a67-ad8e-075226fbc950" />

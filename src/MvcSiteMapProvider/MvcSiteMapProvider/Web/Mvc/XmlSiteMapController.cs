@@ -3,65 +3,64 @@ using System.Collections.Generic;
 using System.Web.Mvc;
 using System.Web.Routing;
 
-namespace MvcSiteMapProvider.Web.Mvc
+namespace MvcSiteMapProvider.Web.Mvc;
+
+/// <summary>
+/// XmlSiteMapController class
+/// </summary>
+[AllowAnonymous]
+public class XmlSiteMapController
+    : Controller
 {
-    /// <summary>
-    /// XmlSiteMapController class
-    /// </summary>
-    [AllowAnonymous]
-    public class XmlSiteMapController
-        : Controller
+    public XmlSiteMapController(
+        IXmlSiteMapResultFactory xmlSiteMapResultFactory
+    )
     {
-        public XmlSiteMapController(
-            IXmlSiteMapResultFactory xmlSiteMapResultFactory
-            )
+        this.xmlSiteMapResultFactory = xmlSiteMapResultFactory ?? throw new ArgumentNullException(nameof(xmlSiteMapResultFactory));
+    }
+
+    private readonly IXmlSiteMapResultFactory xmlSiteMapResultFactory;
+
+    /// <summary>
+    /// GET: /XmlSiteMap/Index
+    /// </summary>
+    /// <param name="page">The page.</param>
+    /// <returns>XmlSiteMapResult instance</returns>
+    public ActionResult Index(int page = 0)
+    {
+        return xmlSiteMapResultFactory.Create(page);
+    }
+
+    /// <summary>
+    /// Registers the routes.
+    /// </summary>
+    /// <param name="routeCollection">The route collection.</param>
+    public static void RegisterRoutes(RouteCollection routeCollection)
+    {
+        var routes = new List<RouteBase> {
+            new Route("sitemap.xml",
+                new RouteValueDictionary(
+                    new { controller = "XmlSiteMap", action = "Index", page = 0 }),
+                new MvcRouteHandler()),
+
+            new Route("sitemap-{page}.xml",
+                new RouteValueDictionary(
+                    new { controller = "XmlSiteMap", action = "Index", page = 0 }),
+                new MvcRouteHandler())
+        };
+
+        if (routeCollection.Count == 0)
         {
-            this.xmlSiteMapResultFactory = xmlSiteMapResultFactory ?? throw new ArgumentNullException(nameof(xmlSiteMapResultFactory));
-        }
-
-        private readonly IXmlSiteMapResultFactory xmlSiteMapResultFactory;
-
-        /// <summary>
-        /// GET: /XmlSiteMap/Index
-        /// </summary>
-        /// <param name="page">The page.</param>
-        /// <returns>XmlSiteMapResult instance</returns>
-        public ActionResult Index(int page = 0)
-        {
-            return xmlSiteMapResultFactory.Create(page);
-        }
-
-        /// <summary>
-        /// Registers the routes.
-        /// </summary>
-        /// <param name="routeCollection">The route collection.</param>
-        public static void RegisterRoutes(RouteCollection routeCollection)
-        {
-            var routes = new List<RouteBase> {
-                new Route("sitemap.xml",
-                    new RouteValueDictionary(
-                        new { controller = "XmlSiteMap", action = "Index", page = 0 }),
-                            new MvcRouteHandler()),
-
-                new Route("sitemap-{page}.xml",
-                    new RouteValueDictionary(
-                        new { controller = "XmlSiteMap", action = "Index", page = 0 }),
-                            new MvcRouteHandler())
-            };
-
-            if (routeCollection.Count == 0)
+            foreach (var route in routes)
             {
-                foreach (var route in routes)
-                {
-                    routeCollection.Add(route);
-                }
+                routeCollection.Add(route);
             }
-            else
+        }
+        else
+        {
+            foreach (var route in routes)
             {
-                foreach (var route in routes)
-                {
-                    routeCollection.Insert(routeCollection.Count - 1, route);
-                }
+                routeCollection.Insert(routeCollection.Count - 1, route);
             }
         }
     }

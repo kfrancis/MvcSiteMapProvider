@@ -9,244 +9,243 @@ using System.Linq;
 
 // Source: http://blogs.microsoft.co.il/blogs/shimmy/archive/2010/12/26/observabledictionary-lt-tkey-tvalue-gt-c.aspx
 
-namespace MvcSiteMapProvider.Collections
-{
-    public class ObservableDictionary<TKey, TValue> 
-        : IDictionary<TKey, TValue>,
+namespace MvcSiteMapProvider.Collections;
+
+public class ObservableDictionary<TKey, TValue> 
+    : IDictionary<TKey, TValue>,
 #if !NET35
         INotifyCollectionChanged,
 #endif
         INotifyPropertyChanged
+{
+    private const string CountString = "Count";
+    private const string IndexerName = "Item[]";
+    private const string KeysName = "Keys";
+    private const string ValuesName = "Values";
+
+    protected IDictionary<TKey, TValue> Dictionary { get; private set; }
+
+    #region Constructors
+    public ObservableDictionary()
     {
-        private const string CountString = "Count";
-        private const string IndexerName = "Item[]";
-        private const string KeysName = "Keys";
-        private const string ValuesName = "Values";
+        this.Dictionary = new Dictionary<TKey, TValue>();
+    }
+    public ObservableDictionary(IDictionary<TKey, TValue> dictionary)
+    {
+        this.Dictionary = new Dictionary<TKey, TValue>(dictionary);
+    }
+    public ObservableDictionary(IEqualityComparer<TKey> comparer)
+    {
+        this.Dictionary = new Dictionary<TKey, TValue>(comparer);
+    }
+    public ObservableDictionary(int capacity)
+    {
+        this.Dictionary = new Dictionary<TKey, TValue>(capacity);
+    }
+    public ObservableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
+    {
+        this.Dictionary = new Dictionary<TKey, TValue>(dictionary, comparer);
+    }
+    public ObservableDictionary(int capacity, IEqualityComparer<TKey> comparer)
+    {
+        this.Dictionary = new Dictionary<TKey, TValue>(capacity, comparer);
+    }
+    #endregion
 
-        protected IDictionary<TKey, TValue> Dictionary { get; private set; }
+    #region IDictionary<TKey,TValue> Members
 
-        #region Constructors
-        public ObservableDictionary()
+    public virtual void Add(TKey key, TValue value)
+    {
+        Insert(key, value, true);
+    }
+
+    public virtual bool ContainsKey(TKey key)
+    {
+        return Dictionary.ContainsKey(key);
+    }
+
+    public virtual ICollection<TKey> Keys => Dictionary.Keys;
+
+    public virtual bool Remove(TKey key)
+    {
+        if (key == null) throw new ArgumentNullException(nameof(key));
+
+        TValue value;
+        Dictionary.TryGetValue(key, out value);
+        var removed = Dictionary.Remove(key);
+        if (removed)
+
+            //OnCollectionChanged(NotifyCollectionChangedAction.Remove, new KeyValuePair<TKey, TValue>(key, value));
+            OnCollectionChanged();
+
+        return removed;
+    }
+
+    public virtual bool TryGetValue(TKey key, out TValue value)
+    {
+        return Dictionary.TryGetValue(key, out value);
+    }
+
+    public virtual ICollection<TValue> Values => Dictionary.Values;
+
+    public virtual TValue this[TKey key]
+    {
+        get => Dictionary[key];
+        set => Insert(key, value, false);
+    }
+
+    #endregion
+
+    #region ICollection<KeyValuePair<TKey,TValue>> Members
+
+    public virtual void Add(KeyValuePair<TKey, TValue> item)
+    {
+        Insert(item.Key, item.Value, true);
+    }
+
+    public virtual void Clear()
+    {
+        if (Dictionary.Count > 0)
         {
-            this.Dictionary = new Dictionary<TKey, TValue>();
+            Dictionary.Clear();
+            OnCollectionChanged();
         }
-        public ObservableDictionary(IDictionary<TKey, TValue> dictionary)
-        {
-            this.Dictionary = new Dictionary<TKey, TValue>(dictionary);
-        }
-        public ObservableDictionary(IEqualityComparer<TKey> comparer)
-        {
-            this.Dictionary = new Dictionary<TKey, TValue>(comparer);
-        }
-        public ObservableDictionary(int capacity)
-        {
-            this.Dictionary = new Dictionary<TKey, TValue>(capacity);
-        }
-        public ObservableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
-        {
-            this.Dictionary = new Dictionary<TKey, TValue>(dictionary, comparer);
-        }
-        public ObservableDictionary(int capacity, IEqualityComparer<TKey> comparer)
-        {
-            this.Dictionary = new Dictionary<TKey, TValue>(capacity, comparer);
-        }
-        #endregion
+    }
 
-        #region IDictionary<TKey,TValue> Members
+    public virtual bool Contains(KeyValuePair<TKey, TValue> item)
+    {
+        return Dictionary.Contains(item);
+    }
 
-        public virtual void Add(TKey key, TValue value)
-        {
-            Insert(key, value, true);
-        }
+    public virtual void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+    {
+        Dictionary.CopyTo(array, arrayIndex);
+    }
 
-        public virtual bool ContainsKey(TKey key)
-        {
-            return Dictionary.ContainsKey(key);
-        }
+    public virtual int Count => Dictionary.Count;
 
-        public virtual ICollection<TKey> Keys => Dictionary.Keys;
+    public virtual bool IsReadOnly => Dictionary.IsReadOnly;
 
-        public virtual bool Remove(TKey key)
-        {
-            if (key == null) throw new ArgumentNullException(nameof(key));
+    public virtual bool Remove(KeyValuePair<TKey, TValue> item)
+    {
+        return Remove(item.Key);
+    }
 
-            TValue value;
-            Dictionary.TryGetValue(key, out value);
-            var removed = Dictionary.Remove(key);
-            if (removed)
 
-                //OnCollectionChanged(NotifyCollectionChangedAction.Remove, new KeyValuePair<TKey, TValue>(key, value));
-                OnCollectionChanged();
+    #endregion
 
-            return removed;
-        }
+    #region IEnumerable<KeyValuePair<TKey,TValue>> Members
 
-        public virtual bool TryGetValue(TKey key, out TValue value)
-        {
-            return Dictionary.TryGetValue(key, out value);
-        }
+    public virtual IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+    {
+        return Dictionary.GetEnumerator();
+    }
 
-        public virtual ICollection<TValue> Values => Dictionary.Values;
+    #endregion
 
-        public virtual TValue this[TKey key]
-        {
-            get => Dictionary[key];
-            set => Insert(key, value, false);
-        }
+    #region IEnumerable Members
 
-        #endregion
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return ((IEnumerable)Dictionary).GetEnumerator();
+    }
 
-        #region ICollection<KeyValuePair<TKey,TValue>> Members
+    #endregion
 
-        public virtual void Add(KeyValuePair<TKey, TValue> item)
-        {
-            Insert(item.Key, item.Value, true);
-        }
+    #region INotifyCollectionChanged Members
+#if !NET35
+    public event NotifyCollectionChangedEventHandler? CollectionChanged;
+#endif
+    #endregion
 
-        public virtual void Clear()
+    #region INotifyPropertyChanged Members
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    #endregion
+
+    public virtual void AddRange(IDictionary<TKey, TValue> items)
+    {
+        if (items == null) throw new ArgumentNullException(nameof(items));
+
+        if (items.Count > 0)
         {
             if (Dictionary.Count > 0)
             {
-                Dictionary.Clear();
-                OnCollectionChanged();
-            }
-        }
-
-        public virtual bool Contains(KeyValuePair<TKey, TValue> item)
-        {
-            return Dictionary.Contains(item);
-        }
-
-        public virtual void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
-        {
-            Dictionary.CopyTo(array, arrayIndex);
-        }
-
-        public virtual int Count => Dictionary.Count;
-
-        public virtual bool IsReadOnly => Dictionary.IsReadOnly;
-
-        public virtual bool Remove(KeyValuePair<TKey, TValue> item)
-        {
-            return Remove(item.Key);
-        }
-
-
-        #endregion
-
-        #region IEnumerable<KeyValuePair<TKey,TValue>> Members
-
-        public virtual IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
-        {
-            return Dictionary.GetEnumerator();
-        }
-
-        #endregion
-
-        #region IEnumerable Members
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IEnumerable)Dictionary).GetEnumerator();
-        }
-
-        #endregion
-
-        #region INotifyCollectionChanged Members
-#if !NET35
-        public event NotifyCollectionChangedEventHandler? CollectionChanged;
-#endif
-        #endregion
-
-        #region INotifyPropertyChanged Members
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        #endregion
-
-        public virtual void AddRange(IDictionary<TKey, TValue> items)
-        {
-            if (items == null) throw new ArgumentNullException(nameof(items));
-
-            if (items.Count > 0)
-            {
-                if (Dictionary.Count > 0)
-                {
-                    if (items.Keys.Any((k) => Dictionary.ContainsKey(k)))
-                        throw new ArgumentException(Resources.Messages.DictionaryAlreadyContainsKey);
-                    else
-                        foreach (var item in items) Dictionary.Add(item);
-                }
+                if (items.Keys.Any((k) => Dictionary.ContainsKey(k)))
+                    throw new ArgumentException(Resources.Messages.DictionaryAlreadyContainsKey);
                 else
-                    Dictionary = new Dictionary<TKey, TValue>(items);
-#if !NET35
-                OnCollectionChanged(NotifyCollectionChangedAction.Add, items.ToArray());
-#endif
-            }
-        }
-
-        protected virtual void Insert(TKey key, TValue value, bool add)
-        {
-            if (key == null) throw new ArgumentNullException(nameof(key));
-
-            if (Dictionary.TryGetValue(key, out var item))
-            {
-                if (add) throw new ArgumentException(Resources.Messages.DictionaryAlreadyContainsKey);
-                if (Equals(item, value)) return;
-                Dictionary[key] = value;
-#if !NET35
-                OnCollectionChanged(NotifyCollectionChangedAction.Replace, new KeyValuePair<TKey, TValue>(key, value), new KeyValuePair<TKey, TValue>(key, item));
-#endif
+                    foreach (var item in items) Dictionary.Add(item);
             }
             else
-            {
-                Dictionary[key] = value;
+                Dictionary = new Dictionary<TKey, TValue>(items);
 #if !NET35
-                OnCollectionChanged(NotifyCollectionChangedAction.Add, new KeyValuePair<TKey, TValue>(key, value));
-#endif
-            }
-        }
-
-        protected virtual void OnPropertyChanged()
-        {
-            OnPropertyChanged(CountString);
-            OnPropertyChanged(IndexerName);
-            OnPropertyChanged(KeysName);
-            OnPropertyChanged(ValuesName);
-        }
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-
-        protected void OnCollectionChanged()
-        {
-            OnPropertyChanged();
-#if !NET35
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            OnCollectionChanged(NotifyCollectionChangedAction.Add, items.ToArray());
 #endif
         }
+    }
 
+    protected virtual void Insert(TKey key, TValue value, bool add)
+    {
+        if (key == null) throw new ArgumentNullException(nameof(key));
+
+        if (Dictionary.TryGetValue(key, out var item))
+        {
+            if (add) throw new ArgumentException(Resources.Messages.DictionaryAlreadyContainsKey);
+            if (Equals(item, value)) return;
+            Dictionary[key] = value;
 #if !NET35
-        protected void OnCollectionChanged(NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue> changedItem)
-        {
-            OnPropertyChanged();
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action, changedItem));
+            OnCollectionChanged(NotifyCollectionChangedAction.Replace, new KeyValuePair<TKey, TValue>(key, value), new KeyValuePair<TKey, TValue>(key, item));
+#endif
         }
+        else
+        {
+            Dictionary[key] = value;
+#if !NET35
+            OnCollectionChanged(NotifyCollectionChangedAction.Add, new KeyValuePair<TKey, TValue>(key, value));
+#endif
+        }
+    }
 
-        protected void OnCollectionChanged(NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue> newItem, KeyValuePair<TKey, TValue> oldItem)
-        {
-            OnPropertyChanged();
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action, newItem, oldItem));
-        }
+    protected virtual void OnPropertyChanged()
+    {
+        OnPropertyChanged(CountString);
+        OnPropertyChanged(IndexerName);
+        OnPropertyChanged(KeysName);
+        OnPropertyChanged(ValuesName);
+    }
 
-        protected void OnCollectionChanged(NotifyCollectionChangedAction action, IList newItems)
-        {
-            OnPropertyChanged();
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action, newItems));
-        }
+    protected virtual void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+
+    protected void OnCollectionChanged()
+    {
+        OnPropertyChanged();
+#if !NET35
+        CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 #endif
     }
+
+#if !NET35
+    protected void OnCollectionChanged(NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue> changedItem)
+    {
+        OnPropertyChanged();
+        CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action, changedItem));
+    }
+
+    protected void OnCollectionChanged(NotifyCollectionChangedAction action, KeyValuePair<TKey, TValue> newItem, KeyValuePair<TKey, TValue> oldItem)
+    {
+        OnPropertyChanged();
+        CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action, newItem, oldItem));
+    }
+
+    protected void OnCollectionChanged(NotifyCollectionChangedAction action, IList newItems)
+    {
+        OnPropertyChanged();
+        CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action, newItems));
+    }
+#endif
 }

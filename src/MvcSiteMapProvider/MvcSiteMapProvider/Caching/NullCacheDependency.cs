@@ -1,16 +1,15 @@
-﻿namespace MvcSiteMapProvider.Caching
+﻿namespace MvcSiteMapProvider.Caching;
+
+/// <summary>
+/// An <see cref="T:MvcSiteMapProvider.Caching.ICacheDependency"/> implementation that can be used to indicate
+/// there are no cache dependencies.
+/// </summary>
+public class NullCacheDependency
+    : ICacheDependency
 {
-    /// <summary>
-    /// An <see cref="T:MvcSiteMapProvider.Caching.ICacheDependency"/> implementation that can be used to indicate
-    /// there are no cache dependencies.
-    /// </summary>
-    public class NullCacheDependency
-        : ICacheDependency
-    {
-        #region ICacheDependency Members
+    #region ICacheDependency Members
 
-        public object? Dependency => null;
+    public object? Dependency => null;
 
-        #endregion
-    }
+    #endregion
 }
