@@ -1,7 +1,8 @@
-﻿namespace MvcSiteMapProvider.Collections.Specialized;
+namespace MvcSiteMapProvider.Collections.Specialized;
 
 /// <summary>
-/// Contract for an abstract factory that creates new instances of <see cref="T:MvcSiteMapProvider.ISiteMapNodeCollection"/> at runtime.
+///     Contract for an abstract factory that creates new instances of
+///     <see cref="T:ISiteMapNodeCollection" /> at runtime.
 /// </summary>
 public interface ISiteMapNodeCollectionFactory
 {

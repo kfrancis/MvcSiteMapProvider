@@ -1,36 +1,36 @@
-﻿using System;
+using System;
 
 namespace MvcSiteMapProvider.Collections.Specialized;
 
 /// <summary>
-/// ReservedKeyException
+///     ReservedKeyException
 /// </summary>
 [Serializable]
 public class ReservedKeyException : MvcSiteMapException
 {
     /// <summary>
-    /// Constructor
+    ///     Constructor
     /// </summary>
     public ReservedKeyException()
-    { 
+    {
     }
 
     /// <summary>
-    /// Constructor
+    ///     Constructor
     /// </summary>
     /// <param name="message">Message</param>
-    public ReservedKeyException(string message) 
-        : base(message) 
-    { 
+    public ReservedKeyException(string message)
+        : base(message)
+    {
     }
 
     /// <summary>
-    /// Constructor
+    ///     Constructor
     /// </summary>
     /// <param name="message">Message</param>
     /// <param name="innerException">Inner Exception</param>
-    public ReservedKeyException(string message, Exception innerException) 
-        : base(message, innerException) 
-    { 
+    public ReservedKeyException(string message, Exception innerException)
+        : base(message, innerException)
+    {
     }
 }

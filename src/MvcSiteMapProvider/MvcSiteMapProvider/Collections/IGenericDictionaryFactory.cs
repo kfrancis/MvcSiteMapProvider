@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace MvcSiteMapProvider.Collections;
 
 /// <summary>
-/// Contract for an abstract factory that creates new instances of <see cref="T:System.Collections.Generic.IDictionary{TKey, TValue}"/> 
-/// at runtime.
+///     Contract for an abstract factory that creates new instances of
+///     <see cref="T:System.Collections.Generic.IDictionary{TKey, TValue}" />
+///     at runtime.
 /// </summary>
 public interface IGenericDictionaryFactory
 {

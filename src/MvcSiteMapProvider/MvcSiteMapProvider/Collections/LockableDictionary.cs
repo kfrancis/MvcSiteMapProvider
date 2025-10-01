@@ -1,81 +1,82 @@
 using System;
 using System.Collections.Generic;
+using MvcSiteMapProvider.Resources;
 
 namespace MvcSiteMapProvider.Collections;
 
 /// <summary>
-/// Generic dictionary that is aware of the ISiteMap interface and can be made read-only
-/// depending on the IsReadOnly property of ISiteMap.
+///     Generic dictionary that is aware of the ISiteMap interface and can be made read-only
+///     depending on the IsReadOnly property of ISiteMap.
 /// </summary>
 public class LockableDictionary<TKey, TValue>
     : ObservableDictionary<TKey, TValue>
 {
-    public LockableDictionary(
+    protected readonly ISiteMap SiteMap;
+
+    protected LockableDictionary(
         ISiteMap siteMap
     )
     {
-        this.siteMap = siteMap ?? throw new ArgumentNullException(nameof(siteMap));
+        SiteMap = siteMap ?? throw new ArgumentNullException(nameof(siteMap));
     }
 
-    protected readonly ISiteMap siteMap;
-
-    public override void Add(KeyValuePair<TKey, TValue> item)
-    {
-        this.ThrowIfReadOnly();
-        base.Add(item);
-    }
-
-    public override void Add(TKey key, TValue value)
-    {
-        this.ThrowIfReadOnly();
-        base.Add(key, value);
-    }
-
-    public override void AddRange(IDictionary<TKey, TValue> items)
-    {
-        this.ThrowIfReadOnly();
-        base.AddRange(items);
-    }
-
-    public override void Clear()
-    {
-        this.ThrowIfReadOnly();
-        base.Clear();
-    }
-
-    protected override void Insert(TKey key, TValue value, bool add)
-    {
-        this.ThrowIfReadOnly();
-        base.Insert(key, value, add);
-    }
-
-    public override bool IsReadOnly => this.siteMap.IsReadOnly;
-
-    public override bool Remove(KeyValuePair<TKey, TValue> item)
-    {
-        this.ThrowIfReadOnly();
-        return base.Remove(item);
-    }
-
-    public override bool Remove(TKey key)
-    {
-        this.ThrowIfReadOnly();
-        return base.Remove(key);
-    }
+    public override bool IsReadOnly => SiteMap.IsReadOnly;
 
     public override TValue this[TKey key]
     {
         get => base[key];
         set
         {
-            this.ThrowIfReadOnly();
+            ThrowIfReadOnly();
             base[key] = value;
         }
     }
 
+    public override void Add(KeyValuePair<TKey, TValue> item)
+    {
+        ThrowIfReadOnly();
+        base.Add(item);
+    }
+
+    public override void Add(TKey key, TValue value)
+    {
+        ThrowIfReadOnly();
+        base.Add(key, value);
+    }
+
+    public override void AddRange(IDictionary<TKey, TValue> items)
+    {
+        ThrowIfReadOnly();
+        base.AddRange(items);
+    }
+
+    public override void Clear()
+    {
+        ThrowIfReadOnly();
+        base.Clear();
+    }
+
+    protected override void Insert(TKey key, TValue value, bool add)
+    {
+        ThrowIfReadOnly();
+        base.Insert(key, value, add);
+    }
+
+    public override bool Remove(KeyValuePair<TKey, TValue> item)
+    {
+        ThrowIfReadOnly();
+        return base.Remove(item);
+    }
+
+    public override bool Remove(TKey key)
+    {
+        ThrowIfReadOnly();
+        return base.Remove(key);
+    }
+
     public virtual void CopyTo(IDictionary<TKey, TValue> destination)
     {
-        foreach (var item in this.Dictionary)
+        foreach (var item in Dictionary)
         {
             // Use null-forgiving to satisfy analyzer - reference types used as designed.
             var keyType = item.Key!.GetType();
@@ -88,16 +89,16 @@ public class LockableDictionary<TKey, TValue>
             }
             else
             {
-                throw new NotSupportedException(Resources.Messages.CopyOperationDoesNotSupportReferenceTypes);
+                throw new NotSupportedException(Messages.CopyOperationDoesNotSupportReferenceTypes);
             }
         }
     }
 
     protected virtual void ThrowIfReadOnly()
     {
-        if (this.IsReadOnly)
+        if (IsReadOnly)
         {
-            throw new InvalidOperationException(string.Format(Resources.Messages.SiteMapReadOnly));
+            throw new InvalidOperationException(string.Format(Messages.SiteMapReadOnly));
         }
     }
 }
