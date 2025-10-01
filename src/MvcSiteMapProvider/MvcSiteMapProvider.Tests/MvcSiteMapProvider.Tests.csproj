@@ -171,6 +171,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Unit\Builder\AspNetDefaultSiteMapProviderTests.cs" />
+    <Compile Include="Unit\Builder\AspNetNamedSiteMapProviderTests.cs" />
     <Compile Include="Unit\Collections\LockableAndCacheableDictionaryTest.cs" />
     <Compile Include="Unit\Collections\LockableListTest.cs" />
     <Compile Include="Unit\Collections\ObservableDictionaryTest.cs" />
