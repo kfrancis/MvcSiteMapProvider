@@ -1,37 +1,38 @@
-﻿using MvcSiteMapProvider.Web.Mvc;
 using System;
 using System.Web;
+using MvcSiteMapProvider.Web.Mvc;
 
 namespace MvcSiteMapProvider.Caching;
 
 /// <summary>
-/// Provides type-safe access to <see cref="P:System.Web.HttpContext.Items"/>.
+///     Provides type-safe access to <see cref="P:System.Web.HttpContext.Items" />.
 /// </summary>
-public class RequestCache 
+public class RequestCache
     : IRequestCache
 {
+    private readonly IMvcContextFactory _mvcContextFactory;
+
     public RequestCache(
         IMvcContextFactory mvcContextFactory
     )
     {
-        this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
+        _mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
     }
 
-    private readonly IMvcContextFactory mvcContextFactory;
-
-    private HttpContextBase Context => this.mvcContextFactory.CreateHttpContext();
+    private HttpContextBase Context => _mvcContextFactory.CreateHttpContext();
 
     public virtual T? GetValue<T>(string key)
     {
-        if (this.Context.Items.Contains(key))
+        if (Context.Items.Contains(key))
         {
-            return (T)this.Context.Items[key];
+            return (T)Context.Items[key];
         }
-        return default(T);
+
+        return default;
     }
 
     public virtual void SetValue<T>(string key, T value)
     {
-        this.Context.Items[key] = value;
+        Context.Items[key] = value;
     }
 }

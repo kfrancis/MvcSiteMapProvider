@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 
 namespace MvcSiteMapProvider.Caching;
 
 /// <summary>
-/// Container for passing caching instructions around as a group.
+///     Container for passing caching instructions around as a group.
 /// </summary>
 public class CacheDetails
     : ICacheDetails
@@ -14,27 +14,24 @@ public class CacheDetails
         ICacheDependency cacheDependency
     )
     {
-        if (absoluteCacheExpiration == null)
+        if (absoluteCacheExpiration == TimeSpan.Zero)
+        {
             throw new ArgumentNullException(nameof(absoluteCacheExpiration));
-        if (slidingCacheExpiration == null)
-            throw new ArgumentNullException(nameof(slidingCacheExpiration));
+        }
 
-        this.absoluteCacheExpiration = absoluteCacheExpiration;
-        this.slidingCacheExpiration = slidingCacheExpiration;
-        this.cacheDependency = cacheDependency ?? throw new ArgumentNullException(nameof(cacheDependency));
+        if (slidingCacheExpiration == TimeSpan.Zero)
+        {
+            throw new ArgumentNullException(nameof(slidingCacheExpiration));
+        }
+
+        AbsoluteCacheExpiration = absoluteCacheExpiration;
+        SlidingCacheExpiration = slidingCacheExpiration;
+        CacheDependency = cacheDependency ?? throw new ArgumentNullException(nameof(cacheDependency));
     }
 
-    protected readonly TimeSpan absoluteCacheExpiration;
-    protected readonly TimeSpan slidingCacheExpiration;
-    protected readonly ICacheDependency cacheDependency;
+    public TimeSpan AbsoluteCacheExpiration { get; }
 
-    #region ICacheDetails Members
+    public TimeSpan SlidingCacheExpiration { get; }
 
-    public TimeSpan AbsoluteCacheExpiration => this.absoluteCacheExpiration;
-
-    public TimeSpan SlidingCacheExpiration => this.slidingCacheExpiration;
-
-    public ICacheDependency CacheDependency => this.cacheDependency;
-
-    #endregion
+    public ICacheDependency CacheDependency { get; }
 }

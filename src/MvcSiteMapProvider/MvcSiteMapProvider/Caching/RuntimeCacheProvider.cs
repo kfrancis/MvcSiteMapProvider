@@ -5,32 +5,33 @@ using System.Runtime.Caching;
 namespace MvcSiteMapProvider.Caching;
 
 /// <summary>
-/// A cache provider that uses an <see cref="System.Runtime.Caching.ObjectCache"/> instance to cache items.
+///     A cache provider that uses an <see cref="System.Runtime.Caching.ObjectCache" /> instance to cache items.
 /// </summary>
 /// <typeparam name="T">The type of item that will be stored in the cache.</typeparam>
 public class RuntimeCacheProvider<T> : ICacheProvider<T>
 {
+    private readonly ObjectCache _cache;
+
     public RuntimeCacheProvider(ObjectCache cache)
     {
-        this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
+        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
     }
-    private readonly ObjectCache cache;
 
     public event EventHandler<MicroCacheItemRemovedEventArgs<T?>>? ItemRemoved;
 
     public bool Contains(string key)
     {
-        return cache.Contains(key);
+        return _cache.Contains(key);
     }
 
-    public LazyLock Get(string key)
+    public LazyLock? Get(string key)
     {
-        return (LazyLock)cache.Get(key);
+        return (LazyLock)_cache.Get(key);
     }
 
-    public bool TryGetValue(string key, out LazyLock value)
+    public bool TryGetValue(string key, out LazyLock? value)
     {
-        value = this.Get(key);
+        value = Get(key);
         return value != null;
     }
 
@@ -63,15 +64,15 @@ public class RuntimeCacheProvider<T> : ICacheProvider<T>
         // Callback
         policy.RemovedCallback = CacheItemRemoved;
 
-        cache.Add(key, item, policy);
+        _cache.Add(key, item, policy);
     }
 
     public void Remove(string key)
     {
-        cache.Remove(key);
+        _cache.Remove(key);
     }
 
-    private bool IsTimespanSet(TimeSpan timeSpan)
+    private static bool IsTimespanSet(TimeSpan timeSpan)
     {
         return !timeSpan.Equals(TimeSpan.MinValue);
     }

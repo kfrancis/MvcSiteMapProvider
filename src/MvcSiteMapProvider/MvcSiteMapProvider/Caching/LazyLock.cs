@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace MvcSiteMapProvider.Caching;
 
@@ -11,12 +11,13 @@ namespace MvcSiteMapProvider.Caching;
 /// </remarks>
 public sealed class LazyLock
 {
-    private volatile bool got;
-    private object? value;
+    private volatile bool _got;
+    private object? _value;
+    private readonly object _lockObject = new();
 
     public TValue? Get<TValue>(Func<TValue>? activator)
     {
-        if (got && value is TValue tValue)
+        if (_got && _value is TValue tValue)
             return tValue;
 
         if (activator == null)
@@ -24,16 +25,16 @@ public sealed class LazyLock
             return default;
         }
 
-        lock (this)
+        lock (_lockObject)
         {
-            if (got)
-                return (TValue)value!;
+            if (_got)
+                return (TValue)_value!;
 
-            value = activator();
+            _value = activator();
 
-            got = true;
+            _got = true;
         }
 
-        return (TValue)value!;
+        return (TValue)_value!;
     }
 }

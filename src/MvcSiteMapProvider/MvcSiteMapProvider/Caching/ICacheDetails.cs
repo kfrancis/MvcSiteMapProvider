@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 
 namespace MvcSiteMapProvider.Caching;
 
 /// <summary>
-/// Contract used to provide caching instructions.
+///     Contract used to provide caching instructions.
 /// </summary>
 public interface ICacheDetails
 {

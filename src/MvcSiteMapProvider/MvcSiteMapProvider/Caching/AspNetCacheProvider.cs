@@ -1,56 +1,51 @@
-﻿using MvcSiteMapProvider.Web.Mvc;
 using System;
 using System.Web;
 using System.Web.Caching;
+using MvcSiteMapProvider.Web.Mvc;
 
 namespace MvcSiteMapProvider.Caching;
 
 /// <summary>
-/// A cache provider that uses the <see cref="T:System.Web.HttpContext.Current.Cache"/> instance to 
-/// cache items that are added.
+///     A cache provider that uses the <see cref="T:System.Web.HttpContext.Cache" /> instance to
+///     cache items that are added.
 /// </summary>
 /// <typeparam name="T">The type of item that will be stored in the cache.</typeparam>
 public class AspNetCacheProvider<T>
     : ICacheProvider<T>
 {
+    private readonly IMvcContextFactory _mvcContextFactory;
+
     public AspNetCacheProvider(
         IMvcContextFactory mvcContextFactory
     )
     {
-        this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
+        _mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
     }
-    private readonly IMvcContextFactory mvcContextFactory;
 
-    private HttpContextBase Context => this.mvcContextFactory.CreateHttpContext();
-
-    #region ICacheProvider<T> Members
+    private HttpContextBase Context => _mvcContextFactory.CreateHttpContext();
 
     public event EventHandler<MicroCacheItemRemovedEventArgs<T?>>? ItemRemoved;
 
     public bool Contains(string key)
     {
-        return (Context.Cache[key] != null);
+        return Context.Cache[key] != null;
     }
 
-    public LazyLock Get(string key)
+    public LazyLock? Get(string key)
     {
-        return (LazyLock)Context.Cache.Get(key);
+        return (LazyLock?)Context.Cache.Get(key);
     }
 
-    public bool TryGetValue(string key, out LazyLock value)
+    public bool TryGetValue(string key, out LazyLock? value)
     {
-        value = this.Get(key);
-        if (value != null)
-        {
-            return true;
-        }
-        return false;
+        value = Get(key);
+        return value != null;
     }
 
     public void Add(string key, LazyLock item, ICacheDetails cacheDetails)
     {
-        var absolute = System.Web.Caching.Cache.NoAbsoluteExpiration;
-        var sliding = System.Web.Caching.Cache.NoSlidingExpiration;
+        var absolute = Cache.NoAbsoluteExpiration;
+        var sliding = Cache.NoSlidingExpiration;
         if (IsTimespanSet(cacheDetails.AbsoluteCacheExpiration))
         {
             absolute = DateTime.UtcNow.Add(cacheDetails.AbsoluteCacheExpiration);
@@ -61,11 +56,13 @@ public class AspNetCacheProvider<T>
         }
 
         if (cacheDetails.CacheDependency.Dependency == null)
+        {
             return;
+        }
 
         var dependency = (CacheDependency)cacheDetails.CacheDependency.Dependency;
 
-        Context.Cache.Insert(key, item, dependency, absolute, sliding, CacheItemPriority.NotRemovable, this.OnItemRemoved);
+        Context.Cache.Insert(key, item, dependency, absolute, sliding, CacheItemPriority.NotRemovable, OnItemRemoved);
     }
 
     public void Remove(string key)
@@ -73,15 +70,13 @@ public class AspNetCacheProvider<T>
         Context.Cache.Remove(key);
     }
 
-    #endregion
-
     private static bool IsTimespanSet(TimeSpan timeSpan)
     {
-        return (!timeSpan.Equals(TimeSpan.MinValue));
+        return !timeSpan.Equals(TimeSpan.MinValue);
     }
 
     /// <summary>
-    /// This method is called when an item has been removed from the cache.
+    ///     This method is called when an item has been removed from the cache.
     /// </summary>
     /// <param name="key">Cached item key.</param>
     /// <param name="item">Cached item.</param>
@@ -94,10 +89,14 @@ public class AspNetCacheProvider<T>
 
     protected virtual void OnCacheItemRemoved(MicroCacheItemRemovedEventArgs<T?>? e)
     {
-        if (this.ItemRemoved != null)
+        if (ItemRemoved == null)
         {
-            if (e != null)
-                ItemRemoved(this, e);
+            return;
+        }
+
+        if (e != null)
+        {
+            ItemRemoved(this, e);
         }
     }
 }

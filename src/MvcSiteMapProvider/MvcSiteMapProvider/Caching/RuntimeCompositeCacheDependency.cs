@@ -1,4 +1,4 @@
-﻿#if !NET35
+#if !NET35
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,32 +17,29 @@ public class RuntimeCompositeCacheDependency
         params ICacheDependency[] cacheDependencies
     )
     {
-        this.cacheDependencies = cacheDependencies ?? throw new ArgumentNullException(nameof(cacheDependencies));
+        _cacheDependencies = cacheDependencies ?? throw new ArgumentNullException(nameof(cacheDependencies));
     }
 
-    protected readonly ICacheDependency[] cacheDependencies;
+    private readonly ICacheDependency[] _cacheDependencies;
 
     public object? Dependency
     {
         get
         {
-            if (!this.cacheDependencies.Any())
+            if (!_cacheDependencies.Any())
             {
                 return null;
             }
 
             var list = new List<ChangeMonitor>();
-            foreach (var item in this.cacheDependencies)
+            foreach (var item in _cacheDependencies)
             {
                 if (item.Dependency is not IList<ChangeMonitor> changeMonitorList)
                 {
                     continue;
                 }
 
-                foreach (var changeMonitor in changeMonitorList)
-                {
-                    list.Add(changeMonitor);
-                }
+                list.AddRange(changeMonitorList);
             }
             return list;
         }

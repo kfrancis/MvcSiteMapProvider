@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 
 namespace MvcSiteMapProvider.Caching;
 
 /// <summary>
-/// Contract for micro cache.
+///     Contract for micro cache.
 /// </summary>
 public interface IMicroCache<T>
 {
