@@ -173,6 +173,9 @@
     <Compile Include="Unit\Collections\LockableAndCacheableDictionaryTest.cs" />
     <Compile Include="Unit\Collections\LockableListTest.cs" />
     <Compile Include="Unit\Collections\ObservableDictionaryTest.cs" />
+    <Compile Include="Unit\Collections\Specialized\AttributeDictionaryTest.cs" />
+    <Compile Include="Unit\Collections\Specialized\MetaRobotsValueCollectionTest.cs" />
+    <Compile Include="Unit\Collections\Specialized\NameValueCollectionExtensionsTest.cs" />
     <Compile Include="Unit\Collections\Specialized\RouteValueDictionaryTest.cs" />
     <Compile Include="Unit\Collections\ThreadSafeDictionaryTest.cs" />
     <Compile Include="Unit\Loader\SiteMapLoaderTest.cs" />
