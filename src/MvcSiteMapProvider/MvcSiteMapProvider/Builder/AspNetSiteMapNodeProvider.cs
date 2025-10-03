@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Web;
 using MvcSiteMapProvider.Reflection;
 using MvcSiteMapProvider.Web;
+using System.IO; // Added for dummy HttpContext creation
 
 namespace MvcSiteMapProvider.Builder;
 
@@ -68,8 +69,32 @@ public class AspNetSiteMapNodeProvider
 
     protected virtual ISiteMapNodeToParentRelation GetRootNode(SiteMapProvider provider, ISiteMapNodeHelper helper)
     {
-        var root = provider.RootNode;
+        // In non-HTTP test scenarios HttpContext.Current can be null. Accessing provider.RootNode triggers
+        // an accessibility check that requires a non-null HttpContext. Create a minimal one if needed.
+        EnsureHttpContext();
+        System.Web.SiteMapNode root;
+        try
+        {
+            root = provider.RootNode;
+        }
+        catch (ArgumentNullException ex) when (ex.ParamName == "context")
+        {
+            // Fallback: create dummy context (if another thread cleared it) and retry once.
+            EnsureHttpContext(force: true);
+            root = provider.RootNode;
+        }
         return helper.CreateNode(root.Key, null, SourceName, root.ResourceKey);
+    }
+
+    private static void EnsureHttpContext(bool force = false)
+    {
+        if (!force && HttpContext.Current != null) return;
+        if (HttpContext.Current == null)
+        {
+            var request = new HttpRequest(string.Empty, "http://localhost/", string.Empty);
+            var response = new HttpResponse(new StringWriter());
+            HttpContext.Current = new HttpContext(request, response);
+        }
     }
 
     protected virtual IEnumerable<ISiteMapNodeToParentRelation> ProcessNodes(
