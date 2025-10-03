@@ -1,59 +1,52 @@
-﻿using MvcSiteMapProvider.DI;
 using System;
+using MvcSiteMapProvider.DI;
 
-namespace MvcSiteMapProvider.Builder
+namespace MvcSiteMapProvider.Builder;
+
+/// <summary>
+///     A set of services useful for creating SiteMap nodes.
+/// </summary>
+[ExcludeFromAutoRegistration]
+public class SiteMapNodeCreator
+    : ISiteMapNodeCreator
 {
-    /// <summary>
-    /// A set of services useful for creating SiteMap nodes.
-    /// </summary>
-    [ExcludeFromAutoRegistration]
-    public class SiteMapNodeCreator
-        : ISiteMapNodeCreator
+    private readonly INodeKeyGenerator _nodeKeyGenerator;
+    private readonly ISiteMap _siteMap;
+    private readonly ISiteMapNodeFactory _siteMapNodeFactory;
+    private readonly ISiteMapNodeToParentRelationFactory _siteMapNodeToParentRelationFactory;
+
+    public SiteMapNodeCreator(
+        ISiteMap siteMap,
+        ISiteMapNodeFactory siteMapNodeFactory,
+        INodeKeyGenerator nodeKeyGenerator,
+        ISiteMapNodeToParentRelationFactory siteMapNodeToParentRelationFactory)
     {
-        public SiteMapNodeCreator(
-            ISiteMap siteMap,
-            ISiteMapNodeFactory siteMapNodeFactory,
-            INodeKeyGenerator nodeKeyGenerator,
-            ISiteMapNodeToParentRelationFactory siteMapNodeToParentRelationFactory)
-        {
-            if (siteMap == null)
-                throw new ArgumentNullException("siteMap");
-            if (siteMapNodeFactory == null)
-                throw new ArgumentNullException("siteMapNodeFactory");
-            if (nodeKeyGenerator == null)
-                throw new ArgumentNullException("nodeKeyGenerator");
-            if (siteMapNodeToParentRelationFactory == null)
-                throw new ArgumentNullException("siteMapNodeToParentRelationFactory");
+        _siteMap = siteMap ?? throw new ArgumentNullException(nameof(siteMap));
+        _siteMapNodeFactory = siteMapNodeFactory ?? throw new ArgumentNullException(nameof(siteMapNodeFactory));
+        _nodeKeyGenerator = nodeKeyGenerator ?? throw new ArgumentNullException(nameof(nodeKeyGenerator));
+        _siteMapNodeToParentRelationFactory = siteMapNodeToParentRelationFactory ??
+                                              throw new ArgumentNullException(
+                                                  nameof(siteMapNodeToParentRelationFactory));
+    }
 
-            this.siteMap = siteMap;
-            this.siteMapNodeFactory = siteMapNodeFactory;
-            this.nodeKeyGenerator = nodeKeyGenerator;
-            this.siteMapNodeToParentRelationFactory = siteMapNodeToParentRelationFactory;
-        }
-        protected readonly ISiteMap siteMap;
-        protected readonly ISiteMapNodeFactory siteMapNodeFactory;
-        protected readonly INodeKeyGenerator nodeKeyGenerator;
-        protected readonly ISiteMapNodeToParentRelationFactory siteMapNodeToParentRelationFactory;
+    public ISiteMapNodeToParentRelation CreateSiteMapNode(string key, string? parentKey, string sourceName,
+        string? implicitResourceKey)
+    {
+        var node = _siteMapNodeFactory.Create(_siteMap, key, implicitResourceKey);
+        return _siteMapNodeToParentRelationFactory.Create(parentKey, node, sourceName);
+    }
 
-        #region ISiteMapNodeService Members
+    public ISiteMapNodeToParentRelation CreateDynamicSiteMapNode(string key, string parentKey, string sourceName,
+        string implicitResourceKey)
+    {
+        var node = _siteMapNodeFactory.CreateDynamic(_siteMap, key, implicitResourceKey);
+        return _siteMapNodeToParentRelationFactory.Create(parentKey, node, sourceName);
+    }
 
-        public ISiteMapNodeToParentRelation CreateSiteMapNode(string key, string parentKey, string sourceName, string implicitResourceKey)
-        {
-            var node = this.siteMapNodeFactory.Create(this.siteMap, key, implicitResourceKey);
-            return this.siteMapNodeToParentRelationFactory.Create(parentKey, node, sourceName);
-        }
-
-        public ISiteMapNodeToParentRelation CreateDynamicSiteMapNode(string key, string parentKey, string sourceName, string implicitResourceKey)
-        {
-            var node = this.siteMapNodeFactory.CreateDynamic(this.siteMap, key, implicitResourceKey);
-            return this.siteMapNodeToParentRelationFactory.Create(parentKey, node, sourceName);
-        }
-
-        public virtual string GenerateSiteMapNodeKey(string parentKey, string key, string url, string title, string area, string controller, string action, string httpMethod, bool clickable)
-        {
-            return this.nodeKeyGenerator.GenerateKey(parentKey, key, url, title, area, controller, action, httpMethod, clickable);
-        }
-
-        #endregion
+    public virtual string GenerateSiteMapNodeKey(string parentKey, string key, string url, string title, string area,
+        string controller, string action, string httpMethod, bool clickable)
+    {
+        return _nodeKeyGenerator.GenerateKey(parentKey, key, url, title, area, controller, action, httpMethod,
+            clickable);
     }
 }

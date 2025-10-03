@@ -1,110 +1,104 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using MvcSiteMapProvider.Resources;
 
-namespace MvcSiteMapProvider.Collections
+namespace MvcSiteMapProvider.Collections;
+
+/// <summary>
+///     Generic dictionary that is aware of the ISiteMap interface and can be made read-only
+///     depending on the IsReadOnly property of ISiteMap.
+/// </summary>
+public class LockableDictionary<TKey, TValue>
+    : ObservableDictionary<TKey, TValue>
 {
-    /// <summary>
-    /// Generic dictionary that is aware of the ISiteMap interface and can be made read-only
-    /// depending on the IsReadOnly property of ISiteMap.
-    /// </summary>
-    public class LockableDictionary<TKey, TValue>
-        : ObservableDictionary<TKey, TValue>
+    protected readonly ISiteMap SiteMap;
+
+    protected LockableDictionary(
+        ISiteMap siteMap
+    )
     {
-        public LockableDictionary(
-            ISiteMap siteMap
-            )
-        {
-            if (siteMap == null)
-                throw new ArgumentNullException("siteMap");
+        SiteMap = siteMap ?? throw new ArgumentNullException(nameof(siteMap));
+    }
 
-            this.siteMap = siteMap;
+    public override bool IsReadOnly => SiteMap.IsReadOnly;
+
+    public override TValue this[TKey key]
+    {
+        get => base[key];
+        set
+        {
+            ThrowIfReadOnly();
+            base[key] = value;
         }
+    }
 
-        protected readonly ISiteMap siteMap;
+    public override void Add(KeyValuePair<TKey, TValue> item)
+    {
+        ThrowIfReadOnly();
+        base.Add(item);
+    }
 
-        public override void Add(KeyValuePair<TKey, TValue> item)
+    public override void Add(TKey key, TValue value)
+    {
+        ThrowIfReadOnly();
+        base.Add(key, value);
+    }
+
+    public override void AddRange(IDictionary<TKey, TValue> items)
+    {
+        ThrowIfReadOnly();
+        base.AddRange(items);
+    }
+
+    public override void Clear()
+    {
+        ThrowIfReadOnly();
+        base.Clear();
+    }
+
+    protected override void Insert(TKey key, TValue value, bool add)
+    {
+        ThrowIfReadOnly();
+        base.Insert(key, value, add);
+    }
+
+    public override bool Remove(KeyValuePair<TKey, TValue> item)
+    {
+        ThrowIfReadOnly();
+        return base.Remove(item);
+    }
+
+    public override bool Remove(TKey key)
+    {
+        ThrowIfReadOnly();
+        return base.Remove(key);
+    }
+
+    public virtual void CopyTo(IDictionary<TKey, TValue> destination)
+    {
+        foreach (var item in Dictionary)
         {
-            this.ThrowIfReadOnly();
-            base.Add(item);
-        }
-
-        public override void Add(TKey key, TValue value)
-        {
-            this.ThrowIfReadOnly();
-            base.Add(key, value);
-        }
-
-        public override void AddRange(IDictionary<TKey, TValue> items)
-        {
-            this.ThrowIfReadOnly();
-            base.AddRange(items);
-        }
-
-        public override void Clear()
-        {
-            this.ThrowIfReadOnly();
-            base.Clear();
-        }
-
-        protected override void Insert(TKey key, TValue value, bool add)
-        {
-            this.ThrowIfReadOnly();
-            base.Insert(key, value, add);
-        }
-
-        public override bool IsReadOnly
-        {
-            get { return this.siteMap.IsReadOnly; }
-        }
-
-        public override bool Remove(KeyValuePair<TKey, TValue> item)
-        {
-            this.ThrowIfReadOnly();
-            return base.Remove(item);
-        }
-
-        public override bool Remove(TKey key)
-        {
-            this.ThrowIfReadOnly();
-            return base.Remove(key);
-        }
-
-        public override TValue this[TKey key]
-        {
-            get
+            // Use null-forgiving to satisfy analyzer - reference types used as designed.
+            var keyType = item.Key!.GetType();
+            var valueType = item.Value!.GetType();
+            var keyIsPointer = keyType.IsPointer;
+            var valueIsPointer = valueType.IsPointer;
+            if (!keyIsPointer && !valueIsPointer)
             {
-                return base[key];
+                destination.Add(new KeyValuePair<TKey, TValue>(item.Key, item.Value));
             }
-            set
+            else
             {
-                this.ThrowIfReadOnly();
-                base[key] = value;
-            }
-        }
-
-        public virtual void CopyTo(IDictionary<TKey, TValue> destination)
-        {
-            foreach (var item in this.Dictionary)
-            {
-                var keyIsPointer = item.Key.GetType().IsPointer;
-                var valueIsPointer = item.Value.GetType().IsPointer;
-                if (!keyIsPointer && !valueIsPointer)
-                {
-                    destination.Add(new KeyValuePair<TKey, TValue>(item.Key, item.Value));
-                }
-                else
-                {
-                    throw new NotSupportedException(Resources.Messages.CopyOperationDoesNotSupportReferenceTypes);
-                }
+                throw new NotSupportedException(Messages.CopyOperationDoesNotSupportReferenceTypes);
             }
         }
+    }
 
-        protected virtual void ThrowIfReadOnly()
+    protected virtual void ThrowIfReadOnly()
+    {
+        if (IsReadOnly)
         {
-            if (this.IsReadOnly)
-            {
-                throw new InvalidOperationException(string.Format(Resources.Messages.SiteMapReadOnly));
-            }
+            throw new InvalidOperationException(string.Format(Messages.SiteMapReadOnly));
         }
     }
 }

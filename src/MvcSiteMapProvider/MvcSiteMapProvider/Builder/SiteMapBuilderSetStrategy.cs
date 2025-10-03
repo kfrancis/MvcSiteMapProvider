@@ -1,53 +1,44 @@
-﻿using MvcSiteMapProvider.Caching;
-using MvcSiteMapProvider.DI;
 using System;
 using System.Linq;
+using MvcSiteMapProvider.Caching;
+using MvcSiteMapProvider.DI;
+using MvcSiteMapProvider.Resources;
 
-namespace MvcSiteMapProvider.Builder
+namespace MvcSiteMapProvider.Builder;
+
+/// <summary>
+///     Tracks all the registered instances of <see cref="T:MvcSiteMapProvider.Builder.ISiteMapBuilderSet" /> and
+///     allows the caller to get a specific named instance of this interface at runtime.
+/// </summary>
+[ExcludeFromAutoRegistration]
+public class SiteMapBuilderSetStrategy
+    : ISiteMapBuilderSetStrategy
 {
-    /// <summary>
-    /// Tracks all of the registered instances of <see cref="T:MvcSiteMapProvider.Builder.ISiteMapBuilderSet"/> and 
-    /// allows the caller to get a specific named instance of this interface at runtime.
-    /// </summary>
-    [ExcludeFromAutoRegistration]
-    public class SiteMapBuilderSetStrategy
-        : ISiteMapBuilderSetStrategy
+    private readonly ISiteMapBuilderSet[] _siteMapBuilderSets;
+
+    public SiteMapBuilderSetStrategy(
+        ISiteMapBuilderSet[] siteMapBuilderSets
+    )
     {
-        public SiteMapBuilderSetStrategy(
-            ISiteMapBuilderSet[] siteMapBuilderSets
-            )
-        {
-            if (siteMapBuilderSets == null)
-                throw new ArgumentNullException("siteMapBuilderSets");
-            this.siteMapBuilderSets = siteMapBuilderSets;
-        }
+        _siteMapBuilderSets = siteMapBuilderSets ?? throw new ArgumentNullException(nameof(siteMapBuilderSets));
+    }
 
-        protected readonly ISiteMapBuilderSet[] siteMapBuilderSets;
+    public virtual ISiteMapBuilderSet GetBuilderSet(string builderSetName)
+    {
+        var builderSet = _siteMapBuilderSets.FirstOrDefault(x => x.AppliesTo(builderSetName));
+        return builderSet ??
+               throw new MvcSiteMapException(string.Format(Messages.NamedBuilderSetNotFound, builderSetName));
+    }
 
-        #region ISiteMapBuilderSetStrategy Members
+    public virtual ISiteMapBuilder GetBuilder(string builderSetName)
+    {
+        var builderSet = GetBuilderSet(builderSetName);
+        return builderSet.Builder;
+    }
 
-        public virtual ISiteMapBuilderSet GetBuilderSet(string builderSetName)
-        {
-            var builderSet = siteMapBuilderSets.FirstOrDefault(x => x.AppliesTo(builderSetName));
-            if (builderSet == null)
-            {
-                throw new MvcSiteMapException(string.Format(Resources.Messages.NamedBuilderSetNotFound, builderSetName));
-            }
-            return builderSet;
-        }
-
-        public virtual ISiteMapBuilder GetBuilder(string builderSetName)
-        {
-            var builderSet = this.GetBuilderSet(builderSetName);
-            return builderSet.Builder;
-        }
-
-        public virtual ICacheDetails GetCacheDetails(string builderSetName)
-        {
-            var builderSet = this.GetBuilderSet(builderSetName);
-            return builderSet.CacheDetails;
-        }
-
-        #endregion
+    public virtual ICacheDetails GetCacheDetails(string builderSetName)
+    {
+        var builderSet = GetBuilderSet(builderSetName);
+        return builderSet.CacheDetails;
     }
 }

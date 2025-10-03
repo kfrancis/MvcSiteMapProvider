@@ -1,38 +1,32 @@
 ﻿using System;
 
-namespace MvcSiteMapProvider.Globalization
+namespace MvcSiteMapProvider.Globalization;
+
+/// <summary>
+/// An abstract factory that can be used to create new instances of <see cref="T:MvcSiteMapProvider.Globalization.LocalizationService"/>
+/// at runtime.
+/// </summary>
+public class LocalizationServiceFactory
+    : ILocalizationServiceFactory
 {
-    /// <summary>
-    /// An abstract factory that can be used to create new instances of <see cref="T:MvcSiteMapProvider.Globalization.LocalizationService"/>
-    /// at runtime.
-    /// </summary>
-    public class LocalizationServiceFactory
-        : ILocalizationServiceFactory
+    public LocalizationServiceFactory(
+        IExplicitResourceKeyParser explicitResourceKeyParser,
+        IStringLocalizer stringLocalizer
+    )
     {
-        public LocalizationServiceFactory(
-            IExplicitResourceKeyParser explicitResourceKeyParser,
-            IStringLocalizer stringLocalizer
-            )
-        {
-            if (explicitResourceKeyParser == null)
-                throw new ArgumentNullException("explicitResourceKeyParser");
-            if (stringLocalizer == null)
-                throw new ArgumentNullException("stringLocalizer");
-
-            this.explicitResourceKeyParser = explicitResourceKeyParser;
-            this.stringLocalizer = stringLocalizer;
-        }
-
-        protected readonly IExplicitResourceKeyParser explicitResourceKeyParser;
-        protected readonly IStringLocalizer stringLocalizer;
-
-        #region ILocalizationServiceFactory Members
-
-        public ILocalizationService Create(string implicitResourceKey)
-        {
-            return new LocalizationService(implicitResourceKey, explicitResourceKeyParser, stringLocalizer);
-        }
-
-        #endregion
+        this.explicitResourceKeyParser = explicitResourceKeyParser ?? throw new ArgumentNullException(nameof(explicitResourceKeyParser));
+        this.stringLocalizer = stringLocalizer ?? throw new ArgumentNullException(nameof(stringLocalizer));
     }
+
+    protected readonly IExplicitResourceKeyParser explicitResourceKeyParser;
+    protected readonly IStringLocalizer stringLocalizer;
+
+    #region ILocalizationServiceFactory Members
+
+    public ILocalizationService Create(string implicitResourceKey)
+    {
+        return new LocalizationService(implicitResourceKey, explicitResourceKeyParser, stringLocalizer);
+    }
+
+    #endregion
 }

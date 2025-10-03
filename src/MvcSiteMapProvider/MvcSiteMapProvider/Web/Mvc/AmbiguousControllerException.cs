@@ -1,31 +1,29 @@
 ﻿using System;
 
-namespace MvcSiteMapProvider.Web.Mvc
+namespace MvcSiteMapProvider.Web.Mvc;
+
+/// <summary>
+/// AmbiguousControllerException
+/// </summary>
+[Serializable]
+public class AmbiguousControllerException : Exception
 {
     /// <summary>
-    /// AmbiguousControllerException
+    /// Constructor
     /// </summary>
-    [Serializable]
-    public class AmbiguousControllerException : Exception
-    {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public AmbiguousControllerException()
-        { }
+    public AmbiguousControllerException()
+    { }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="message">Message</param>
-        public AmbiguousControllerException(string message) : base(message) { }
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="message">Message</param>
+    public AmbiguousControllerException(string message) : base(message) { }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="message">Message</param>
-        /// <param name="innerException">Inner Exception</param>
-        public AmbiguousControllerException(string message, Exception innerException) : base(message, innerException) { }
-    }
-
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="message">Message</param>
+    /// <param name="innerException">Inner Exception</param>
+    public AmbiguousControllerException(string message, Exception innerException) : base(message, innerException) { }
 }

@@ -2,49 +2,48 @@
 using System.Reflection;
 using System.Web.Hosting;
 
-namespace MvcSiteMapProvider.Web.Mvc
+namespace MvcSiteMapProvider.Web.Mvc;
+
+/// <summary>
+/// MvcSiteMapProviderViewEngineVirtualFile class.
+/// </summary>
+internal class MvcSiteMapProviderViewEngineVirtualFile 
+    : VirtualFile
 {
     /// <summary>
-    /// MvcSiteMapProviderViewEngineVirtualFile class.
+    /// Gets or sets the file path.
     /// </summary>
-    internal class MvcSiteMapProviderViewEngineVirtualFile 
-        : VirtualFile
+    /// <value>The file path.</value>
+    protected string FilePath { get; private set; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MvcSiteMapProviderViewEngineVirtualFile"/> class.
+    /// </summary>
+    /// <param name="filePath">The filePath.</param>
+    public MvcSiteMapProviderViewEngineVirtualFile(string filePath)
+        : base(filePath)
     {
-        /// <summary>
-        /// Gets or sets the file path.
-        /// </summary>
-        /// <value>The file path.</value>
-        protected string FilePath { get; private set; }
+        this.FilePath = filePath;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MvcSiteMapProviderViewEngineVirtualFile"/> class.
-        /// </summary>
-        /// <param name="filePath">The filePath.</param>
-        public MvcSiteMapProviderViewEngineVirtualFile(string filePath)
-            : base(filePath)
-        {
-            this.FilePath = filePath;
-        }
+    /// <summary>
+    /// When overridden in a derived class, returns a read-only stream to the virtual resource.
+    /// </summary>
+    /// <returns>A read-only stream to the virtual file.</returns>
+    public override Stream Open()
+    {
+        return ReadResource(FilePath);
+    }
 
-        /// <summary>
-        /// When overridden in a derived class, returns a read-only stream to the virtual resource.
-        /// </summary>
-        /// <returns>A read-only stream to the virtual file.</returns>
-        public override Stream Open()
-        {
-            return ReadResource(FilePath);
-        }
-
-        /// <summary>
-        /// Reads the resource.
-        /// </summary>
-        /// <param name="embeddedFileName">Name of the embedded file.</param>
-        /// <returns></returns>
-        private static Stream ReadResource(string embeddedFileName)
-        {
-            string resourceFileName = Path.GetFileName(embeddedFileName);
-            Assembly assembly = typeof(MvcSiteMapProviderViewEngineVirtualFile).Assembly;
-            return assembly.GetManifestResourceStream("MvcSiteMapProvider.Web.Html.DisplayTemplates." + resourceFileName);
-        }
+    /// <summary>
+    /// Reads the resource.
+    /// </summary>
+    /// <param name="embeddedFileName">Name of the embedded file.</param>
+    /// <returns></returns>
+    private static Stream ReadResource(string embeddedFileName)
+    {
+        var resourceFileName = Path.GetFileName(embeddedFileName);
+        var assembly = typeof(MvcSiteMapProviderViewEngineVirtualFile).Assembly;
+        return assembly.GetManifestResourceStream("MvcSiteMapProvider.Web.Html.DisplayTemplates." + resourceFileName);
     }
 }

@@ -292,12 +292,14 @@ namespace MvcSiteMapProvider.Tests.Unit.Web.Html
             return this.ReturnNodeIfAccessible(parentNode);
         }
 
-        public ISiteMapNode GetParentNodeRelativeToCurrentNodeAndHintDownFromParent(int walkupLevels, int relativeDepthFromWalkup)
+        public ISiteMapNode GetParentNodeRelativeToCurrentNodeAndHintDownFromParent(int walkupLevels,
+            int relativeDepthFromWalkup)
         {
             throw new NotImplementedException();
         }
 
-        public ISiteMapNode GetParentNodeRelativeToNodeAndHintDownFromParent(ISiteMapNode node, int walkupLevels, int relativeDepthFromWalkup)
+        public ISiteMapNode GetParentNodeRelativeToNodeAndHintDownFromParent(ISiteMapNode node, int walkupLevels,
+            int relativeDepthFromWalkup)
         {
             throw new NotImplementedException();
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+// ReSharper disable Mvc.ViewNotResolved
 
 namespace MvcSiteMapProvider.Sample.Mvc5.Controllers
 {

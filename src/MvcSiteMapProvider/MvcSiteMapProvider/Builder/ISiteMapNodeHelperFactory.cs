@@ -1,12 +1,12 @@
 ﻿using MvcSiteMapProvider.Globalization;
 
-namespace MvcSiteMapProvider.Builder
+namespace MvcSiteMapProvider.Builder;
+
+/// <summary>
+///     Contract for an abstract factory that creates instances of
+///     <see cref="T:MvcSiteMapProvider.Builder.ISiteMapNodeHelper" />.
+/// </summary>
+public interface ISiteMapNodeHelperFactory
 {
-    /// <summary>
-    /// Contract for an abstract factory that creates instances of <see cref="T:MvcSiteMapProvider.Builder.ISiteMapNodeHelper"/>.
-    /// </summary>
-    public interface ISiteMapNodeHelperFactory
-    {
-        ISiteMapNodeHelper Create(ISiteMap siteMap, ICultureContext cultureContext);
-    }
+    ISiteMapNodeHelper Create(ISiteMap siteMap, ICultureContext cultureContext);
 }

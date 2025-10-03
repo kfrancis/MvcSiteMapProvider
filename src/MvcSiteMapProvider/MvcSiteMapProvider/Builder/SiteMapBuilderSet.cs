@@ -1,112 +1,81 @@
-﻿using MvcSiteMapProvider.Caching;
 using System;
+using MvcSiteMapProvider.Caching;
 
-namespace MvcSiteMapProvider.Builder
+namespace MvcSiteMapProvider.Builder;
+
+/// <summary>
+///     Provides a named set of services that can be used to build a <see cref="T:MvcSiteMapProvider.ISiteMap" />.
+/// </summary>
+public class SiteMapBuilderSet
+    : ISiteMapBuilderSet
 {
-    /// <summary>
-    /// Provides a named set of services that can be used to build a <see cref="T:MvcSiteMapProvider.ISiteMap"/>.
-    /// </summary>
-    public class SiteMapBuilderSet
-        : ISiteMapBuilderSet
+    private readonly string _instanceName;
+
+    public SiteMapBuilderSet(
+        string? instanceName,
+        bool securityTrimmingEnabled,
+        bool enableLocalization,
+        bool visibilityAffectsDescendants,
+        bool useTitleIfDescriptionNotProvided,
+        ISiteMapBuilder? siteMapBuilder,
+        ICacheDetails? cacheDetails
+    )
     {
-        public SiteMapBuilderSet(
-           string instanceName,
-           bool securityTrimmingEnabled,
-           bool enableLocalization,
-           bool visibilityAffectsDescendants,
-           bool useTitleIfDescriptionNotProvided,
-           ISiteMapBuilder siteMapBuilder,
-           ICacheDetails cacheDetails
-           )
+        if (string.IsNullOrEmpty(instanceName))
         {
-            if (string.IsNullOrEmpty(instanceName))
-                throw new ArgumentNullException("instanceName");
-            if (siteMapBuilder == null)
-                throw new ArgumentNullException("siteMapBuilder");
-            if (cacheDetails == null)
-                throw new ArgumentNullException("cacheDetails");
-
-            this.instanceName = instanceName;
-            this.securityTrimmingEnabled = securityTrimmingEnabled;
-            this.enableLocalization = enableLocalization;
-            this.visibilityAffectsDescendants = visibilityAffectsDescendants;
-            this.useTitleIfDescriptionNotProvided = useTitleIfDescriptionNotProvided;
-            this.siteMapBuilder = siteMapBuilder;
-            this.cacheDetails = cacheDetails;
+            throw new ArgumentNullException(nameof(instanceName));
         }
 
-        /// <summary>
-        /// ctor for backward compatibility, 
-        /// visibilityAffectsDescendants parameter defaults to true
-        /// useTitleIfDescriptionNotProvided parameter defaults to true
-        /// </summary>
-        [Obsolete("Use the overload ctor(string, bool, bool, bool, bool, ISiteMapBuilder, ICacheDetails) instead.")]
-        public SiteMapBuilderSet(
-            string instanceName,
-            bool securityTrimmingEnabled,
-            bool enableLocalization,
-            ISiteMapBuilder siteMapBuilder,
-            ICacheDetails cacheDetails
-            ) 
-            : this(
-                instanceName,
-                securityTrimmingEnabled,
-                enableLocalization,
-                true,
-                true,
-                siteMapBuilder,
-                cacheDetails
-            ) 
-        { 
-        }
+        _instanceName = instanceName!;
+        SecurityTrimmingEnabled = securityTrimmingEnabled;
+        EnableLocalization = enableLocalization;
+        VisibilityAffectsDescendants = visibilityAffectsDescendants;
+        UseTitleIfDescriptionNotProvided = useTitleIfDescriptionNotProvided;
+        Builder = siteMapBuilder ?? throw new ArgumentNullException(nameof(siteMapBuilder));
+        CacheDetails = cacheDetails ?? throw new ArgumentNullException(nameof(cacheDetails));
+    }
 
-        protected readonly string instanceName;
-        protected readonly bool securityTrimmingEnabled;
-        protected readonly bool enableLocalization;
-        protected readonly bool visibilityAffectsDescendants;
-        protected readonly bool useTitleIfDescriptionNotProvided;
-        protected readonly ISiteMapBuilder siteMapBuilder;
-        protected readonly ICacheDetails cacheDetails;
+    /// <summary>
+    ///     ctor for backward compatibility,
+    ///     visibilityAffectsDescendants parameter defaults to true
+    ///     useTitleIfDescriptionNotProvided parameter defaults to true
+    /// </summary>
+    [Obsolete("Use the overload ctor(string, bool, bool, bool, bool, ISiteMapBuilder, ICacheDetails) instead.")]
+    public SiteMapBuilderSet(
+        string instanceName,
+        bool securityTrimmingEnabled,
+        bool enableLocalization,
+        ISiteMapBuilder siteMapBuilder,
+        ICacheDetails cacheDetails
+    )
+        : this(
+            instanceName,
+            securityTrimmingEnabled,
+            enableLocalization,
+            true,
+            true,
+            siteMapBuilder,
+            cacheDetails
+        )
+    {
+    }
 
-        #region ISiteMapBuilderSet Members
+    public virtual ISiteMapBuilder Builder { get; }
 
-        public virtual ISiteMapBuilder Builder
-        {
-            get { return this.siteMapBuilder; }
-        }
+    public virtual ICacheDetails CacheDetails { get; }
 
-        public virtual ICacheDetails CacheDetails
-        {
-            get { return this.cacheDetails; }
-        }
+    public virtual string? SiteMapCacheKey { get; set; }
 
-        public virtual string SiteMapCacheKey { get; set; }
+    public virtual bool SecurityTrimmingEnabled { get; }
 
-        public virtual bool SecurityTrimmingEnabled
-        {
-            get { return this.securityTrimmingEnabled; }
-        }
+    public virtual bool EnableLocalization { get; }
 
-        public virtual bool EnableLocalization
-        {
-            get { return this.enableLocalization; }
-        }
+    public virtual bool VisibilityAffectsDescendants { get; }
 
-        public virtual bool VisibilityAffectsDescendants
-        {
-            get { return this.visibilityAffectsDescendants; }
-        }
+    public virtual bool UseTitleIfDescriptionNotProvided { get; }
 
-        public virtual bool UseTitleIfDescriptionNotProvided
-        {
-            get { return this.useTitleIfDescriptionNotProvided; }
-        }
-
-        public virtual bool AppliesTo(string builderSetName)
-        {
-            return this.instanceName.Equals(builderSetName, StringComparison.Ordinal);
-        }
-
-        #endregion
+    public virtual bool AppliesTo(string builderSetName)
+    {
+        return _instanceName.Equals(builderSetName, StringComparison.Ordinal);
     }
 }

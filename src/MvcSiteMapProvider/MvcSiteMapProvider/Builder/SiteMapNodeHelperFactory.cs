@@ -1,53 +1,45 @@
-﻿using MvcSiteMapProvider.Globalization;
 using System;
+using MvcSiteMapProvider.Globalization;
 
-namespace MvcSiteMapProvider.Builder
+namespace MvcSiteMapProvider.Builder;
+
+/// <summary>
+///     Abstract factory that creates instances of <see cref="T:MvcSiteMapProvider.Builder.ISiteMapNodeHelper" />.
+/// </summary>
+public class SiteMapNodeHelperFactory
+    : ISiteMapNodeHelperFactory
 {
-    /// <summary>
-    /// Abstract factory that creates instances of <see cref="T:MvcSiteMapProvider.Builder.ISiteMapNodeHelper"/>.
-    /// </summary>
-    public class SiteMapNodeHelperFactory
-        : ISiteMapNodeHelperFactory
+    private readonly ICultureContextFactory _cultureContextFactory;
+    private readonly IDynamicSiteMapNodeBuilderFactory _dynamicSiteMapNodeBuilderFactory;
+    private readonly IReservedAttributeNameProvider _reservedAttributeNameProvider;
+    private readonly ISiteMapNodeCreatorFactory _siteMapNodeCreatorFactory;
+
+    public SiteMapNodeHelperFactory(
+        ISiteMapNodeCreatorFactory siteMapNodeCreatorFactory,
+        IDynamicSiteMapNodeBuilderFactory dynamicSiteMapNodeBuilderFactory,
+        IReservedAttributeNameProvider reservedAttributeNameProvider,
+        ICultureContextFactory cultureContextFactory
+    )
     {
-        public SiteMapNodeHelperFactory(
-            ISiteMapNodeCreatorFactory siteMapNodeCreatorFactory,
-            IDynamicSiteMapNodeBuilderFactory dynamicSiteMapNodeBuilderFactory,
-            IReservedAttributeNameProvider reservedAttributeNameProvider,
-            ICultureContextFactory cultureContextFactory
-            )
-        {
-            if (siteMapNodeCreatorFactory == null)
-                throw new ArgumentNullException("siteMapNodeCreatorFactory");
-            if (dynamicSiteMapNodeBuilderFactory == null)
-                throw new ArgumentNullException("dynamicSiteMapNodeBuilderFactory");
-            if (reservedAttributeNameProvider == null)
-                throw new ArgumentNullException("reservedAttributeNameProvider");
-            if (cultureContextFactory == null)
-                throw new ArgumentNullException("cultureContextFactory");
+        _siteMapNodeCreatorFactory = siteMapNodeCreatorFactory ??
+                                     throw new ArgumentNullException(nameof(siteMapNodeCreatorFactory));
+        _dynamicSiteMapNodeBuilderFactory = dynamicSiteMapNodeBuilderFactory ??
+                                            throw new ArgumentNullException(
+                                                nameof(dynamicSiteMapNodeBuilderFactory));
+        _reservedAttributeNameProvider = reservedAttributeNameProvider ??
+                                         throw new ArgumentNullException(nameof(reservedAttributeNameProvider));
+        _cultureContextFactory =
+            cultureContextFactory ?? throw new ArgumentNullException(nameof(cultureContextFactory));
+    }
 
-            this.siteMapNodeCreatorFactory = siteMapNodeCreatorFactory;
-            this.dynamicSiteMapNodeBuilderFactory = dynamicSiteMapNodeBuilderFactory;
-            this.reservedAttributeNameProvider = reservedAttributeNameProvider;
-            this.cultureContextFactory = cultureContextFactory;
-        }
-        protected readonly ISiteMapNodeCreatorFactory siteMapNodeCreatorFactory;
-        protected readonly IDynamicSiteMapNodeBuilderFactory dynamicSiteMapNodeBuilderFactory;
-        protected readonly IReservedAttributeNameProvider reservedAttributeNameProvider;
-        protected readonly ICultureContextFactory cultureContextFactory;
-
-        #region ISiteMapNodeHelperFactory Members
-
-        public ISiteMapNodeHelper Create(ISiteMap siteMap, ICultureContext cultureContext)
-        {
-            return new SiteMapNodeHelper(
-                siteMap,
-                cultureContext,
-                this.siteMapNodeCreatorFactory,
-                this.dynamicSiteMapNodeBuilderFactory,
-                this.reservedAttributeNameProvider,
-                this.cultureContextFactory);
-        }
-
-        #endregion
+    public ISiteMapNodeHelper Create(ISiteMap siteMap, ICultureContext cultureContext)
+    {
+        return new SiteMapNodeHelper(
+            siteMap,
+            cultureContext,
+            _siteMapNodeCreatorFactory,
+            _dynamicSiteMapNodeBuilderFactory,
+            _reservedAttributeNameProvider,
+            _cultureContextFactory);
     }
 }

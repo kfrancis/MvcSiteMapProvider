@@ -1,9 +1,8 @@
-﻿using MvcSiteMapProvider.Globalization;
+using MvcSiteMapProvider.Globalization;
 
-namespace MvcSiteMapProvider.Builder
+namespace MvcSiteMapProvider.Builder;
+
+public interface IDynamicSiteMapNodeBuilderFactory
 {
-    public interface IDynamicSiteMapNodeBuilderFactory
-    {
-        IDynamicSiteMapNodeBuilder Create(ISiteMap siteMap, ICultureContext cultureContext);
-    }
+    IDynamicSiteMapNodeBuilder Create(ISiteMap siteMap, ICultureContext cultureContext);
 }

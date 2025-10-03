@@ -1,7 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SimpleInjector;
 
 namespace DI.SimpleInjector
@@ -13,7 +11,10 @@ namespace DI.SimpleInjector
         public SimpleInjectorDependencyInjectionContainer(Container container)
         {
             if (container == null)
-                throw new ArgumentNullException("container");
+            {
+                throw new ArgumentNullException(nameof(container));
+            }
+
             _container = container;
         }
 
@@ -24,7 +25,7 @@ namespace DI.SimpleInjector
 
         public object TryGetInstance(Type type)
         {
-            return ((IServiceProvider) _container).GetService(type);
+            return ((IServiceProvider)_container).GetService(type);
         }
 
         public IEnumerable<object> GetAllInstances(Type type)
@@ -36,8 +37,7 @@ namespace DI.SimpleInjector
         {
             // Simple Injector depends on the behavior of the
             // DefaultControllerFactory to release controllers.
-            IDisposable disposable = instance as IDisposable;
-            if (disposable != null)
+            if (instance is IDisposable disposable)
             {
                 disposable.Dispose();
             }

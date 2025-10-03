@@ -1,0 +1,82 @@
+name: "Copilot Setup Steps"
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+jobs:
+  # IMPORTANT: Job id must be exactly this for Copilot to use it.
+  copilot-setup-steps:
+    # NOTE: Copilot coding agent currently only supports Ubuntu runners per docs.
+    # However this repository targets classic .NET Framework (4.0 / 4.5) which
+    # requires Windows/MSBuild to compile successfully (uses System.Web / IIS assemblies).
+    # We therefore use our own runner on dev-pc so the agent will have a successful build
+    # environment with full .NET Framework installed.
+    runs-on: self-hosted
+    permissions:
+      contents: read
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/packages.config') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Restore NuGet (solution or individual projects)
+        shell: pwsh
+        run: |
+          if (Test-Path *.sln) {
+            Get-ChildItem -Filter *.sln | ForEach-Object { nuget restore $_.FullName }
+          } else {
+            Get-ChildItem -Recurse -Filter *.csproj | ForEach-Object { nuget restore $_.FullName }
+          }
+
+      - name: Build (Release)
+        shell: pwsh
+        run: |
+          $projects = @(
+            'MvcSiteMapProvider/MvcSiteMapProvider.csproj',
+            'MvcSiteMapProvider.Tests/MvcSiteMapProvider.Tests.csproj'
+          ) | Where-Object { Test-Path $_ }
+          foreach ($p in $projects) {
+            msbuild $p /p:Configuration=Release /verbosity:minimal
+          }
+
+      - name: Install NUnit 2.6.x Console Runner
+        shell: pwsh
+        run: |
+          nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
+
+      - name: Run Tests
+        shell: pwsh
+        run: |
+          $runner = Get-ChildItem -Recurse -Filter nunit-console.exe | Select-Object -First 1
+          if (-not $runner) { throw 'NUnit console runner not found.' }
+          $testAssembly = 'MvcSiteMapProvider.Tests/bin/Release/MvcSiteMapProvider.Tests.dll'
+          if (Test-Path $testAssembly) {
+            & $runner.FullName $testAssembly /noshadow /framework:net-4.5 || exit 1
+          } else {
+            Write-Host "Test assembly not found: $testAssembly"
+            exit 1
+          }
+
+      - name: Summary
+        if: always()
+        shell: pwsh
+        run: |
+          Write-Host 'Environment prepared for Copilot coding agent (.NET Framework 4.x, packages restored, solution built, tests executed).'

@@ -1,34 +1,30 @@
-﻿namespace MvcSiteMapProvider.Collections.Specialized
+namespace MvcSiteMapProvider.Collections.Specialized;
+
+/// <summary>
+///     An abstract factory that can be used to create new instances of
+///     <see cref="T:MvcSiteMapProvider.ISiteMapNodeCollection" />
+///     at runtime.
+/// </summary>
+public class SiteMapNodeCollectionFactory
+    : ISiteMapNodeCollectionFactory
 {
-    /// <summary>
-    /// An abstract factory that can be used to create new instances of <see cref="T:MvcSiteMapProvider.ISiteMapNodeCollection"/>
-    /// at runtime.
-    /// </summary>
-    public class SiteMapNodeCollectionFactory
-        : ISiteMapNodeCollectionFactory
+    public virtual ISiteMapNodeCollection Create()
     {
-        #region ISiteMapNodeCollectionFactory Members
+        return new SiteMapNodeCollection();
+    }
 
-        public virtual ISiteMapNodeCollection Create()
-        {
-            return new SiteMapNodeCollection();
-        }
+    public virtual ISiteMapNodeCollection CreateLockable(ISiteMap siteMap)
+    {
+        return new LockableSiteMapNodeCollection(siteMap);
+    }
 
-        public virtual ISiteMapNodeCollection CreateLockable(ISiteMap siteMap)
-        {
-            return new LockableSiteMapNodeCollection(siteMap);
-        }
+    public virtual ISiteMapNodeCollection CreateReadOnly(ISiteMapNodeCollection siteMapNodeCollection)
+    {
+        return new ReadOnlySiteMapNodeCollection(siteMapNodeCollection);
+    }
 
-        public virtual ISiteMapNodeCollection CreateReadOnly(ISiteMapNodeCollection siteMapNodeCollection)
-        {
-            return new ReadOnlySiteMapNodeCollection(siteMapNodeCollection);
-        }
-
-        public virtual ISiteMapNodeCollection CreateEmptyReadOnly()
-        {
-            return new ReadOnlySiteMapNodeCollection(new SiteMapNodeCollection());
-        }
-
-        #endregion
+    public virtual ISiteMapNodeCollection CreateEmptyReadOnly()
+    {
+        return new ReadOnlySiteMapNodeCollection(new SiteMapNodeCollection());
     }
 }

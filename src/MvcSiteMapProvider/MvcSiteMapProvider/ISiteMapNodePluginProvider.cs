@@ -1,14 +1,13 @@
 ﻿using MvcSiteMapProvider.Web.UrlResolver;
 
-namespace MvcSiteMapProvider
+namespace MvcSiteMapProvider;
+
+/// <summary>
+/// Contract for plugins used by <see cref="T:MvcSiteMapProvider.SiteMapNode"/>.
+/// </summary>
+public interface ISiteMapNodePluginProvider
 {
-    /// <summary>
-    /// Contract for plugins used by <see cref="T:MvcSiteMapProvider.SiteMapNode"/>.
-    /// </summary>
-    public interface ISiteMapNodePluginProvider
-    {
-        IDynamicNodeProviderStrategy DynamicNodeProviderStrategy { get; }
-        ISiteMapNodeUrlResolverStrategy UrlResolverStrategy { get; }
-        ISiteMapNodeVisibilityProviderStrategy VisibilityProviderStrategy { get; }
-    }
+    IDynamicNodeProviderStrategy DynamicNodeProviderStrategy { get; }
+    ISiteMapNodeUrlResolverStrategy UrlResolverStrategy { get; }
+    ISiteMapNodeVisibilityProviderStrategy VisibilityProviderStrategy { get; }
 }

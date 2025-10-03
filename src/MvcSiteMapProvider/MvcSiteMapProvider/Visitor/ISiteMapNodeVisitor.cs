@@ -1,10 +1,9 @@
-﻿namespace MvcSiteMapProvider.Visitor
+﻿namespace MvcSiteMapProvider.Visitor;
+
+/// <summary>
+/// Contract for a site map node visitor.
+/// </summary>
+public interface ISiteMapNodeVisitor
 {
-    /// <summary>
-    /// Contract for a site map node visitor.
-    /// </summary>
-    public interface ISiteMapNodeVisitor
-    {
-        void Execute(ISiteMapNode node);
-    }
+    void Execute(ISiteMapNode? node);
 }

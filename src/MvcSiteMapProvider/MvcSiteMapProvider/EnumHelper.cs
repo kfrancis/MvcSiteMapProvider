@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 
-namespace MvcSiteMapProvider
+namespace MvcSiteMapProvider;
+
+static class EnumHelper
 {
-    static class EnumHelper
+    public static bool TryParse<TEnum>(string value, bool ignoreCase, out TEnum result) where TEnum : struct
     {
-        public static bool TryParse<TEnum>(string value, bool ignoreCase, out TEnum result) where TEnum : struct
-        {
 #if NET35
             try
             {
@@ -18,14 +18,12 @@ namespace MvcSiteMapProvider
             result = default(TEnum);
             return false;
 #else
-            return Enum.TryParse<TEnum>(value, ignoreCase, out result);
+        return Enum.TryParse(value, ignoreCase, out result);
 #endif
-        }
+    }
 
-        public static bool TryParse<TEnum>(string value, out TEnum result) where TEnum : struct
-        {
-            return EnumHelper.TryParse<TEnum>(value, false, out result);
-        }
+    public static bool TryParse<TEnum>(string value, out TEnum result) where TEnum : struct
+    {
+        return EnumHelper.TryParse(value, false, out result);
     }
 }
-

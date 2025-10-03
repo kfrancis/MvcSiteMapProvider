@@ -1,0 +1,90 @@
+name: "Copilot Setup Steps"
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+jobs:
+  # IMPORTANT: Job id must be exactly this for Copilot to use it.
+  copilot-setup-steps:
+    # NOTE: Copilot coding agent currently only supports Ubuntu runners per docs.
+    # A Windows runner is required for full .NET Framework builds; if the agent
+    # ignores this (because only ubuntu is supported) you may need to migrate.
+    # Keeping windows for successful classic .NET Framework compilation.
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Download NuGet.exe
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "$env:UserProfile\nuget")) { New-Item -ItemType Directory -Path "$env:UserProfile\nuget" | Out-Null }
+          Invoke-WebRequest https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -OutFile "$env:UserProfile\nuget\nuget.exe"
+          "$env:UserProfile\nuget" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            packages
+          key: nuget-pkgs-${{ runner.os }}-${{ hashFiles('**/packages.config') }}
+          restore-keys: |
+            nuget-pkgs-${{ runner.os }}-
+
+      - name: Restore packages (packages.config)
+        shell: pwsh
+        run: |
+          $pkgDir = Join-Path $PWD 'packages'
+          New-Item -ItemType Directory -Force -Path $pkgDir | Out-Null
+          Get-ChildItem -Recurse -Filter packages.config | ForEach-Object {
+            Write-Host "Restoring packages for $($_.FullName)";
+            nuget install $_.FullName -OutputDirectory $pkgDir -NonInteractive -Verbosity quiet
+          }
+
+      - name: Build (Release)
+        shell: pwsh
+        run: |
+          $projects = @(
+            'src/MvcSiteMapProvider/MvcSiteMapProvider/MvcSiteMapProvider.csproj',
+            'src/MvcSiteMapProvider/MvcSiteMapProvider.Tests/MvcSiteMapProvider.Tests.csproj'
+          ) | Where-Object { Test-Path $_ }
+          foreach ($p in $projects) {
+            msbuild $p /p:Configuration=Release /verbosity:minimal /p:RestorePackages=false
+          }
+
+      - name: Install NUnit 2.6.x Console Runner
+        shell: pwsh
+        run: |
+          if (-not (Test-Path 'testrunner')) { New-Item -ItemType Directory -Path 'testrunner' | Out-Null }
+          nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner -NonInteractive -Verbosity quiet
+
+      - name: Run Tests
+        shell: pwsh
+        run: |
+          $runner = Get-ChildItem -Recurse -Filter nunit-console.exe | Select-Object -First 1
+          if (-not $runner) { throw 'NUnit console runner not found.' }
+          $testAssembly = 'src/MvcSiteMapProvider/MvcSiteMapProvider.Tests/bin/Release/MvcSiteMapProvider.Tests.dll'
+          if (Test-Path $testAssembly) {
+            & $runner.FullName $testAssembly /noshadow /framework:net-4.5 || exit 1
+          } else {
+            Write-Host "Test assembly not found: $testAssembly"
+            exit 1
+          }
+
+      - name: Summary
+        if: always()
+        shell: pwsh
+        run: |
+          Write-Host 'Environment prepared: packages restored from packages.config, projects built, tests executed.'

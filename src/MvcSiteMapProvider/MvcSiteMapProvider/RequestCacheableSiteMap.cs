@@ -1,140 +1,134 @@
-﻿using MvcSiteMapProvider.Caching;
-using MvcSiteMapProvider.Web;
-using MvcSiteMapProvider.Web.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Web.Mvc;
+using MvcSiteMapProvider.Caching;
+using MvcSiteMapProvider.Web;
+using MvcSiteMapProvider.Web.Mvc;
 
-namespace MvcSiteMapProvider
+namespace MvcSiteMapProvider;
+
+/// <summary>
+///     Provides overrides of the <see cref="T:MvcSiteMapProvider.SiteMap" /> that track the return values of specific
+///     resource-intensive members in case they are accessed more than one time during a single request.
+/// </summary>
+public class RequestCacheableSiteMap
+    : LockableSiteMap
 {
-    /// <summary>
-    /// Provides overrides of the <see cref="T:MvcSiteMapProvider.SiteMap"/> that track the return values of specific 
-    /// resource-intensive members in case they are accessed more than one time during a single request.
-    /// </summary>
-    public class RequestCacheableSiteMap
-        : LockableSiteMap
+    private readonly IRequestCache requestCache;
+
+    public RequestCacheableSiteMap(
+        ISiteMapPluginProvider pluginProvider,
+        IMvcContextFactory mvcContextFactory,
+        ISiteMapChildStateFactory siteMapChildStateFactory,
+        IUrlPath urlPath,
+        ISiteMapSettings siteMapSettings,
+        IRequestCache requestCache
+    )
+        : base(pluginProvider, mvcContextFactory, siteMapChildStateFactory, urlPath, siteMapSettings)
     {
-        public RequestCacheableSiteMap(
-            ISiteMapPluginProvider pluginProvider,
-            IMvcContextFactory mvcContextFactory,
-            ISiteMapChildStateFactory siteMapChildStateFactory,
-            IUrlPath urlPath,
-            ISiteMapSettings siteMapSettings,
-            IRequestCache requestCache
-            )
-            : base(pluginProvider, mvcContextFactory, siteMapChildStateFactory, urlPath, siteMapSettings)
+        this.requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
+    }
+
+    public override ISiteMapNode? FindSiteMapNode(string rawUrl)
+    {
+        var key = GetCacheKey("FindSiteMapNode_" + rawUrl);
+        var result = requestCache.GetValue<ISiteMapNode>(key);
+        if (result != null)
         {
-            if (requestCache == null)
-                throw new ArgumentNullException("requestCache");
-
-            this.requestCache = requestCache;
-        }
-
-        private readonly IRequestCache requestCache;
-
-        #region Request Cacheable Members
-
-        public override ISiteMapNode FindSiteMapNode(string rawUrl)
-        {
-            var key = this.GetCacheKey("FindSiteMapNode_" + rawUrl);
-            var result = this.requestCache.GetValue<ISiteMapNode>(key);
-            if (result == null)
-            {
-                result = base.FindSiteMapNode(rawUrl);
-                if (result != null)
-                {
-                    this.requestCache.SetValue<ISiteMapNode>(key, result);
-                }
-            }
             return result;
         }
 
-        public override ISiteMapNode FindSiteMapNodeFromCurrentContext()
+        result = base.FindSiteMapNode(rawUrl);
+        if (result != null)
         {
-            var key = this.GetCacheKey("FindSiteMapNodeFromCurrentContext");
-            var result = this.requestCache.GetValue<ISiteMapNode>(key);
-            if (result == null)
-            {
-                result = base.FindSiteMapNodeFromCurrentContext();
-                if (result != null)
-                {
-                    this.requestCache.SetValue<ISiteMapNode>(key, result);
-                }
-            }
+            requestCache.SetValue(key, result);
+        }
+
+        return result;
+    }
+
+    public override ISiteMapNode? FindSiteMapNodeFromCurrentContext()
+    {
+        var key = GetCacheKey("FindSiteMapNodeFromCurrentContext");
+        var result = requestCache.GetValue<ISiteMapNode>(key);
+        if (result != null)
+        {
             return result;
         }
 
-        public override ISiteMapNode FindSiteMapNode(ControllerContext context)
+        result = base.FindSiteMapNodeFromCurrentContext();
+        if (result != null)
         {
-            var key = this.GetCacheKey("FindSiteMapNode_ControllerContext" + this.GetDictionaryKey(context.RouteData.Values));
-            var result = this.requestCache.GetValue<ISiteMapNode>(key);
-            if (result == null)
-            {
-                result = base.FindSiteMapNode(context);
-                if (result != null)
-                {
-                    this.requestCache.SetValue<ISiteMapNode>(key, result);
-                }
-            }
+            requestCache.SetValue(key, result);
+        }
+
+        return result;
+    }
+
+    public override ISiteMapNode? FindSiteMapNode(ControllerContext context)
+    {
+        var key = GetCacheKey("FindSiteMapNode_ControllerContext" + GetDictionaryKey(context.RouteData.Values));
+        var result = requestCache.GetValue<ISiteMapNode>(key);
+        if (result != null)
+        {
             return result;
         }
 
-        public override bool IsAccessibleToUser(ISiteMapNode node)
+        result = base.FindSiteMapNode(context);
+        if (result != null)
         {
-            var key = this.GetCacheKey("IsAccessibleToUser_" + node.Key);
-            var result = this.requestCache.GetValue<bool?>(key);
-            if (result == null)
-            {
-                // Fix for #272 - Change the context of the URL cache to ensure
-                // that the AclModule doesn't prevent manually setting route values
-                // from having any effect on the URL. This setting takes effect in
-                // the RequestCacheableSiteMapNode.Url property.
-                var urlContextKey = this.GetUrlContextKey();
-                this.requestCache.SetValue<string>(urlContextKey, "AclModule");
-                result = base.IsAccessibleToUser(node);
-                this.requestCache.SetValue<bool>(key, (bool)result);
-
-                // Restore the URL context.
-                this.requestCache.SetValue<string>(urlContextKey, string.Empty);
-            }
-            return (bool)result;
+            requestCache.SetValue(key, result);
         }
 
-        #endregion
+        return result;
+    }
 
-        #region Protected Members
-
-        protected virtual string GetCacheKey(string memberName)
+    public override bool IsAccessibleToUser(ISiteMapNode node)
+    {
+        var key = GetCacheKey("IsAccessibleToUser_" + node.Key);
+        var result = requestCache.GetValue<bool?>(key);
+        if (result == null)
         {
-            // NOTE: We must include IsReadOnly in the request cache key because we may have a different 
-            // result when the sitemap is being constructed than when it is being read by the presentation layer.
-            return "__MVCSITEMAP_" + this.CacheKey + "_" + memberName + "_" + this.IsReadOnly.ToString() + "_";
+            // Fix for #272 - Change the context of the URL cache to ensure
+            // that the AclModule doesn't prevent manually setting route values
+            // from having any effect on the URL. This setting takes effect in
+            // the RequestCacheableSiteMapNode.Url property.
+            var urlContextKey = this.GetUrlContextKey();
+            requestCache.SetValue<string>(urlContextKey, "AclModule");
+            result = base.IsAccessibleToUser(node);
+            requestCache.SetValue(key, (bool)result);
+
+            // Restore the URL context.
+            requestCache.SetValue(urlContextKey, string.Empty);
         }
 
-        protected virtual string GetDictionaryKey(IDictionary<string, object> dictionary)
+        return (bool)result;
+    }
+
+    protected virtual string GetCacheKey(string memberName)
+    {
+        // NOTE: We must include IsReadOnly in the request cache key because we may have a different 
+        // result when the sitemap is being constructed than when it is being read by the presentation layer.
+        return "__MVCSITEMAP_" + CacheKey + "_" + memberName + "_" + IsReadOnly + "_";
+    }
+
+    protected virtual string GetDictionaryKey(IDictionary<string, object> dictionary)
+    {
+        var builder = new StringBuilder();
+        foreach (var pair in dictionary)
         {
-            var builder = new StringBuilder();
-            foreach (var pair in dictionary)
-            {
-                builder.Append(pair.Key);
-                builder.Append("_");
-                builder.Append(GetStringFromValue(pair.Value));
-                builder.Append("|");
-            }
-            return builder.ToString();
+            builder.Append(pair.Key);
+            builder.Append("_");
+            builder.Append(GetStringFromValue(pair.Value));
+            builder.Append("|");
         }
 
-        protected virtual string GetStringFromValue(object value)
-        {
-            if (value.GetType().Equals(typeof(string)))
-            {
-                return value.ToString();
-            }
-            return value.GetHashCode().ToString();
-        }
+        return builder.ToString();
+    }
 
-        #endregion
-
+    protected virtual string GetStringFromValue(object value)
+    {
+        return value is string ? value.ToString() : value.GetHashCode().ToString();
     }
 }

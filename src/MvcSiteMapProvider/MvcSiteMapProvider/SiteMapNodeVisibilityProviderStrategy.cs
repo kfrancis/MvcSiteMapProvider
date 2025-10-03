@@ -1,55 +1,50 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using MvcSiteMapProvider.Resources;
 
-namespace MvcSiteMapProvider
+namespace MvcSiteMapProvider;
+
+/// <summary>
+///     Default implementation of the <see cref="T:MvcSiteMapProvider.ISiteMapNodeVisibilityProviderStrategy" /> contract.
+/// </summary>
+public class SiteMapNodeVisibilityProviderStrategy
+    : ISiteMapNodeVisibilityProviderStrategy
 {
-    /// <summary>
-    /// Tracks all of the registered instances of <see cref="T:MvcSiteMapProvider.ISiteMapNodeVisiblityProvider"/> and 
-    /// allows the caller to get a specific named instance of <see cref="T:MvcSiteMapProvider.ISiteMapNodeVisiblityProvider"/> at runtime.
-    /// </summary>
-    public class SiteMapNodeVisibilityProviderStrategy
-        : ISiteMapNodeVisibilityProviderStrategy
+    private readonly string defaultProviderName;
+
+    private readonly ISiteMapNodeVisibilityProvider[] siteMapNodeVisibilityProviders;
+
+    public SiteMapNodeVisibilityProviderStrategy(ISiteMapNodeVisibilityProvider[] siteMapNodeVisibilityProviders,
+        string defaultProviderName)
     {
-        public SiteMapNodeVisibilityProviderStrategy(ISiteMapNodeVisibilityProvider[] siteMapNodeVisibilityProviders, string defaultProviderName)
-        {
-            if (siteMapNodeVisibilityProviders == null)
-                throw new ArgumentNullException("siteMapNodeVisibilityProviders");
+        this.siteMapNodeVisibilityProviders = siteMapNodeVisibilityProviders ??
+                                              throw new ArgumentNullException(
+                                                  nameof(siteMapNodeVisibilityProviders));
+        this.defaultProviderName = defaultProviderName;
+    }
 
-            this.siteMapNodeVisibilityProviders = siteMapNodeVisibilityProviders;
-            this.defaultProviderName = defaultProviderName;
+    public ISiteMapNodeVisibilityProvider? GetProvider(string providerName)
+    {
+        if (string.IsNullOrEmpty(providerName))
+        {
+            // Get the configured default provider
+            providerName = defaultProviderName;
         }
 
-        private readonly ISiteMapNodeVisibilityProvider[] siteMapNodeVisibilityProviders;
-        private readonly string defaultProviderName;
-
-
-        #region ISiteMapNodeVisibilityProviderStrategy Members
-
-        public ISiteMapNodeVisibilityProvider GetProvider(string providerName)
+        var provider = siteMapNodeVisibilityProviders.FirstOrDefault(x => x.AppliesTo(providerName));
+        if (provider == null && !string.IsNullOrEmpty(providerName))
         {
-            if (string.IsNullOrEmpty(providerName))
-            {
-                // Get the configured default provider
-                providerName = this.defaultProviderName;
-            }
-
-            var provider = this.siteMapNodeVisibilityProviders.FirstOrDefault(x => x.AppliesTo(providerName));
-            if (provider == null && !string.IsNullOrEmpty(providerName))
-            {
-                throw new MvcSiteMapException(string.Format(Resources.Messages.NamedSiteMapNodeVisibilityProviderNotFound, providerName));
-            }
-
-            return provider;
+            throw new MvcSiteMapException(string.Format(Messages.NamedSiteMapNodeVisibilityProviderNotFound,
+                providerName));
         }
 
-        public bool IsVisible(string providerName, ISiteMapNode node, IDictionary<string, object> sourceMetadata)
-        {
-            var provider = this.GetProvider(providerName);
-            if (provider == null) return true; // If no provider configured, then always visible.
-            return provider.IsVisible(node, sourceMetadata);
-        }
+        return provider;
+    }
 
-        #endregion
+    public bool IsVisible(string providerName, ISiteMapNode node, IDictionary<string, object?> sourceMetadata)
+    {
+        var provider = GetProvider(providerName);
+        return provider == null || provider.IsVisible(node, sourceMetadata); // If no provider configured, then always visible.
     }
 }

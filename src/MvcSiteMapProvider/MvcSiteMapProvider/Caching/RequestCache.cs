@@ -1,47 +1,38 @@
-﻿using MvcSiteMapProvider.Web.Mvc;
 using System;
 using System.Web;
+using MvcSiteMapProvider.Web.Mvc;
 
-namespace MvcSiteMapProvider.Caching
+namespace MvcSiteMapProvider.Caching;
+
+/// <summary>
+///     Provides type-safe access to <see cref="P:System.Web.HttpContext.Items" />.
+/// </summary>
+public class RequestCache
+    : IRequestCache
 {
-    /// <summary>
-    /// Provides type-safe access to <see cref="P:System.Web.HttpContext.Items"/>.
-    /// </summary>
-    public class RequestCache 
-        : IRequestCache
+    private readonly IMvcContextFactory _mvcContextFactory;
+
+    public RequestCache(
+        IMvcContextFactory mvcContextFactory
+    )
     {
-        public RequestCache(
-            IMvcContextFactory mvcContextFactory
-            )
-        {
-            if (mvcContextFactory == null)
-                throw new ArgumentNullException("mvcContextFactory");
+        _mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
+    }
 
-            this.mvcContextFactory = mvcContextFactory;
+    private HttpContextBase Context => _mvcContextFactory.CreateHttpContext();
+
+    public virtual T? GetValue<T>(string key)
+    {
+        if (Context.Items.Contains(key))
+        {
+            return (T)Context.Items[key];
         }
 
-        private readonly IMvcContextFactory mvcContextFactory;
+        return default;
+    }
 
-        protected HttpContextBase Context
-        {
-            get 
-            { 
-                return this.mvcContextFactory.CreateHttpContext();
-            }
-        }
-
-        public virtual T GetValue<T>(string key)
-        {
-            if (this.Context.Items.Contains(key))
-            {
-                return (T)this.Context.Items[key];
-            }
-            return default(T);
-        }
-
-        public virtual void SetValue<T>(string key, T value)
-        {
-            this.Context.Items[key] = value;
-        }
+    public virtual void SetValue<T>(string key, T value)
+    {
+        Context.Items[key] = value;
     }
 }

@@ -1,48 +1,32 @@
-﻿using System;
+using System;
 
-namespace MvcSiteMapProvider.Builder
+namespace MvcSiteMapProvider.Builder;
+
+/// <summary>
+///     Class for tracking the relationship between node instances to their parent nodes
+///     before they are added to the SiteMap.
+/// </summary>
+public class SiteMapNodeToParentRelation
+    : ISiteMapNodeToParentRelation
 {
-    /// <summary>
-    /// Class for tracking the relationship between node instances to their parent nodes 
-    /// before they are added to the SiteMap.
-    /// </summary>
-    public class SiteMapNodeToParentRelation
-        : ISiteMapNodeToParentRelation
+    private readonly ISiteMapNode _node;
+    private readonly string? _parentKey;
+    private readonly string _sourceName;
+
+    public SiteMapNodeToParentRelation(
+        string? parentKey,
+        ISiteMapNode node,
+        string sourceName
+    )
     {
-        public SiteMapNodeToParentRelation(
-            string parentKey,
-            ISiteMapNode node,
-            string sourceName
-            )
-        {
-            if (node == null)
-                throw new ArgumentNullException("node");
-
-            this.parentKey = parentKey;
-            this.node = node;
-            this.sourceName = sourceName;
-        }
-        protected readonly string parentKey;
-        protected readonly ISiteMapNode node;
-        protected readonly string sourceName;
-
-        #region ISiteMapNodeToParentRelation Members
-
-        public virtual string ParentKey
-        {
-            get { return this.parentKey; }
-        }
-
-        public virtual ISiteMapNode Node
-        {
-            get { return this.node; }
-        }
-
-        public virtual string SourceName
-        {
-            get { return this.sourceName; }
-        }
-
-        #endregion
+        _parentKey = parentKey;
+        _node = node ?? throw new ArgumentNullException(nameof(node));
+        _sourceName = sourceName;
     }
+
+    public virtual string? ParentKey => _parentKey;
+
+    public virtual ISiteMapNode Node => _node;
+
+    public virtual string SourceName => _sourceName;
 }

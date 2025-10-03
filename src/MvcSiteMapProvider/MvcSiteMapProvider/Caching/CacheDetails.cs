@@ -1,52 +1,37 @@
-﻿using System;
+using System;
 
-namespace MvcSiteMapProvider.Caching
+namespace MvcSiteMapProvider.Caching;
+
+/// <summary>
+///     Container for passing caching instructions around as a group.
+/// </summary>
+public class CacheDetails
+    : ICacheDetails
 {
-    /// <summary>
-    /// Container for passing caching instructions around as a group.
-    /// </summary>
-    public class CacheDetails
-        : ICacheDetails
+    public CacheDetails(
+        TimeSpan absoluteCacheExpiration,
+        TimeSpan slidingCacheExpiration,
+        ICacheDependency cacheDependency
+    )
     {
-        public CacheDetails(
-            TimeSpan absoluteCacheExpiration,
-            TimeSpan slidingCacheExpiration,
-            ICacheDependency cacheDependency
-            )
+        if (absoluteCacheExpiration == TimeSpan.Zero)
         {
-            if (absoluteCacheExpiration == null)
-                throw new ArgumentNullException("absoluteCacheExpiration");
-            if (slidingCacheExpiration == null)
-                throw new ArgumentNullException("slidingCacheExpiration");
-            if (cacheDependency == null)
-                throw new ArgumentNullException("cacheDependency");
-
-            this.absoluteCacheExpiration = absoluteCacheExpiration;
-            this.slidingCacheExpiration = slidingCacheExpiration;
-            this.cacheDependency = cacheDependency;
+            throw new ArgumentNullException(nameof(absoluteCacheExpiration));
         }
 
-        protected readonly TimeSpan absoluteCacheExpiration;
-        protected readonly TimeSpan slidingCacheExpiration;
-        protected readonly ICacheDependency cacheDependency;
-
-        #region ICacheDetails Members
-
-        public TimeSpan AbsoluteCacheExpiration
+        if (slidingCacheExpiration == TimeSpan.Zero)
         {
-            get { return this.absoluteCacheExpiration; }
+            throw new ArgumentNullException(nameof(slidingCacheExpiration));
         }
 
-        public TimeSpan SlidingCacheExpiration
-        {
-            get { return this.slidingCacheExpiration; }
-        }
-
-        public ICacheDependency CacheDependency
-        {
-            get { return this.cacheDependency; }
-        }
-
-        #endregion
+        AbsoluteCacheExpiration = absoluteCacheExpiration;
+        SlidingCacheExpiration = slidingCacheExpiration;
+        CacheDependency = cacheDependency ?? throw new ArgumentNullException(nameof(cacheDependency));
     }
+
+    public TimeSpan AbsoluteCacheExpiration { get; }
+
+    public TimeSpan SlidingCacheExpiration { get; }
+
+    public ICacheDependency CacheDependency { get; }
 }

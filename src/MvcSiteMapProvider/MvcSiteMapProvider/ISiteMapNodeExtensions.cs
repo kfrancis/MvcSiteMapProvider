@@ -1,18 +1,17 @@
 ﻿using MvcSiteMapProvider.Web.UrlResolver;
 using System;
 
-namespace MvcSiteMapProvider
+namespace MvcSiteMapProvider;
+
+/// <summary>
+/// Contains extension logic for the ISiteMapNode interface that is not user 
+/// overridable.
+/// </summary>
+public static class ISiteMapNodeExtensions
 {
-    /// <summary>
-    /// Contains extension logic for the ISiteMapNode interface that is not user 
-    /// overridable.
-    /// </summary>
-    public static class ISiteMapNodeExtensions
+    public static bool UsesDefaultUrlResolver(this ISiteMapNode node)
     {
-        public static bool UsesDefaultUrlResolver(this ISiteMapNode node)
-        {
-            return string.IsNullOrEmpty(node.UrlResolver) ||
-                typeof(SiteMapNodeUrlResolver).Equals(Type.GetType(node.UrlResolver, false));
-        }
+        return string.IsNullOrEmpty(node.UrlResolver) ||
+               typeof(SiteMapNodeUrlResolver).Equals(Type.GetType(node.UrlResolver, false));
     }
 }

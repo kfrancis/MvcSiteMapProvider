@@ -1,7 +1,6 @@
-﻿namespace MvcSiteMapProvider.Builder
+﻿namespace MvcSiteMapProvider.Builder;
+
+public interface ISiteMapNodeCreatorFactory
 {
-    public interface ISiteMapNodeCreatorFactory
-    {
-        ISiteMapNodeCreator Create(ISiteMap siteMap);
-    }
+    ISiteMapNodeCreator Create(ISiteMap siteMap);
 }

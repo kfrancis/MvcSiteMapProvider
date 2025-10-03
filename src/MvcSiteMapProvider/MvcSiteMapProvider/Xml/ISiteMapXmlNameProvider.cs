@@ -1,14 +1,13 @@
 ﻿using System.Xml.Linq;
 
-namespace MvcSiteMapProvider.Xml
+namespace MvcSiteMapProvider.Xml;
+
+/// <summary>
+/// Contract for class that provides details of the sitemap XML element names.
+/// </summary>
+public interface ISiteMapXmlNameProvider
 {
-    /// <summary>
-    /// Contract for class that provides details of the sitemap XML element names.
-    /// </summary>
-    public interface ISiteMapXmlNameProvider
-    {
-        XName NodeName { get; }
-        XName RootName { get; }
-        void FixXmlNamespaces(XDocument xml);
-    }
+    XName NodeName { get; }
+    XName RootName { get; }
+    void FixXmlNamespaces(XDocument xml);
 }

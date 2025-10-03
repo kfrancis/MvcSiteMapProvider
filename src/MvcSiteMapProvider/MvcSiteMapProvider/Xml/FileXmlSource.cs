@@ -1,47 +1,46 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Xml.Linq;
+using MvcSiteMapProvider.Resources;
 
-namespace MvcSiteMapProvider.Xml
+namespace MvcSiteMapProvider.Xml;
+
+/// <summary>
+///     Provides an XDocument instance based on an XML file source.
+/// </summary>
+public class FileXmlSource
+    : IXmlSource
 {
+    private readonly string _fileName;
+
     /// <summary>
-    /// Provides an XDocument instance based on an XML file source.
+    ///     Creates a new instance of FileXmlSource.
     /// </summary>
-    public class FileXmlSource
-        : IXmlSource
+    /// <param name="fileName">The absolute path to the Xml file.</param>
+    public FileXmlSource(
+        string fileName
+    )
     {
-        /// <summary>
-        /// Creates a new instance of FileXmlSource.
-        /// </summary>
-        /// <param name="fileName">The absolute path to the Xml file.</param>
-        public FileXmlSource(
-            string fileName
-            )
+        if (string.IsNullOrEmpty(fileName))
         {
-            if (string.IsNullOrEmpty(fileName))
-                throw new ArgumentNullException("fileName");
-
-            this.fileName = fileName;
+            throw new ArgumentNullException(nameof(fileName));
         }
 
-        protected readonly string fileName;
+        this._fileName = fileName;
+    }
 
-        #region IXmlSource Members
-
-        public XDocument GetXml()
+    public XDocument? GetXml()
+    {
+        XDocument? result;
+        if (File.Exists(_fileName))
         {
-            XDocument result = null;
-            if (File.Exists(this.fileName))
-            {
-                result = XDocument.Load(this.fileName);
-            }
-            else
-            {
-                throw new FileNotFoundException(string.Format(Resources.Messages.XmlFileNotFound, this.fileName), this.fileName);
-            }
-            return result;
+            result = XDocument.Load(_fileName);
+        }
+        else
+        {
+            throw new FileNotFoundException(string.Format(Messages.XmlFileNotFound, _fileName), _fileName);
         }
 
-        #endregion
+        return result;
     }
 }

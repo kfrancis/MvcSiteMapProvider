@@ -1,34 +1,32 @@
 ﻿using System;
 using System.Web;
 
-namespace MvcSiteMapProvider.Builder
+namespace MvcSiteMapProvider.Builder;
+
+/// <summary>
+///     Provider for ASP.NET classic SiteMapProvider. Use this class to
+///     get the provider configured in the sitemap/providers section of
+///     Web.config by name.
+/// </summary>
+public class AspNetNamedSiteMapProvider
+    : IAspNetSiteMapProvider
 {
-    /// <summary>
-    /// Provider for ASP.NET classic SiteMapProvider. Use this class to 
-    /// get the provider configured in the sitemap/providers section of 
-    /// Web.config by name.
-    /// </summary>
-    public class AspNetNamedSiteMapProvider
-        : IAspNetSiteMapProvider
+    private readonly string _providerName;
+
+    public AspNetNamedSiteMapProvider(
+        string providerName
+    )
     {
-        public AspNetNamedSiteMapProvider(
-            string providerName
-            )
+        if (string.IsNullOrEmpty(providerName))
         {
-            if (string.IsNullOrEmpty(providerName))
-                throw new ArgumentNullException(providerName);
-            this.providerName = providerName;
+            throw new ArgumentNullException(providerName);
         }
 
-        protected readonly string providerName;
+        _providerName = providerName;
+    }
 
-        #region IAspNetStaticSiteMapProvider Members
-
-        public SiteMapProvider GetProvider()
-        {
-            return System.Web.SiteMap.Providers[providerName];
-        }
-
-        #endregion
+    public SiteMapProvider GetProvider()
+    {
+        return System.Web.SiteMap.Providers[_providerName] ?? throw new InvalidOperationException();
     }
 }

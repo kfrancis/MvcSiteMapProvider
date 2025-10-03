@@ -1,11 +1,10 @@
-﻿namespace MvcSiteMapProvider
+﻿namespace MvcSiteMapProvider;
+
+public interface ISiteMapSettings
 {
-    public interface ISiteMapSettings
-    {
-        string SiteMapCacheKey { get; set; }
-        bool SecurityTrimmingEnabled { get; }
-        bool EnableLocalization { get; }
-        bool VisibilityAffectsDescendants { get; }
-        bool UseTitleIfDescriptionNotProvided { get; }
-    }
+    string? SiteMapCacheKey { get; set; }
+    bool SecurityTrimmingEnabled { get; }
+    bool EnableLocalization { get; }
+    bool VisibilityAffectsDescendants { get; }
+    bool UseTitleIfDescriptionNotProvided { get; }
 }
