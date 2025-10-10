@@ -5,13 +5,22 @@ using System.Linq;
 namespace MvcSiteMapProvider.Web.Html.Models;
 
 /// <summary>
-/// SiteMapNodeModel
+///     SiteMapNodeModel
 /// </summary>
 public class SiteMapNodeModel
     : ISortable
 {
+    private readonly bool _drillDownToCurrent;
+
+    private readonly ISiteMapNode _node;
+    private readonly bool _startingNodeInChildLevel;
+    private SiteMapNodeModelList? _ancestors;
+    private SiteMapNodeModelList? _children;
+    private SiteMapNodeModelList? _descendants;
+    private int _maxDepth;
+
     /// <summary>
-    /// Initializes a new instance of the <see cref="SiteMapNodeModel"/> class.
+    ///     Initializes a new instance of the <see cref="SiteMapNodeModel" /> class.
     /// </summary>
     /// <param name="node">The node.</param>
     /// <param name="sourceMetadata">The source metadata provided by the HtmlHelper.</param>
@@ -21,23 +30,26 @@ public class SiteMapNodeModel
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SiteMapNodeModel"/> class.
+    ///     Initializes a new instance of the <see cref="SiteMapNodeModel" /> class.
     /// </summary>
     /// <param name="node">The node.</param>
     /// <param name="sourceMetadata">The source metadata provided by the HtmlHelper.</param>
     /// <param name="maxDepth">The max depth.</param>
     /// <param name="drillDownToCurrent">Should the model exceed the maxDepth to reach the current node</param>
     /// <param name="startingNodeInChildLevel">Renders startingNode in child level if set to <c>true</c>.</param>
-    public SiteMapNodeModel(ISiteMapNode node, IDictionary<string, object?> sourceMetadata, int maxDepth, bool drillDownToCurrent, bool startingNodeInChildLevel, bool visibilityAffectsDescendants)
+    public SiteMapNodeModel(ISiteMapNode node, IDictionary<string, object?> sourceMetadata, int maxDepth,
+        bool drillDownToCurrent, bool startingNodeInChildLevel, bool visibilityAffectsDescendants)
     {
         if (maxDepth < 0)
+        {
             throw new ArgumentOutOfRangeException(nameof(maxDepth));
+        }
 
-        this.node = node ?? throw new ArgumentNullException(nameof(node));
-        this.maxDepth = maxDepth;
-        this.startingNodeInChildLevel = startingNodeInChildLevel;
-        this.drillDownToCurrent = drillDownToCurrent;
-        this.SourceMetadata = sourceMetadata ?? throw new ArgumentNullException(nameof(sourceMetadata));
+        _node = node ?? throw new ArgumentNullException(nameof(node));
+        _maxDepth = maxDepth;
+        _startingNodeInChildLevel = startingNodeInChildLevel;
+        _drillDownToCurrent = drillDownToCurrent;
+        SourceMetadata = sourceMetadata ?? throw new ArgumentNullException(nameof(sourceMetadata));
 
         Key = node.Key;
         Area = node.Area;
@@ -50,9 +62,9 @@ public class SiteMapNodeModel
         Url = node.Url;
         CanonicalUrl = node.CanonicalUrl;
         MetaRobotsContent = node.GetMetaRobotsContentString();
-        IsCurrentNode = (node.Equals(node.SiteMap.CurrentNode));
+        IsCurrentNode = node.Equals(node.SiteMap.CurrentNode);
         IsInCurrentPath = node.IsInCurrentPath();
-        IsRootNode = (node.Equals(node.SiteMap.RootNode));
+        IsRootNode = node.Equals(node.SiteMap.RootNode);
         IsClickable = node.Clickable;
         VisibilityAffectsDescendants = visibilityAffectsDescendants;
         RouteValues = node.RouteValues;
@@ -60,165 +72,153 @@ public class SiteMapNodeModel
         Order = node.Order;
     }
 
-    protected readonly ISiteMapNode node;
-    protected int maxDepth;
-    protected readonly bool startingNodeInChildLevel;
-    protected readonly bool drillDownToCurrent;
-    protected SiteMapNodeModelList descendants;
-    protected SiteMapNodeModelList ancestors;
-    protected SiteMapNodeModelList children;
-
     /// <summary>
-    /// Gets or sets the key.
+    ///     Gets or sets the key.
     /// </summary>
     /// <value>The key.</value>
     public string Key { get; protected set; }
 
     /// <summary>
-    /// Gets or sets the area.
+    ///     Gets or sets the area.
     /// </summary>
     /// <value>The area.</value>
     public string Area { get; protected set; }
 
     /// <summary>
-    /// Gets or sets the controller.
+    ///     Gets or sets the controller.
     /// </summary>
     /// <value>The controller.</value>
     public string Controller { get; protected set; }
 
     /// <summary>
-    /// Gets or sets the action.
+    ///     Gets or sets the action.
     /// </summary>
     /// <value>The action.</value>
     public string Action { get; protected set; }
 
     /// <summary>
-    /// Gets or sets the URL.
+    ///     Gets or sets the URL.
     /// </summary>
     /// <value>The URL.</value>
     public string Url { get; protected set; }
 
     /// <summary>
-    /// Gets or sets the canonical URL.
+    ///     Gets or sets the canonical URL.
     /// </summary>
     /// <value>The canonical URL.</value>
     public string CanonicalUrl { get; protected set; }
 
     /// <summary>
-    /// Gets or sets the content value of the meta robots tag.
+    ///     Gets or sets the content value of the meta robots tag.
     /// </summary>
     /// <value>The content value of the meta robots tag.</value>
     public string MetaRobotsContent { get; protected set; }
 
     /// <summary>
-    /// Gets or sets the title.
+    ///     Gets or sets the title.
     /// </summary>
     /// <value>The title.</value>
     public string Title { get; protected set; }
 
     /// <summary>
-    /// Gets or sets the description.
+    ///     Gets or sets the description.
     /// </summary>
     /// <value>The description.</value>
     public string Description { get; protected set; }
 
     /// <summary>
-    /// Gets or sets the target frame.
+    ///     Gets or sets the target frame.
     /// </summary>
     /// <value>The target frame.</value>
     public string TargetFrame { get; protected set; }
 
     /// <summary>
-    /// Gets or sets the image URL.
+    ///     Gets or sets the image URL.
     /// </summary>
     /// <value>The image URL.</value>
     public string ImageUrl { get; protected set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether this instance is current node.
+    ///     Gets or sets a value indicating whether this instance is current node.
     /// </summary>
     /// <value>
-    /// 	<c>true</c> if this instance is current node; otherwise, <c>false</c>.
+    ///     <c>true</c> if this instance is current node; otherwise, <c>false</c>.
     /// </value>
     public bool IsCurrentNode { get; protected set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether this instance is in current path.
+    ///     Gets or sets a value indicating whether this instance is in current path.
     /// </summary>
     /// <value>
-    /// 	<c>true</c> if this instance is in current path; otherwise, <c>false</c>.
+    ///     <c>true</c> if this instance is in current path; otherwise, <c>false</c>.
     /// </value>
     public bool IsInCurrentPath { get; protected set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether this instance is root node.
+    ///     Gets or sets a value indicating whether this instance is root node.
     /// </summary>
     /// <value>
-    /// 	<c>true</c> if this instance is root node; otherwise, <c>false</c>.
+    ///     <c>true</c> if this instance is root node; otherwise, <c>false</c>.
     /// </value>
     public bool IsRootNode { get; protected set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether this instance is clickable.
+    ///     Gets or sets a value indicating whether this instance is clickable.
     /// </summary>
     /// <value>
-    /// 	<c>true</c> if this instance is clickable; otherwise, <c>false</c>.
+    ///     <c>true</c> if this instance is clickable; otherwise, <c>false</c>.
     /// </value>
     public bool IsClickable { get; protected set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the visibility property of the current node
-    /// will affect the descendant nodes.
+    ///     Gets or sets a value indicating whether the visibility property of the current node
+    ///     will affect the descendant nodes.
     /// </summary>
     /// <value>
-    /// 	<c>true</c> if visibility should affect descendants; otherwise, <c>false</c>.
+    ///     <c>true</c> if visibility should affect descendants; otherwise, <c>false</c>.
     /// </value>
     public bool VisibilityAffectsDescendants { get; protected set; }
 
     /// <summary>
-    /// Gets or sets the route values.
+    ///     Gets or sets the route values.
     /// </summary>
     /// <value>The route values.</value>
     public IDictionary<string, object> RouteValues { get; protected set; }
 
     /// <summary>
-    /// Gets or sets the meta attributes.
+    ///     Gets or sets the meta attributes.
     /// </summary>
     /// <value>The meta attributes.</value>
     public IDictionary<string, object> Attributes { get; protected set; }
 
     /// <summary>
-    /// Gets or sets the source metadata generated by the HtmlHelper.
+    ///     Gets or sets the source metadata generated by the HtmlHelper.
     /// </summary>
     /// <value>The source metadata.</value>
     public IDictionary<string, object?> SourceMetadata { get; protected set; }
 
     /// <summary>
-    /// Gets the order of the node relative to its sibling nodes.
-    /// </summary>
-    public int Order { get; protected set; }
-
-    /// <summary>
-    /// Gets the children.
+    ///     Gets the children.
     /// </summary>
     public SiteMapNodeModelList Children
     {
         get
         {
-            if (children == null)
+            if (_children == null)
             {
-                children = [];
-                if (ReachedMaximalNodelevel(maxDepth, node, drillDownToCurrent) && node.HasChildNodes)
+                _children = [];
+                if (ReachedMaximalNodelevel(_maxDepth, _node, _drillDownToCurrent) && _node.HasChildNodes)
                 {
-                    var sortedNodes = SortSiteMapNodes(node.ChildNodes);
+                    var sortedNodes = SortSiteMapNodes(_node.ChildNodes);
 
                     if (VisibilityAffectsDescendants)
                     {
                         foreach (var child in sortedNodes)
                         {
-                            if (child.IsAccessibleToUser() && child.IsVisible(SourceMetadata) && maxDepth > 0)
+                            if (child.IsAccessibleToUser() && child.IsVisible(SourceMetadata) && _maxDepth > 0)
                             {
-                                children.Add(new SiteMapNodeModel(child, SourceMetadata, maxDepth - 1, drillDownToCurrent, false, VisibilityAffectsDescendants));
+                                _children.Add(new SiteMapNodeModel(child, SourceMetadata, _maxDepth - 1,
+                                    _drillDownToCurrent, false, VisibilityAffectsDescendants));
                             }
                         }
                     }
@@ -226,54 +226,119 @@ public class SiteMapNodeModel
                     {
                         foreach (var child in sortedNodes)
                         {
-                            if (child.IsAccessibleToUser())
+                            if (!child.IsAccessibleToUser())
                             {
-                                if (child.IsVisible(SourceMetadata) && maxDepth > 0)
-                                {
-                                    children.Add(new SiteMapNodeModel(child, SourceMetadata, maxDepth - 1, drillDownToCurrent, false, VisibilityAffectsDescendants));
-                                }
-                                else if (maxDepth > 1) //maxDepth should be greater then 1 to be allowed to descent another level
-                                {
-                                    var nearestVisibleDescendants = new List<SiteMapNodeModel>();
-                                    FindNearestVisibleDescendants(child, maxDepth - 1, ref nearestVisibleDescendants);
-                                    var sortedDescendants = SortSiteMapNodes(nearestVisibleDescendants);
-                                    children.AddRange(sortedDescendants);
-                                }
+                                continue;
+                            }
+
+                            if (child.IsVisible(SourceMetadata) && _maxDepth > 0)
+                            {
+                                _children.Add(new SiteMapNodeModel(child, SourceMetadata, _maxDepth - 1,
+                                    _drillDownToCurrent, false, VisibilityAffectsDescendants));
+                            }
+                            else if
+                                (_maxDepth >
+                                 1) //maxDepth should be greater than 1 to be allowed to descent another level
+                            {
+                                var nearestVisibleDescendants = new List<SiteMapNodeModel>();
+                                FindNearestVisibleDescendants(child, _maxDepth - 1, ref nearestVisibleDescendants);
+                                var sortedDescendants = SortSiteMapNodes(nearestVisibleDescendants);
+                                _children.AddRange(sortedDescendants);
                             }
                         }
                     }
                 }
             }
-            if (startingNodeInChildLevel)
+
+            if (!_startingNodeInChildLevel)
             {
-                var children_res = children;
-                children = [];
-                maxDepth = 0;
-                return children_res;
+                return _children;
             }
-            else return children;
+
+            // Return children and reset the children collection to avoid returning the same children again
+            var childrenRes = _children;
+            _children = [];
+            _maxDepth = 0;
+            return childrenRes;
         }
     }
 
-    private void FindNearestVisibleDescendants(ISiteMapNode node, int maxDepth, ref List<SiteMapNodeModel> nearestVisibleDescendants)
+    /// <summary>
+    ///     Gets the parent
+    /// </summary>
+    public SiteMapNodeModel? Parent
+    {
+        get => _node.ParentNode == null
+            ? null
+            : new SiteMapNodeModel(_node.ParentNode, SourceMetadata,
+                _maxDepth == int.MaxValue ? int.MaxValue : _maxDepth + 1, _drillDownToCurrent,
+                _startingNodeInChildLevel, VisibilityAffectsDescendants);
+    }
+
+    /// <summary>
+    ///     Gets the descendants.
+    /// </summary>
+    public SiteMapNodeModelList Descendants
+    {
+        get
+        {
+            if (_descendants != null)
+            {
+                return _descendants;
+            }
+
+            _descendants = [];
+            GetDescendants(this);
+            return _descendants;
+        }
+    }
+
+    /// <summary>
+    ///     Gets the ancestors.
+    /// </summary>
+    public SiteMapNodeModelList Ancestors
+    {
+        get
+        {
+            if (_ancestors != null)
+            {
+                return _ancestors;
+            }
+
+            _ancestors = [];
+            GetAncestors(this);
+            return _ancestors;
+        }
+    }
+
+    /// <summary>
+    ///     Gets the order of the node relative to its sibling nodes.
+    /// </summary>
+    public int Order { get; protected set; }
+
+    private void FindNearestVisibleDescendants(ISiteMapNode node, int maxDepth,
+        ref List<SiteMapNodeModel> nearestVisibleDescendants)
     {
         foreach (var child in node.ChildNodes)
         {
-            if (child.IsAccessibleToUser())
+            if (!child.IsAccessibleToUser())
             {
-                if (child.IsVisible(SourceMetadata))
-                {
-                    nearestVisibleDescendants.Add(new SiteMapNodeModel(child, SourceMetadata, maxDepth - 1, drillDownToCurrent, false, VisibilityAffectsDescendants));
-                }
-                else if (maxDepth > 1) //maxDepth should be greater then 1 to be allowed to descent another level
-                {
-                    FindNearestVisibleDescendants(child, maxDepth - 1, ref nearestVisibleDescendants);
-                }
+                continue;
+            }
+
+            if (child.IsVisible(SourceMetadata))
+            {
+                nearestVisibleDescendants.Add(new SiteMapNodeModel(child, SourceMetadata, maxDepth - 1,
+                    _drillDownToCurrent, false, VisibilityAffectsDescendants));
+            }
+            else if (maxDepth > 1) //maxDepth should be greater than 1 to be allowed to descent another level
+            {
+                FindNearestVisibleDescendants(child, maxDepth - 1, ref nearestVisibleDescendants);
             }
         }
     }
 
-    private IEnumerable<T> SortSiteMapNodes<T>(IList<T> nodesToSort) where T: ISortable
+    private static IEnumerable<T> SortSiteMapNodes<T>(IList<T> nodesToSort) where T : ISortable
     {
         if (nodesToSort.Any(x => x.Order != 0))
         {
@@ -284,62 +349,34 @@ public class SiteMapNodeModel
     }
 
     /// <summary>
-    /// Gets the parent
-    /// </summary>
-    public SiteMapNodeModel? Parent =>
-        node.ParentNode == null
-            ? null
-            : new SiteMapNodeModel(node.ParentNode, SourceMetadata, maxDepth == int.MaxValue ? int.MaxValue : maxDepth + 1, drillDownToCurrent, startingNodeInChildLevel, VisibilityAffectsDescendants);
-
-    /// <summary>
-    /// Gets the descendants.
-    /// </summary>
-    public SiteMapNodeModelList Descendants
-    {
-        get
-        {
-            if (descendants == null)
-            {
-                descendants = [];
-                GetDescendants(this);
-            }
-            return descendants;
-        }
-    }
-
-    /// <summary>
-    /// Gets the ancestors.
-    /// </summary>
-    public SiteMapNodeModelList Ancestors
-    {
-        get
-        {
-            if (ancestors == null)
-            {
-                ancestors = [];
-                GetAncestors(this);
-            }
-            return ancestors;
-        }
-    }
-
-    /// <summary>
-    /// Test if the maximal node level has not been reached
+    ///     Test if the maximal node level has not been reached
     /// </summary>
     /// <param name="maxDepth">The normal max depth.</param>
     /// <param name="node">The starting node</param>
     /// <param name="drillDownToCurrent">Should the model exceed the maxDepth to reach the current node</param>
     /// <returns></returns>
-    private bool ReachedMaximalNodelevel(int maxDepth, ISiteMapNode node, bool drillDownToCurrent)
+    private static bool ReachedMaximalNodelevel(int maxDepth, ISiteMapNode node, bool drillDownToCurrent)
     {
         if (maxDepth > 0)
+        {
             return true;
+        }
+
         if (!drillDownToCurrent)
+        {
             return false;
+        }
+
         if (node.IsInCurrentPath())
+        {
             return true;
-        if (node.ParentNode != null && node.ParentNode.Equals(node.SiteMap.CurrentNode))
+        }
+
+        if (node.ParentNode?.Equals(node.SiteMap.CurrentNode) ?? false)
+        {
             return true;
+        }
+
         if (node.ParentNode?.ChildNodes == null)
         {
             return false;
@@ -348,29 +385,30 @@ public class SiteMapNodeModel
         foreach (var sibling in node.ParentNode.ChildNodes)
         {
             if (sibling.IsInCurrentPath())
+            {
                 return true;
+            }
         }
 
         return false;
     }
 
     /// <summary>
-    /// Retrieve all descendants    
+    ///     Retrieve all descendants
     /// </summary>
     /// <param name="siteMapNodeModel">the node</param>
     /// <returns></returns>
     private void GetDescendants(SiteMapNodeModel siteMapNodeModel)
     {
-        var sortedNodes = SortSiteMapNodes(siteMapNodeModel.Children);
-        foreach (var child in sortedNodes)
+        foreach (var child in SortSiteMapNodes(siteMapNodeModel.Children))
         {
-            descendants.Add(child);
+            _descendants?.Add(child);
             GetDescendants(child);
         }
     }
 
     /// <summary>
-    /// Retrieve all ancestors  
+    ///     Retrieve all ancestors
     /// </summary>
     /// <param name="siteMapNodeModel">the node</param>
     /// <returns></returns>
@@ -383,7 +421,7 @@ public class SiteMapNodeModel
                 return;
             }
 
-            ancestors.Add(siteMapNodeModel.Parent);
+            _ancestors?.Add(siteMapNodeModel.Parent);
             siteMapNodeModel = siteMapNodeModel.Parent;
         }
     }
