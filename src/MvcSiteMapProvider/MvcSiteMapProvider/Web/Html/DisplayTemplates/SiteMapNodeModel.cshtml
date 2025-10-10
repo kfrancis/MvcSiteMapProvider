@@ -1,24 +1,29 @@
 @model MvcSiteMapProvider.Web.Html.Models.SiteMapNodeModel
 @using System.Web.Mvc
-@using System.Web.Mvc.Html
-@using MvcSiteMapProvider.Web.Html.Models
 @using MvcSiteMapProvider.Web.Html
 @{
     var attrs = HtmlAttributeParser.Parse(Model.Attributes != null && Model.Attributes.TryGetValue("htmlAttributes", out var raw) ? raw?.ToString() : null);
 }
 
-@if (Model.IsCurrentNode && Model.SourceMetadata["HtmlHelper"]?.ToString() != "MvcSiteMapProvider.Web.Html.MenuHelper")  { 
+@if (Model.IsCurrentNode && Model.SourceMetadata["HtmlHelper"]?.ToString() != "MvcSiteMapProvider.Web.Html.MenuHelper")
+{
     <text>@Model.Title</text>
-} else if (Model.IsClickable) { 
-    var tag = new TagBuilder("a");
-    tag.Attributes["href"] = Model.Url;
+}
+else if (Model.IsClickable)
+{
+    var tag = new TagBuilder("a")
+    {
+        Attributes =
+        {
+            ["href"] = Model.Url
+        }
+    };
     if (string.IsNullOrEmpty(Model.Description))
     {
         if (!attrs.ContainsKey("title") && !string.IsNullOrEmpty(Model.Description))
         {
             tag.Attributes["title"] = Model.Description;
         }
-        tag.SetInnerText(Model.Title);
     }
     else
     {
@@ -26,13 +31,16 @@
         {
             tag.Attributes["title"] = Model.Description;
         }
-        tag.SetInnerText(Model.Title);
     }
+
+    tag.SetInnerText(Model.Title);
     foreach (var kv in attrs)
     {
         tag.MergeAttribute(kv.Key, kv.Value?.ToString(), true);
     }
     @Html.Raw(tag.ToString())
-} else { 
+}
+else
+{
     <text>@Model.Title</text>
 }

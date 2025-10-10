@@ -325,12 +325,22 @@ namespace MvcSiteMapProvider.Tests.Unit.Web.Html
 
         public bool Equals(ISiteMapNode node)
         {
-            if (base.Equals(node))
+            // Handle reference equality and nulls safely.
+            if (ReferenceEquals(this, node))
             {
                 return true;
             }
-
-            return this.Key.Equals(node.Key);
+            if (node == null)
+            {
+                return false;
+            }
+            // Compare keys (guard against an unexpected null key on the other node)
+            var otherKey = node.Key;
+            if (otherKey == null)
+            {
+                return false;
+            }
+            return string.Equals(this.Key, otherKey, StringComparison.Ordinal);
         }
 
         #endregion

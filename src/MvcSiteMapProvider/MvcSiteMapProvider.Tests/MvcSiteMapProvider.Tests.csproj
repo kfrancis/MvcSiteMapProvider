@@ -194,6 +194,7 @@
     <Compile Include="Unit\Web\Html\HtmlAttributeParserTests.cs" />
     <Compile Include="Unit\Web\Html\HtmlHelperTestCases.cs" />
     <Compile Include="Unit\Web\Html\MenuHelperTest.cs" />
+    <Compile Include="Unit\Web\Html\Models\SiteMapNodeModelTests.cs" />
     <Compile Include="Unit\Web\Html\SiteMapHelperTest.cs" />
     <Compile Include="Unit\Web\UrlPathTest.cs" />
   </ItemGroup>
