@@ -1,10 +1,10 @@
-﻿using Moq;
-using MvcSiteMapProvider.Web;
-using MvcSiteMapProvider.Web.Mvc;
-using NUnit.Framework;
 using System;
 using System.Collections.Specialized;
 using System.Web;
+using Moq;
+using MvcSiteMapProvider.Web;
+using MvcSiteMapProvider.Web.Mvc;
+using NUnit.Framework;
 
 namespace MvcSiteMapProvider.Tests.Unit.Web
 {

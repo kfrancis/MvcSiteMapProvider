@@ -302,7 +302,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Web.Html
             get { throw new NotImplementedException(); }
         }
 
-        public RouteData GetRouteData(HttpContextBase httpContext)
+        public RouteData? GetRouteData(HttpContextBase httpContext)
         {
             throw new NotImplementedException();
         }

@@ -86,7 +86,7 @@ public abstract class SiteMapNodeSecurityBase
     public abstract string Route { get; set; }
     public abstract IRouteValueDictionary RouteValues { get; }
     public abstract IPreservedRouteParameterCollection PreservedRouteParameters { get; }
-    public abstract RouteData GetRouteData(HttpContextBase httpContext);
+    public abstract RouteData? GetRouteData(HttpContextBase httpContext);
     public abstract bool MatchesRoute(IDictionary<string, object> routeValues);
     public abstract string Area { get; set; }
     public abstract string Controller { get; set; }

@@ -79,7 +79,7 @@ public interface ISiteMapNode
     string Route { get; set; }
     IRouteValueDictionary RouteValues { get; }
     IPreservedRouteParameterCollection PreservedRouteParameters { get; }
-    RouteData GetRouteData(HttpContextBase httpContext);
+    RouteData? GetRouteData(HttpContextBase httpContext);
     bool MatchesRoute(IDictionary<string, object> routeValues);
         
     string Area { get; set; }

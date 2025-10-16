@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Mvc.Async;
@@ -26,17 +27,20 @@ public class AuthorizeAttributeAclModule
         IGlobalFilterProvider filterProvider
     )
     {
-        this.mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
-        this.controllerDescriptorFactory = controllerDescriptorFactory ??
+        _mvcContextFactory = mvcContextFactory ?? throw new ArgumentNullException(nameof(mvcContextFactory));
+        _controllerDescriptorFactory = controllerDescriptorFactory ??
                                            throw new ArgumentNullException(nameof(controllerDescriptorFactory));
-        this.controllerBuilder = controllerBuilder ?? throw new ArgumentNullException(nameof(controllerBuilder));
-        this.filterProvider = filterProvider ?? throw new ArgumentNullException(nameof(filterProvider));
+        _controllerBuilder = controllerBuilder ?? throw new ArgumentNullException(nameof(controllerBuilder));
+        _filterProvider = filterProvider ?? throw new ArgumentNullException(nameof(filterProvider));
     }
 
-    private readonly IMvcContextFactory mvcContextFactory;
-    private readonly IControllerDescriptorFactory controllerDescriptorFactory;
-    private readonly IControllerBuilder controllerBuilder;
-    private readonly IGlobalFilterProvider filterProvider;
+    private readonly IMvcContextFactory _mvcContextFactory;
+    private readonly IControllerDescriptorFactory _controllerDescriptorFactory;
+    private readonly IControllerBuilder _controllerBuilder;
+    private readonly IGlobalFilterProvider _filterProvider;
+
+    // Cache for RouteData to prevent repeated expensive GetRouteData calls
+    private readonly ConditionalWeakTable<ISiteMapNode, RouteData> _routeDataCache = new();
 
     /// <summary>
     ///     Determines whether node is accessible to user.
@@ -54,7 +58,7 @@ public class AuthorizeAttributeAclModule
             return true;
         }
 
-        var httpContext = mvcContextFactory.CreateHttpContext();
+        var httpContext = _mvcContextFactory.CreateHttpContext();
 
         // Is it an external Url?
         return node.HasExternalUrl(httpContext) || VerifyNode(siteMap, node, httpContext);
@@ -83,7 +87,7 @@ public class AuthorizeAttributeAclModule
     protected virtual bool VerifyController(ISiteMapNode node, RouteData routes, Type controllerType)
     {
         // Get controller factory
-        var controllerFactory = controllerBuilder.GetControllerFactory();
+        var controllerFactory = _controllerBuilder.GetControllerFactory();
 
         // Create controller context
         var controllerContext = CreateControllerContext(node, routes, controllerType, controllerFactory,
@@ -102,8 +106,14 @@ public class AuthorizeAttributeAclModule
         }
     }
 
-    protected virtual RouteData FindRoutesForNode(ISiteMapNode node, HttpContextBase httpContext)
+    protected virtual RouteData? FindRoutesForNode(ISiteMapNode node, HttpContextBase httpContext)
     {
+        // Try to get cached RouteData for this node
+        if (_routeDataCache.TryGetValue(node, out var cachedRouteData))
+        {
+            return cachedRouteData;
+        }
+
         // Create a Uri for the current node. If we have an absolute URL,
         // it will be used instead of the baseUri.
         var nodeUri = new Uri(httpContext.Request.Url, node.Url);
@@ -113,10 +123,16 @@ public class AuthorizeAttributeAclModule
         using var nullWriter = new StreamWriter(Stream.Null);
 
         // Create a new HTTP context using the node's URL instead of the current one.
-        var nodeHttpContext = mvcContextFactory.CreateHttpContext(node, nodeUri, nullWriter);
+        var nodeHttpContext = _mvcContextFactory.CreateHttpContext(node, nodeUri, nullWriter);
 
         // Find routes for the sitemap node's URL using the new HTTP context
         var routeData = node.GetRouteData(nodeHttpContext);
+
+        // Cache the result if not null
+        if (routeData != null)
+        {
+            _routeDataCache.Add(node, routeData);
+        }
 
         return routeData;
     }
@@ -125,7 +141,7 @@ public class AuthorizeAttributeAclModule
         ControllerContext controllerContext)
     {
         // Get controller descriptor
-        var controllerDescriptor = controllerDescriptorFactory.Create(controllerType);
+        var controllerDescriptor = _controllerDescriptorFactory.Create(controllerType);
         if (controllerDescriptor == null)
         {
             return true;
@@ -181,7 +197,7 @@ public class AuthorizeAttributeAclModule
     protected virtual IEnumerable<AuthorizeAttribute?> GetAuthorizeAttributes(ActionDescriptor actionDescriptor,
         ControllerContext controllerContext)
     {
-        var filters = filterProvider.GetFilters(controllerContext, actionDescriptor);
+        var filters = _filterProvider.GetFilters(controllerContext, actionDescriptor);
 
         return filters
             .Where(f => typeof(AuthorizeAttribute).IsAssignableFrom(f.Instance.GetType()))
@@ -193,27 +209,28 @@ public class AuthorizeAttributeAclModule
         ControllerContext controllerContext, ActionDescriptor actionDescriptor)
     {
         var authorizationContext =
-            mvcContextFactory.CreateAuthorizationContext(controllerContext, actionDescriptor);
+            _mvcContextFactory.CreateAuthorizationContext(controllerContext, actionDescriptor);
         authorizeAttribute.OnAuthorization(authorizationContext);
         return authorizationContext.Result == null;
     }
 
-    protected virtual ActionDescriptor GetActionDescriptor(string actionName,
+    protected virtual ActionDescriptor? GetActionDescriptor(string actionName,
         ControllerDescriptor controllerDescriptor, ControllerContext controllerContext)
     {
         var found = TryFindActionDescriptor(actionName, controllerContext, controllerDescriptor,
             out var actionDescriptor);
+
         if (!found)
         {
-            actionDescriptor = controllerDescriptor.GetCanonicalActions()
-                .FirstOrDefault(a => a.ActionName == actionName);
+            actionDescriptor = controllerDescriptor.GetCanonicalActions().DefaultIfEmpty(null)
+                .FirstOrDefault(a => a?.ActionName == actionName);
         }
 
         return actionDescriptor;
     }
 
     protected virtual bool TryFindActionDescriptor(string actionName, ControllerContext controllerContext,
-        ControllerDescriptor controllerDescriptor, out ActionDescriptor actionDescriptor)
+        ControllerDescriptor controllerDescriptor, out ActionDescriptor? actionDescriptor)
     {
         actionDescriptor = null;
         try
@@ -236,7 +253,7 @@ public class AuthorizeAttributeAclModule
     protected virtual ControllerContext CreateControllerContext(ISiteMapNode node, RouteData routes,
         Type controllerType, IControllerFactory controllerFactory, out bool factoryBuiltController)
     {
-        var requestContext = mvcContextFactory.CreateRequestContext(node, routes);
+        var requestContext = _mvcContextFactory.CreateRequestContext(node, routes);
         var controllerName = requestContext.RouteData.GetOptionalString("controller");
 
         // Whether controller is built by the ControllerFactory (or otherwise by Activator)
@@ -248,12 +265,11 @@ public class AuthorizeAttributeAclModule
         }
 
         // Create controller context
-        var controllerContext = mvcContextFactory.CreateControllerContext(requestContext, controller);
-        return controllerContext;
+        return _mvcContextFactory.CreateControllerContext(requestContext, controller);
     }
 
     protected virtual bool TryCreateController(RequestContext requestContext, string controllerName,
-        IControllerFactory controllerFactory, out ControllerBase? controller)
+        IControllerFactory? controllerFactory, out ControllerBase? controller)
     {
         controller = null;
         if (controllerFactory == null)
@@ -300,7 +316,7 @@ public class AuthorizeAttributeAclModule
         : AsyncControllerActionInvoker
     {
         // Needed because FindAction is protected, and we are changing it to be public
-        public new ActionDescriptor FindAction(ControllerContext controllerContext,
+        public new ActionDescriptor? FindAction(ControllerContext controllerContext,
             ControllerDescriptor controllerDescriptor, string actionName)
         {
             return base.FindAction(controllerContext, controllerDescriptor, actionName);

@@ -560,13 +560,10 @@ public class SiteMapNode
     /// </summary>
     /// <param name="httpContext">The HTTP context.</param>
     /// <returns>The route data associated with the current node.</returns>
-    public override RouteData GetRouteData(HttpContextBase httpContext)
+    public override RouteData? GetRouteData(HttpContextBase httpContext)
     {
         var routes = mvcContextFactory.GetRoutes();
-        RouteData routeData;
-        routeData = !string.IsNullOrEmpty(Route) ? routes[Route].GetRouteData(httpContext) : routes.GetRouteData(httpContext);
-
-        return routeData;
+        return !string.IsNullOrEmpty(Route) ? routes[Route].GetRouteData(httpContext) : routes.GetRouteData(httpContext);
     }
 
     /// <summary>

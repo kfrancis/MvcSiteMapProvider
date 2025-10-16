@@ -249,7 +249,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Builder
         public string Route { get; set; }
         public IRouteValueDictionary RouteValues { get; }
         public IPreservedRouteParameterCollection PreservedRouteParameters { get; }
-        public RouteData GetRouteData(HttpContextBase httpContext) { return null; }
+        public RouteData? GetRouteData(HttpContextBase httpContext) { return null; }
         public bool MatchesRoute(IDictionary<string, object> routeValues) { return false; }
 
         public string Area

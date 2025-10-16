@@ -82,9 +82,9 @@ public class ControllerTypeResolver
         if (areaNamespaces != null)
         {
             areaNamespaces = (from ns in areaNamespaces
-                where ns != "Elmah.Mvc"
-                where !_areaNamespacesToIgnore.Contains(ns)
-                select ns).ToList();
+                              where ns != "Elmah.Mvc"
+                              where !_areaNamespacesToIgnore.Contains(ns)
+                              select ns).ToList();
             if (areaNamespaces.Any())
             {
                 namespaces = new HashSet<string>(areaNamespaces, StringComparer.OrdinalIgnoreCase);
@@ -184,8 +184,16 @@ public class ControllerTypeResolver
     {
         var result = new List<Type>(512);
         var assemblies = BuildManager.GetReferencedAssemblies();
+        var controllerType = typeof(IController);
+
         foreach (Assembly assembly in assemblies)
         {
+            // Skip assemblies that definitely won't contain controllers
+            if (IsSystemAssembly(assembly))
+            {
+                continue;
+            }
+
             Type?[] typesInAsm;
             try
             {
@@ -201,35 +209,65 @@ public class ControllerTypeResolver
                 continue;
             }
 
-            for (var i = 0; i < typesInAsm.Length; i++)
+            // Process types in a single pass to reduce overhead
+            foreach (var t in typesInAsm)
             {
-                var t = typesInAsm[i];
+                // Early null check
                 if (t == null)
                 {
                     continue;
                 }
 
-                if (!t.IsClass || !t.IsPublic || t.IsAbstract)
+                // Combined checks to short-circuit faster
+                // Check cheapest conditions first
+                if (!t.IsClass || t.IsAbstract || !t.IsPublic)
                 {
                     continue;
                 }
 
-                if (!typeof(IController).IsAssignableFrom(t))
+                // Check if it's a controller type (more expensive check)
+                if (!controllerType.IsAssignableFrom(t))
                 {
                     continue;
                 }
 
+                // Check name ends with "Controller" using EndsWith instead of IndexOf
                 var name = t.Name;
-                if (name.IndexOf("Controller", StringComparison.OrdinalIgnoreCase) == -1)
+                if (name.Length > 10 && name.EndsWith("Controller", StringComparison.OrdinalIgnoreCase))
                 {
-                    continue;
+                    result.Add(t);
                 }
-
-                result.Add(t);
             }
         }
 
         return result;
+    }
+
+    /// <summary>
+    ///     Determines if an assembly is a system assembly that won't contain controllers.
+    /// </summary>
+    /// <param name="assembly">The assembly to check.</param>
+    /// <returns>True if the assembly is a system assembly; otherwise, false.</returns>
+    private static bool IsSystemAssembly(Assembly assembly)
+    {
+        // Cache the assembly name to avoid multiple allocations
+        var assemblyName = assembly.FullName;
+
+        if (string.IsNullOrEmpty(assemblyName))
+        {
+            return false;
+        }
+
+        // Check for common system assemblies that won't have controllers
+        // Using StartsWith with ordinal comparison for performance
+        return assemblyName.StartsWith("mscorlib,", StringComparison.Ordinal)
+            || assemblyName.StartsWith("System,", StringComparison.Ordinal)
+            || assemblyName.StartsWith("System.", StringComparison.Ordinal)
+            || assemblyName.StartsWith("Microsoft.CSharp,", StringComparison.Ordinal)
+            || assemblyName.StartsWith("netstandard,", StringComparison.Ordinal)
+            || assemblyName.StartsWith("Newtonsoft.Json,", StringComparison.Ordinal)
+            || assemblyName.StartsWith("EntityFramework,", StringComparison.Ordinal)
+            || assemblyName.StartsWith("EntityFramework.", StringComparison.Ordinal);
     }
 
     /// <summary>
