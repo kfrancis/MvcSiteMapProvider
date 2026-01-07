@@ -85,9 +85,23 @@ public class AuthorizeAttributeAclModule
         // Get controller factory
         var controllerFactory = _controllerBuilder.GetControllerFactory();
 
-        // Create controller context
-        var controllerContext = CreateControllerContext(node, routes, controllerType, controllerFactory,
-            out var factoryBuiltController);
+        // Try to create controller context
+        ControllerContext? controllerContext = null;
+        bool factoryBuiltController = false;
+        
+        try
+        {
+            controllerContext = CreateControllerContext(node, routes, controllerType, controllerFactory,
+                out factoryBuiltController);
+        }
+        catch
+        {
+            // If we can't create a controller context (e.g., controller has dependencies we can't resolve),
+            // we allow access rather than failing. This is consistent with returning true when
+            // controller type is null or action descriptor is null.
+            return true;
+        }
+
         try
         {
             return VerifyControllerAttributes(routes, controllerType, controllerContext);
@@ -95,7 +109,7 @@ public class AuthorizeAttributeAclModule
         finally
         {
             // Release controller
-            if (factoryBuiltController)
+            if (factoryBuiltController && controllerContext != null)
             {
                 controllerFactory.ReleaseController(controllerContext.Controller);
             }
@@ -308,7 +322,7 @@ public class AuthorizeAttributeAclModule
         }
 
         // Create controller context
-        return _mvcContextFactory.CreateControllerContext(requestContext, controller);
+        return _mvcContextFactory.CreateControllerContext(requestContext, controller!);
     }
 
     protected virtual bool TryCreateController(RequestContext requestContext, string controllerName,
