@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Mvc.Async;
@@ -38,9 +37,6 @@ public class AuthorizeAttributeAclModule
     private readonly IControllerDescriptorFactory _controllerDescriptorFactory;
     private readonly IControllerBuilder _controllerBuilder;
     private readonly IGlobalFilterProvider _filterProvider;
-
-    // Cache for RouteData to prevent repeated expensive GetRouteData calls
-    private readonly ConditionalWeakTable<ISiteMapNode, RouteData> _routeDataCache = new();
 
     /// <summary>
     ///     Determines whether node is accessible to user.
@@ -108,33 +104,80 @@ public class AuthorizeAttributeAclModule
 
     protected virtual RouteData? FindRoutesForNode(ISiteMapNode node, HttpContextBase httpContext)
     {
-        // Try to get cached RouteData for this node
-        if (_routeDataCache.TryGetValue(node, out var cachedRouteData))
+        // If the node is an MVC node, don't route-match. Just materialize RouteData.
+        if (TryGetMvcNodeValues(node, out var area, out var controller, out var action))
         {
-            return cachedRouteData;
+            return CreateRouteData(area, controller!, action!);
+        }
+
+        // Fallback for truly "URL-only" nodes
+        return FindRoutesForNodeByUrl(node, httpContext);
+    }
+
+    protected virtual RouteData? FindRoutesForNodeByUrl(ISiteMapNode node, HttpContextBase httpContext)
+    {
+        // Use per-request cache in HttpContext.Items for URL-only nodes
+        // This is safe across different sitemap configurations per user type
+        var cache = (Dictionary<string, RouteData?>)(httpContext.Items["MSMP.RouteDataCache"]
+            ??= new Dictionary<string, RouteData?>(StringComparer.OrdinalIgnoreCase));
+
+        // Use node.Url as the cache key (stable per request)
+        var key = node.Url;
+        if (cache.TryGetValue(key, out var hit))
+        {
+            return hit;
         }
 
         // Create a Uri for the current node. If we have an absolute URL,
         // it will be used instead of the baseUri.
         var nodeUri = new Uri(httpContext.Request.Url, node.Url);
 
-        // Create a TextWriter with null stream as a backing stream 
-        // which doesn't consume resources
-        using var nullWriter = new StreamWriter(Stream.Null);
-
-        // Create a new HTTP context using the node's URL instead of the current one.
-        var nodeHttpContext = _mvcContextFactory.CreateHttpContext(node, nodeUri, nullWriter);
+        // TextWriter.Null: avoid allocating StreamWriter each call
+        var nodeHttpContext = _mvcContextFactory.CreateHttpContext(node, nodeUri, TextWriter.Null);
 
         // Find routes for the sitemap node's URL using the new HTTP context
         var routeData = node.GetRouteData(nodeHttpContext);
 
-        // Cache the result if not null
-        if (routeData != null)
-        {
-            _routeDataCache.Add(node, routeData);
-        }
+        // Cache the result (including null) to avoid repeated misses
+        cache[key] = routeData;
 
         return routeData;
+    }
+
+    protected virtual bool TryGetMvcNodeValues(ISiteMapNode node, out string? area, out string? controller, out string? action)
+    {
+        area = null;
+        controller = null;
+        action = null;
+
+        // Check if the node has controller and action defined (MVC node)
+        controller = node.Controller;
+        action = node.Action;
+
+        // Must have at least controller and action to be considered an MVC node
+        if (string.IsNullOrEmpty(controller) || string.IsNullOrEmpty(action))
+        {
+            return false;
+        }
+
+        // Area is optional
+        area = node.Area;
+
+        return true;
+    }
+
+    protected static RouteData CreateRouteData(string? area, string controller, string action)
+    {
+        var rd = new RouteData();
+        rd.Values["controller"] = controller;
+        rd.Values["action"] = action;
+
+        if (!string.IsNullOrEmpty(area))
+        {
+            rd.DataTokens["area"] = area; // what GetAreaName() typically reads
+        }
+
+        return rd;
     }
 
     protected virtual bool VerifyControllerAttributes(RouteData routes, Type controllerType,

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Web;
 using System.Web.Routing;
@@ -25,9 +26,11 @@ namespace MvcSiteMapProvider.Tests.Unit.Security
             _node = new Mock<ISiteMapNode>();
             _httpContext = new Mock<HttpContextBase>();
             _httpRequest = new Mock<HttpRequestBase>();
+            _httpContextItems = new Dictionary<object, object>();
 
             // Setup basic HTTP context
             _httpContext.Setup(c => c.Request).Returns(_httpRequest.Object);
+            _httpContext.Setup(c => c.Items).Returns(_httpContextItems);
             _httpRequest.Setup(r => r.Url).Returns(new Uri("http://localhost/"));
             _mvcContextFactory.Setup(m => m.CreateHttpContext()).Returns(_httpContext.Object);
 
@@ -47,6 +50,7 @@ namespace MvcSiteMapProvider.Tests.Unit.Security
         private Mock<ISiteMapNode> _node;
         private Mock<HttpContextBase> _httpContext;
         private Mock<HttpRequestBase> _httpRequest;
+        private Dictionary<object, object> _httpContextItems;
         private TestableAuthorizeAttributeAclModule _aclModule;
 
         [Test]
@@ -77,10 +81,81 @@ namespace MvcSiteMapProvider.Tests.Unit.Security
         }
 
         [Test]
-        public void FindRoutesForNode_CachesRouteDataOnFirstCall()
+        public void FindRoutesForNode_WithMvcNode_ConstructsRouteDataDirectly()
+        {
+            // Arrange
+            _node.SetupGet(n => n.Controller).Returns("Test");
+            _node.SetupGet(n => n.Action).Returns("Action");
+            _node.SetupGet(n => n.Area).Returns("Admin");
+
+            // Act
+            var result = _aclModule.PublicFindRoutesForNode(_node.Object, _httpContext.Object);
+
+            // Assert
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result?.Values["controller"], Is.EqualTo("Test"));
+            Assert.That(result?.Values["action"], Is.EqualTo("Action"));
+            Assert.That(result?.DataTokens["area"], Is.EqualTo("Admin"));
+            
+            // Verify that GetRouteData was never called (optimization)
+            _node.Verify(n => n.GetRouteData(It.IsAny<HttpContextBase>()), Times.Never);
+        }
+
+        [Test]
+        public void FindRoutesForNode_WithMvcNodeNoArea_ConstructsRouteDataWithoutArea()
+        {
+            // Arrange
+            _node.SetupGet(n => n.Controller).Returns("Home");
+            _node.SetupGet(n => n.Action).Returns("Index");
+            _node.SetupGet(n => n.Area).Returns(string.Empty);
+
+            // Act
+            var result = _aclModule.PublicFindRoutesForNode(_node.Object, _httpContext.Object);
+
+            // Assert
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result?.Values["controller"], Is.EqualTo("Home"));
+            Assert.That(result?.Values["action"], Is.EqualTo("Index"));
+            Assert.That(result?.DataTokens.ContainsKey("area"), Is.False);
+        }
+
+        [Test]
+        public void FindRoutesForNode_WithUrlOnlyNode_UsesRoutingFallback()
         {
             // Arrange
             var nodeUrl = "/test/action";
+            _node.SetupGet(n => n.Controller).Returns(string.Empty);
+            _node.SetupGet(n => n.Action).Returns(string.Empty);
+            _node.SetupGet(n => n.Url).Returns(nodeUrl);
+
+            var mockRouteData = new RouteData { Values = { ["controller"] = "Test", ["action"] = "Action" } };
+
+            var mockNodeHttpContext = new Mock<HttpContextBase>();
+            _mvcContextFactory.Setup(m => m.CreateHttpContext(
+                    It.IsAny<ISiteMapNode>(),
+                    It.IsAny<Uri>(),
+                    It.IsAny<TextWriter>()))
+                .Returns(mockNodeHttpContext.Object);
+
+            _node.Setup(n => n.GetRouteData(It.IsAny<HttpContextBase>()))
+                .Returns(mockRouteData);
+
+            // Act
+            var result = _aclModule.PublicFindRoutesForNode(_node.Object, _httpContext.Object);
+
+            // Assert
+            _node.Verify(n => n.GetRouteData(It.IsAny<HttpContextBase>()), Times.Once);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result?.Values["controller"], Is.EqualTo("Test"));
+        }
+
+        [Test]
+        public void FindRoutesForNode_CachesUrlOnlyNodeInHttpContextItems()
+        {
+            // Arrange
+            var nodeUrl = "/test/action";
+            _node.SetupGet(n => n.Controller).Returns(string.Empty);
+            _node.SetupGet(n => n.Action).Returns(string.Empty);
             _node.SetupGet(n => n.Url).Returns(nodeUrl);
 
             var mockRouteData = new RouteData { Values = { ["controller"] = "Test", ["action"] = "Action" } };
@@ -98,101 +173,25 @@ namespace MvcSiteMapProvider.Tests.Unit.Security
             // Act - First call
             var result1 = _aclModule.PublicFindRoutesForNode(_node.Object, _httpContext.Object);
 
-            // Assert - First call creates HTTP context
-            _mvcContextFactory.Verify(m => m.CreateHttpContext(
-                It.IsAny<ISiteMapNode>(),
-                It.IsAny<Uri>(),
-                It.IsAny<TextWriter>()), Times.Once);
-
-            _node.Verify(n => n.GetRouteData(It.IsAny<HttpContextBase>()), Times.Once);
-            Assert.That(result1, Is.Not.Null);
-            Assert.That(result1?.Values["controller"], Is.EqualTo("Test"));
-        }
-
-        [Test]
-        public void FindRoutesForNode_ReturnsFromCacheOnSecondCall()
-        {
-            // Arrange
-            var nodeUrl = "/test/action";
-            _node.SetupGet(n => n.Url).Returns(nodeUrl);
-
-            var mockRouteData = new RouteData { Values = { ["controller"] = "Test", ["action"] = "Action" } };
-
-            var mockNodeHttpContext = new Mock<HttpContextBase>();
-            _mvcContextFactory.Setup(m => m.CreateHttpContext(
-                    It.IsAny<ISiteMapNode>(),
-                    It.IsAny<Uri>(),
-                    It.IsAny<TextWriter>()))
-                .Returns(mockNodeHttpContext.Object);
-
-            _node.Setup(n => n.GetRouteData(It.IsAny<HttpContextBase>()))
-                .Returns(mockRouteData);
-
-            // Act - First call (should cache)
-            var result1 = _aclModule.PublicFindRoutesForNode(_node.Object, _httpContext.Object);
-
-            // Act - Second call (should use cache)
+            // Act - Second call (should use cache from HttpContext.Items)
             var result2 = _aclModule.PublicFindRoutesForNode(_node.Object, _httpContext.Object);
 
-            // Assert - CreateHttpContext and GetRouteData should only be called once
-            _mvcContextFactory.Verify(m => m.CreateHttpContext(
-                    It.IsAny<ISiteMapNode>(),
-                    It.IsAny<Uri>(),
-                    It.IsAny<TextWriter>()), Times.Once,
-                "CreateHttpContext should only be called once due to caching");
-
+            // Assert - GetRouteData should only be called once due to per-request caching
             _node.Verify(n => n.GetRouteData(It.IsAny<HttpContextBase>()), Times.Once,
-                "GetRouteData should only be called once due to caching");
+                "GetRouteData should only be called once due to per-request caching");
 
-            // Both results should be the same cached instance
-            Assert.That(result2, Is.SameAs(result1));
+            Assert.That(result1, Is.Not.Null);
+            Assert.That(result2, Is.Not.Null);
             Assert.That(result2?.Values["controller"], Is.EqualTo("Test"));
         }
 
         [Test]
-        public void FindRoutesForNode_CachesIndependentlyForDifferentNodes()
-        {
-            // Arrange
-            var node1 = new Mock<ISiteMapNode>();
-            var node2 = new Mock<ISiteMapNode>();
-
-            node1.SetupGet(n => n.Url).Returns("/test/action1");
-            node2.SetupGet(n => n.Url).Returns("/test/action2");
-
-            var routeData1 = new RouteData { Values = { ["controller"] = "Test", ["action"] = "Action1" } };
-
-            var routeData2 = new RouteData { Values = { ["controller"] = "Test", ["action"] = "Action2" } };
-
-            var mockNodeHttpContext = new Mock<HttpContextBase>();
-            _mvcContextFactory.Setup(m => m.CreateHttpContext(
-                    It.IsAny<ISiteMapNode>(),
-                    It.IsAny<Uri>(),
-                    It.IsAny<TextWriter>()))
-                .Returns(mockNodeHttpContext.Object);
-
-            node1.Setup(n => n.GetRouteData(It.IsAny<HttpContextBase>()))
-                .Returns(routeData1);
-            node2.Setup(n => n.GetRouteData(It.IsAny<HttpContextBase>()))
-                .Returns(routeData2);
-
-            // Act - Call for both nodes
-            var result1 = _aclModule.PublicFindRoutesForNode(node1.Object, _httpContext.Object);
-            var result2 = _aclModule.PublicFindRoutesForNode(node2.Object, _httpContext.Object);
-
-            // Assert - Each node should have its own cache entry
-            node1.Verify(n => n.GetRouteData(It.IsAny<HttpContextBase>()), Times.Once);
-            node2.Verify(n => n.GetRouteData(It.IsAny<HttpContextBase>()), Times.Once);
-
-            Assert.That(result1, Is.Not.SameAs(result2));
-            Assert.That(result1?.Values["action"], Is.EqualTo("Action1"));
-            Assert.That(result2?.Values["action"], Is.EqualTo("Action2"));
-        }
-
-        [Test]
-        public void FindRoutesForNode_DoesNotCacheNullRouteData()
+        public void FindRoutesForNode_CachesNullRouteData()
         {
             // Arrange
             var nodeUrl = "/static/url";
+            _node.SetupGet(n => n.Controller).Returns(string.Empty);
+            _node.SetupGet(n => n.Action).Returns(string.Empty);
             _node.SetupGet(n => n.Url).Returns(nodeUrl);
 
             var mockNodeHttpContext = new Mock<HttpContextBase>();
@@ -211,12 +210,54 @@ namespace MvcSiteMapProvider.Tests.Unit.Security
             // Act - Second call
             var result2 = _aclModule.PublicFindRoutesForNode(_node.Object, _httpContext.Object);
 
-            // Assert - GetRouteData should be called twice (not cached)
-            _node.Verify(n => n.GetRouteData(It.IsAny<HttpContextBase>()), Times.Exactly(2),
-                "GetRouteData should be called twice because null values are not cached");
+            // Assert - GetRouteData should only be called once because null is now cached
+            _node.Verify(n => n.GetRouteData(It.IsAny<HttpContextBase>()), Times.Once,
+                "GetRouteData should be called once because null values are now cached to avoid repeated misses");
 
             Assert.That(result1, Is.Null);
             Assert.That(result2, Is.Null);
+        }
+
+        [Test]
+        public void FindRoutesForNode_CacheIsolatedByUrl()
+        {
+            // Arrange
+            var node1 = new Mock<ISiteMapNode>();
+            var node2 = new Mock<ISiteMapNode>();
+
+            node1.SetupGet(n => n.Controller).Returns(string.Empty);
+            node1.SetupGet(n => n.Action).Returns(string.Empty);
+            node1.SetupGet(n => n.Url).Returns("/test/action1");
+
+            node2.SetupGet(n => n.Controller).Returns(string.Empty);
+            node2.SetupGet(n => n.Action).Returns(string.Empty);
+            node2.SetupGet(n => n.Url).Returns("/test/action2");
+
+            var routeData1 = new RouteData { Values = { ["controller"] = "Test", ["action"] = "Action1" } };
+            var routeData2 = new RouteData { Values = { ["controller"] = "Test", ["action"] = "Action2" } };
+
+            var mockNodeHttpContext = new Mock<HttpContextBase>();
+            _mvcContextFactory.Setup(m => m.CreateHttpContext(
+                    It.IsAny<ISiteMapNode>(),
+                    It.IsAny<Uri>(),
+                    It.IsAny<TextWriter>()))
+                .Returns(mockNodeHttpContext.Object);
+
+            node1.Setup(n => n.GetRouteData(It.IsAny<HttpContextBase>()))
+                .Returns(routeData1);
+            node2.Setup(n => n.GetRouteData(It.IsAny<HttpContextBase>()))
+                .Returns(routeData2);
+
+            // Act - Call for both nodes
+            var result1 = _aclModule.PublicFindRoutesForNode(node1.Object, _httpContext.Object);
+            var result2 = _aclModule.PublicFindRoutesForNode(node2.Object, _httpContext.Object);
+
+            // Assert - Each URL should have its own cache entry
+            node1.Verify(n => n.GetRouteData(It.IsAny<HttpContextBase>()), Times.Once);
+            node2.Verify(n => n.GetRouteData(It.IsAny<HttpContextBase>()), Times.Once);
+
+            Assert.That(result1?.Values["action"], Is.EqualTo("Action1"));
+            Assert.That(result2?.Values["action"], Is.EqualTo("Action2"));
         }
 
         [Test]
@@ -224,6 +265,8 @@ namespace MvcSiteMapProvider.Tests.Unit.Security
         {
             // Arrange
             var nodeUrl = "/test/action";
+            _node.SetupGet(n => n.Controller).Returns(string.Empty);
+            _node.SetupGet(n => n.Action).Returns(string.Empty);
             _node.SetupGet(n => n.Url).Returns(nodeUrl);
 
             var mockRouteData = new RouteData { Values = { ["controller"] = "Test", ["action"] = "Action" } };
@@ -248,9 +291,10 @@ namespace MvcSiteMapProvider.Tests.Unit.Security
             _node.Verify(n => n.GetRouteData(It.IsAny<HttpContextBase>()), Times.Once,
                 "GetRouteData should only be called once regardless of number of calls");
 
-            Assert.That(result1, Is.SameAs(result2));
-            Assert.That(result2, Is.SameAs(result3));
-            Assert.That(result3, Is.SameAs(result4));
+            Assert.That(result1?.Values["controller"], Is.EqualTo("Test"));
+            Assert.That(result2?.Values["controller"], Is.EqualTo("Test"));
+            Assert.That(result3?.Values["controller"], Is.EqualTo("Test"));
+            Assert.That(result4?.Values["controller"], Is.EqualTo("Test"));
         }
 
         [Test]
@@ -258,6 +302,8 @@ namespace MvcSiteMapProvider.Tests.Unit.Security
         {
             // Arrange
             const string NodeUrl = "/test/action";
+            _node.SetupGet(n => n.Controller).Returns(string.Empty);
+            _node.SetupGet(n => n.Action).Returns(string.Empty);
             _node.SetupGet(n => n.Url).Returns(NodeUrl);
 
             var mockRouteData = new RouteData();
